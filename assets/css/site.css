@@ -372,3 +372,23 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 }
 .gauge-tick::before { content: ""; position: absolute; left: 50%; top: -8px; height: 6px; border-left: 2px solid var(--ink); }
 @media (max-width: 560px) { .gauge-track em { font-size: 13px; letter-spacing: .08em; } }
+
+/* ---------- Strength standards ---------- */
+.lift-card { background: var(--paper); border: 2px solid var(--ink); border-radius: var(--r-md); padding: 14px 16px 10px; margin-bottom: 12px; }
+.lift-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.lift-head .k { font-family: var(--pixel); font-size: 20px; letter-spacing: .18em; text-transform: uppercase; text-shadow: var(--px-shadow); }
+.lift-head .lvl { font-family: var(--pixel); font-size: 26px; letter-spacing: .08em; text-transform: uppercase; color: var(--lav-dark); }
+.lift-sub { font-size: 13px; color: var(--ink-soft); margin: 2px 0 14px; }
+.lvl-track { position: relative; display: flex; border: 2px solid var(--ink); border-radius: 999px; height: 22px; background: var(--card); }
+.lvl-track span { flex: 1; }
+.lvl-track span:first-child { border-radius: 999px 0 0 999px; }
+.lvl-track span:nth-of-type(5) { border-radius: 0 999px 999px 0; }
+.lvl-track span + span { border-left: 2px solid var(--ink); }
+.lvl-track span.on { background: var(--lav); }
+.lvl-track .meter-pin { top: -12px; transition: left .5s cubic-bezier(.2,.8,.2,1); }
+.lift-card .meter-labels { font-size: 13px; }
+.method { margin-top: 16px; border: 2px solid var(--lav-line); border-radius: var(--r-md); background: var(--paper); }
+.method summary { cursor: pointer; padding: 12px 14px; font-weight: 600; font-size: 14px; color: var(--lav-dark); }
+.method .body { padding: 0 14px 6px; font-size: 14px; }
+.method .body p { margin: 0 0 10px; }
+.method a { color: var(--lav-dark); }
