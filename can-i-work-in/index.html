@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>CAN I WORK IN? Daily Barbell Puzzle | Trainbloom</title>
+  <meta name="description" content="A daily barbell puzzle. Two lifters share one bar. Hit every weight, in order, in the fewest plate moves. New puzzle every midnight Pacific.">
+  <link rel="canonical" href="https://www.trainbloom.com/can-i-work-in/">
+  <meta property="og:title" content="Can I Work In? — the daily barbell puzzle">
+  <meta property="og:description" content="Two lifters, one bar. Hit every weight in the fewest plate moves.">
+  <meta name="theme-color" content="#07070b">
+  <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <link rel="stylesheet" href="/assets/css/workin.css">
+</head>
+<body class="wi-page">
+  <main class="wi" id="wi">
+    <header class="wi-head">
+      <h1>Can I Work In?</h1>
+      <span class="wi-no" id="wi-no">#001</span>
+      <button class="wi-icon" id="wi-sound" type="button" aria-pressed="true" aria-label="Sound on">&#9834;</button>
+      <button class="wi-icon" id="wi-help-btn" type="button" aria-expanded="false" aria-controls="wi-help" aria-label="How to play">?</button>
+    </header>
+
+    <ol class="wi-targets" id="wi-targets" aria-label="Weights to hit, in order"></ol>
+
+    <div class="wi-hud sr-only" aria-live="polite">
+      <div class="wi-total"><span class="k">On the bar</span><b id="wi-total">45</b><small>lb</small></div>
+      <div class="wi-need" id="wi-need"></div>
+      <div class="wi-moves"><span class="k">Moves</span><b id="wi-moves">0</b></div>
+    </div>
+
+    <div class="wi-stage" id="wi-stage">
+      <canvas id="wi-scene" role="img" aria-label="Barbell"></canvas>
+    </div>
+
+    <div class="wi-order">
+      <div class="wi-side" id="wi-side" aria-live="polite"></div>
+      <button class="wi-pull" id="wi-pull" type="button" disabled>Pull</button>
+    </div>
+
+    <p class="wi-note" id="wi-note" hidden></p>
+    <div class="wi-rack" id="wi-rack" role="group" aria-label="Plate rack: tap to load a pair"></div>
+
+    <section class="wi-help" id="wi-help" hidden>
+      <ul>
+        <li><b>Tap a plate</b> on the rack to slide a pair on.</li>
+        <li><b>Tap the bar</b> (or Pull) to take the outer pair off. Only the outer pair comes off.</li>
+        <li>Hit each lifter&rsquo;s weight in order. Plates stay on between sets.</li>
+        <li>Every add or pull is one move, and there are no take-backs. Plan for the next lifter as well as this one.</li>
+      </ul>
+    </section>
+  </main>
+
+  <div class="wi-sheet" id="wi-sheet" hidden>
+    <div class="wi-sheet-bg" data-close></div>
+    <div class="wi-card" role="dialog" aria-modal="true" aria-labelledby="wi-r-title">
+      <button class="wi-x" type="button" data-close aria-label="Close">&times;</button>
+      <h2 id="wi-r-title">Racked</h2>
+      <div class="wi-score">
+        <div><span class="k">You</span><b id="wi-r-moves">4</b><small>moves</small></div>
+        <div><span class="k">Minimum</span><b id="wi-r-min">4</b><small>moves</small></div>
+      </div>
+      <p class="wi-verdict" id="wi-r-verdict">Perfect</p>
+      <button class="btn wi-share" id="wi-share" type="button">Share</button>
+      <p class="wi-copied" id="wi-copied" role="status"></p>
+      <details class="wi-sol" id="wi-sol"><summary>Show a minimum line</summary><ol id="wi-sol-list"></ol></details>
+      <p class="wi-stats" id="wi-stats"></p>
+      <p class="wi-next">Next puzzle in <b id="wi-count">--:--:--</b></p>
+      <button class="wi-again" id="wi-again" type="button">Play again for practice</button>
+    </div>
+  </div>
+
+  <script src="/assets/js/layout.js"></script>
+  <script src="/assets/js/workin-engine.js"></script>
+  <script src="/assets/js/workin-puzzles.js"></script>
+  <script src="/assets/js/workin.js"></script>
+</body>
+</html>

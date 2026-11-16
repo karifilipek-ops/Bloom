@@ -15,10 +15,13 @@ muscle-gain-potential-calculator/index.html
 creatine-calculator/index.html
 how-long-should-i-diet-calculator/index.html
 workout-tracker/index.html              Workout tracker (mobile-first, saves on device)
+can-i-work-in/index.html                Can I Work In? daily barbell puzzle
 assets/css/site.css                     All styles (colors at the top in :root)
 assets/js/layout.js                     Shared header nav + footer (edit the nav list here)
 assets/js/calc.js                       Helpers shared by the calculators
 assets/js/lift.js, assets/css/lift.css  Workout tracker app (data model documented at the top of lift.js)
+assets/js/workin-*.js, assets/css/workin.css  Daily puzzle: engine/solver, puzzle list, game
+tools/workin-check.js, workin-generate.js     Validate / propose daily puzzles (Node, no deps)
 assets/img, assets/fonts                Images and the pixel font from the Wix site
 ```
 
@@ -43,3 +46,13 @@ Any static host works (Netlify, Vercel, Cloudflare Pages, GitHub Pages). Point i
 `/workout-tracker/` is a single-page app (hash routes) that saves every tap to `localStorage` (`bloom.lift.v1`), works offline via `workout-tracker/sw.js`, and can export/import a JSON backup from Settings.
 
 Programs and user routines share one template shape and open in the same logger. Lift history is keyed by exercise, not by routine or program, so it survives switching programs. To ship a real Trainbloom program later, add it to `PROGRAMS` in `assets/js/lift.js` (or fetch that list from a server in the same shape).
+
+## Can I Work In? (daily puzzle)
+
+`/can-i-work-in/` is a daily barbell puzzle: two lifters share one bar, and the player hits every weight in order in the fewest plate moves (adding or pulling one pair = one move; only the outer pair comes off). Everyone gets the same puzzle, rolling over at midnight Pacific.
+
+- **Edit puzzles** in `assets/js/workin-puzzles.js` (`start` date = puzzle #001; the list loops when it runs out). Each entry is `targets`, plus an optional `rack` (plate pairs available), `note` and `who`.
+- **Check them** with `node tools/workin-check.js`. It validates every puzzle, confirms the #001 reference line, and shows how many moves a lifter who only plans for the current target can waste. Bigger is better.
+- **Get new ideas** with `node tools/workin-generate.js [count] [seed]`.
+
+The game computes the true minimum in the browser with a breadth-first search over (plate order, active target), so scores stay correct after edits. Progress, streaks and the sound setting are saved in `localStorage` (`bloom.workin.v1`). `?n=5` replays an earlier puzzle, never a future one.

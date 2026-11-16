@@ -9,7 +9,8 @@
     ["/muscle-gain-potential-calculator/", "Muscle Gain Calculator"],
     ["/creatine-calculator/", "Creatine Calculator"],
     ["/how-long-should-i-diet-calculator/", "How Long to Diet"],
-    ["/workout-tracker/", "Workout Tracker"]
+    ["/workout-tracker/", "Workout Tracker"],
+    ["/can-i-work-in/", "Can I Work In? (daily puzzle)"]
   ];
 
   var here = location.pathname.replace(/index\.html$/, "");
