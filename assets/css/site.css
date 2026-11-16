@@ -346,3 +346,29 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .site-footer a:hover { text-decoration: underline; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+/* ---------- Protein gauge ---------- */
+.gauge { position: relative; margin: 70px 6px 44px; }
+.gauge-track { display: flex; height: 30px; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; background: var(--paper); }
+.gauge-track span { display: flex; align-items: center; justify-content: center; min-width: 0; overflow: hidden; }
+.gauge-track span + span { border-left: 2px solid var(--ink); }
+.gauge-track em { font-style: normal; font-family: var(--pixel); font-size: 16px; letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; }
+.z-low { background: repeating-linear-gradient(-45deg, var(--paper) 0 6px, var(--card) 6px 12px); color: var(--muted); }
+.z-target { background: var(--lav); color: #fff; text-shadow: 1px 1px 0 var(--lav-dark); }
+.z-high { background: repeating-linear-gradient(-45deg, var(--paper) 0 6px, var(--lav-soft) 6px 12px); color: var(--muted); }
+.gauge-pin {
+  position: absolute; bottom: calc(100% + 4px); transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; transition: left .5s cubic-bezier(.2,.8,.2,1);
+}
+.gauge-pin img { height: 26px; width: auto; margin-bottom: 2px; }
+.gauge-pin span {
+  font-family: var(--pixel); font-size: 20px; letter-spacing: .08em; background: var(--ink); color: #fff;
+  border-radius: 8px; padding: 0 8px; line-height: 1.4; box-shadow: 2px 2px 0 var(--lav);
+}
+.gauge-pin::after { content: ""; width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 9px solid var(--ink); margin-top: 2px; }
+.gauge-tick {
+  position: absolute; top: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap;
+  font-family: var(--pixel); font-size: 16px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft);
+}
+.gauge-tick::before { content: ""; position: absolute; left: 50%; top: -8px; height: 6px; border-left: 2px solid var(--ink); }
+@media (max-width: 560px) { .gauge-track em { font-size: 13px; letter-spacing: .08em; } }

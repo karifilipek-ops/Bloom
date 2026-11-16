@@ -65,9 +65,9 @@
           <span class="label">How many hours do you work out each week?</span>
           <div class="seg multi" data-name="hours">
             <button data-value="1" aria-pressed="true">0–1</button>
-            <button data-value="1.1">1–3</button>
-            <button data-value="1.2">4–6</button>
-            <button data-value="1.3">7+</button>
+            <button data-value="1.15">1–3</button>
+            <button data-value="1.3">4–6</button>
+            <button data-value="1.4">7+</button>
           </div>
         </div>
         <div class="field full">
@@ -87,6 +87,17 @@
           <div class="stat"><div class="k">Minimum</div><div class="v"><span id="r-min"></span>g/day</div><div class="s">The minimum to optimize physical progress</div></div>
           <div class="stat"><div class="k">Maximum</div><div class="v"><span id="r-max"></span>g/day</div><div class="s">Past this, little extra benefit</div></div>
         </div>
+        <div class="gauge" id="gauge" aria-hidden="true">
+          <div class="gauge-pin" id="g-pin"><img class="px" src="/assets/icons/protein.png" alt=""><span id="g-pin-t"></span></div>
+          <div class="gauge-track">
+            <span class="z-low" id="g-low"><em>Low</em></span>
+            <span class="z-target" id="g-target"><em>Target zone</em></span>
+            <span class="z-high" id="g-high"><em>High</em></span>
+          </div>
+          <div class="gauge-tick" id="g-min"></div>
+          <div class="gauge-tick" id="g-max"></div>
+        </div>
+
         <div class="big" style="background:var(--pink)">
           <div class="k">Optimal intake</div>
           <div class="v"><span id="r-opt"></span> <small>g/day</small></div>
@@ -185,15 +196,26 @@
         var w = B.num("weight");
         if (!B.error(form, !(w > 0) ? "Please enter your weight." : "")) return;
 
-        var lbs = u === "metric" ? w * B.LB_PER_KG : w;
-        var lbm = lbs - lbs * bodyFat.value() * 0.01;                 // lean body mass, lbs
         var factor = (GENDER[sex()] + parseFloat(age()) + parseFloat(hours()) + parseFloat(document.getElementById("plant").value)) / 4;
+        var lbm = w - w * bodyFat.value() * 0.01;                      // lean body mass, in the units entered
+        var min, max, opt;
+        if (u === "metric") { min = lbm * 1.76; max = lbm * 2.65; opt = lbm * 2.2 * factor; }   // original kg formulas
+        else { min = lbm * 0.8; max = lbm * 1.2; opt = lbm * factor; }
 
-        document.getElementById("r-min").textContent = B.fmt(lbm * 0.8);
-        document.getElementById("r-max").textContent = B.fmt(lbm * 1.2);
-        document.getElementById("r-opt").textContent = B.fmt(lbm * factor);
-        document.getElementById("r-basis").textContent = "Based on your lean body mass of " +
-          (u === "metric" ? B.fmt(lbm / B.LB_PER_KG) + " kg" : B.fmt(lbm) + " lbs") + ".";
+        document.getElementById("r-min").textContent = B.fmt(min);
+        document.getElementById("r-max").textContent = B.fmt(max);
+        document.getElementById("r-opt").textContent = B.fmt(opt);
+        document.getElementById("r-basis").textContent = "Based on your lean body mass of " + B.fmt(lbm) + (u === "metric" ? " kg." : " lbs.");
+
+        // Gauge: scale runs from 0 to 125% of the maximum
+        var end = max * 1.25, pct = function (v) { return Math.max(0, Math.min(100, v / end * 100)); };
+        document.getElementById("g-low").style.flex = pct(min);
+        document.getElementById("g-target").style.flex = pct(max) - pct(min);
+        document.getElementById("g-high").style.flex = 100 - pct(max);
+        var tick = function (id, v, label) { var t = document.getElementById(id); t.style.left = pct(v) + "%"; t.textContent = label + " " + B.fmt(v) + "g"; };
+        tick("g-min", min, "Min"); tick("g-max", max, "Max");
+        document.getElementById("g-pin").style.left = pct(opt) + "%";
+        document.getElementById("g-pin-t").textContent = B.fmt(opt) + "g";
 
         B.show(document.getElementById("results"));
       });
