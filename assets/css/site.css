@@ -243,3 +243,27 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .site-footer a:hover { text-decoration: underline; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+/* multi-option segmented buttons that wrap */
+.seg.multi { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; border: 0; }
+.seg.multi button { border: 2px solid var(--ink); }
+.seg.multi button + button { border-left: 2px solid var(--ink); }
+
+/* range slider */
+input[type="range"] { width: 100%; accent-color: var(--purple); height: 28px; margin: 4px 0 0; }
+.range-ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+#bf-out { color: var(--purple-dark); }
+
+/* body fat guide */
+.bf-guide { margin-top: 10px; }
+.bf-guide summary { cursor: pointer; font-size: 14px; font-weight: 500; color: var(--purple-dark); text-decoration: underline; }
+.bf-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 8px; }
+.bf-card {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px;
+  background: var(--paper); border: 2px solid var(--ink); padding: 10px 8px; cursor: pointer; font: inherit; color: var(--ink);
+}
+.bf-card svg { width: 34px; height: 54px; fill: var(--purple); stroke: var(--purple); margin-bottom: 4px; }
+.bf-card .r { font-family: var(--pixel); font-size: 16px; }
+.bf-card .n { font-family: var(--pixel); font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--ink-soft); }
+.bf-card .d { font-size: 12px; line-height: 1.4; color: var(--ink-soft); margin-top: 4px; }
+.bf-card[aria-pressed="true"] { background: var(--pink); }
