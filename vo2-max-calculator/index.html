@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VO2 MAX CALCULATOR | Trainbloom</title>
+  <meta name="description" content="Estimate your VO2 max from resting heart rate, a 12-minute run or a 1.5-mile run, and see how you compare for your age and sex.">
+  <link rel="canonical" href="https://www.trainbloom.com/vo2-max-calculator/">
+  <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+  <main class="wrap">
+    <h1 class="sr-only">VO2 Max Calculator</h1>
+    <div class="banner"><img src="/assets/img/banner-vo2.webp" alt="VO2 Max Calculator" width="1600" height="320"></div>
+    <p class="lede">Use the calculator below to estimate your VO₂ max. Basically, how good your body is at using oxygen when things get uncomfortable.</p>
+
+    <form class="calc" id="form" novalidate>
+      <h2>Pick a test</h2>
+      <div class="fields">
+        <div class="field full">
+          <div class="seg" data-name="method">
+            <button data-value="hr" aria-pressed="true">Heart rate</button>
+            <button data-value="cooper">12-min run</button>
+            <button data-value="mile">1.5-mile run</button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="label">Sex</span>
+          <div class="seg" data-name="sex">
+            <button data-value="m" aria-pressed="true">Male</button>
+            <button data-value="f">Female</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="age">Age</label>
+          <div class="unit-wrap"><input type="number" id="age" inputmode="numeric" min="15" max="90" placeholder="30"><span class="u">yrs</span></div>
+        </div>
+
+        <div class="field" data-method="hr">
+          <label for="rhr">Resting heart rate</label>
+          <div class="unit-wrap"><input type="number" id="rhr" inputmode="numeric" min="30" max="120" placeholder="60"><span class="u">bpm</span></div>
+          <div class="hint">Measure first thing in the morning, before getting up.</div>
+        </div>
+        <div class="field" data-method="hr">
+          <label for="mhr">Max heart rate <span style="text-transform:none;color:var(--muted)">(optional)</span></label>
+          <div class="unit-wrap"><input type="number" id="mhr" inputmode="numeric" min="120" max="230" placeholder="auto"><span class="u">bpm</span></div>
+          <div class="hint">Leave blank to estimate from age.</div>
+        </div>
+
+        <div class="field" data-method="cooper" hidden>
+          <label for="dist">Distance covered in 12 minutes</label>
+          <div class="unit-wrap"><input type="number" id="dist" inputmode="decimal" min="0" step="0.01" placeholder="1.5"><span class="u" id="dist-u">mi</span></div>
+        </div>
+        <div class="field" data-method="cooper" hidden>
+          <span class="label">Distance unit</span>
+          <div class="seg" data-name="distunit">
+            <button data-value="mi" aria-pressed="true">Miles</button>
+            <button data-value="km">Km</button>
+          </div>
+        </div>
+
+        <div class="field full" data-method="mile" hidden>
+          <span class="label">Time to run 1.5 miles (2.4 km)</span>
+          <div class="row">
+            <div class="unit-wrap"><input type="number" id="t-min" inputmode="numeric" min="0" placeholder="12" aria-label="Minutes"><span class="u">min</span></div>
+            <div class="unit-wrap"><input type="number" id="t-sec" inputmode="numeric" min="0" max="59" placeholder="30" aria-label="Seconds"><span class="u">sec</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="actions"><button class="btn" type="submit">Calculate</button></div>
+
+      <div class="results" id="results" hidden aria-live="polite">
+        <div class="big">
+          <div class="k">Estimated VO₂ max</div>
+          <div class="v"><span id="r-vo2"></span> <small>ml/kg/min</small></div>
+          <div class="s" id="r-rating"></div>
+        </div>
+        <div class="meter">
+          <div class="meter-track" id="r-track">
+            <span style="background:#f4f4f5"></span><span style="background:#ecebf6"></span><span style="background:#c9c5e4"></span><span style="background:#a49dd0"></span><span style="background:#8e86c1"></span>
+            <i class="meter-pin" id="r-pin"></i>
+          </div>
+          <div class="meter-labels"><span>Poor</span><span>Fair</span><span>Good</span><span>Excellent</span><span>Superior</span></div>
+        </div>
+        <p class="note">Ratings are approximate norms for your age and sex. Field tests estimate VO₂ max; only a lab test with gas analysis measures it directly.</p>
+      </div>
+    </form>
+  </main>
+
+  <script src="/assets/js/layout.js"></script>
+  <script src="/assets/js/calc.js"></script>
+  <script>
+    (function () {
+      var B = Bloom;
+      var method = B.seg("method", function (m) {
+        B.$$("[data-method]").forEach(function (el) { el.hidden = el.dataset.method !== m; });
+      });
+      var sex = B.seg("sex");
+      var distunit = B.seg("distunit", function (v) { document.getElementById("dist-u").textContent = v; });
+      var form = document.getElementById("form");
+
+      // thresholds for [fair, good, excellent, superior] by age band
+      var NORMS = {
+        m: [[29, [38, 42, 46, 52]], [39, [36, 40, 44, 50]], [49, [34, 38, 42, 48]], [59, [31, 35, 39, 45]], [200, [28, 32, 36, 42]]],
+        f: [[29, [32, 36, 40, 46]], [39, [30, 34, 38, 44]], [49, [28, 32, 36, 41]], [59, [25, 29, 33, 37]], [200, [23, 27, 31, 35]]]
+      };
+      var LABELS = ["Poor", "Fair", "Good", "Excellent", "Superior"];
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var age = B.num("age"), m = method(), vo2, err = "";
+        if (!(age > 0)) err = "Please enter your age.";
+
+        if (!err && m === "hr") {
+          var rhr = B.num("rhr"), mhr = B.num("mhr");
+          if (!(rhr > 0)) err = "Please enter your resting heart rate.";
+          if (!(mhr > 0)) mhr = 208 - 0.7 * age;                // Tanaka
+          vo2 = 15.3 * mhr / rhr;                                // Uth et al.
+        } else if (!err && m === "cooper") {
+          var d = B.num("dist");
+          if (!(d > 0)) err = "Please enter the distance you covered.";
+          var meters = distunit() === "mi" ? d * 1609.34 : d * 1000;
+          vo2 = (meters - 504.9) / 44.73;                        // Cooper
+        } else if (!err) {
+          var mins = B.num("t-min"), secs = B.num("t-sec");
+          var t = (mins > 0 ? mins : 0) + (secs > 0 ? secs : 0) / 60;
+          if (!(t > 0)) err = "Please enter your 1.5-mile time.";
+          vo2 = 3.5 + 483 / t;                                   // 1.5-mile run
+        }
+        if (!B.error(form, err)) return;
+        if (!(vo2 > 0)) { B.error(form, "That result doesn't look right — double-check your inputs."); return; }
+
+        var band = NORMS[sex()].filter(function (b) { return age <= b[0]; })[0][1];
+        var idx = band.filter(function (t) { return vo2 >= t; }).length;
+
+        document.getElementById("r-vo2").textContent = vo2.toFixed(1);
+        document.getElementById("r-rating").textContent = LABELS[idx] + " for your age and sex";
+
+        // position pin: each segment spans one rating band
+        var lo = band[0] - (band[1] - band[0]), edges = [lo].concat(band, [band[3] + (band[3] - band[2])]);
+        var seg = Math.min(idx, 4), a = edges[seg], b = edges[seg + 1];
+        var within = Math.max(0, Math.min(1, (vo2 - a) / (b - a)));
+        document.getElementById("r-pin").style.left = ((seg + within) / 5 * 100) + "%";
+
+        B.show(document.getElementById("results"));
+      });
+    })();
+  </script>
+</body>
+</html>

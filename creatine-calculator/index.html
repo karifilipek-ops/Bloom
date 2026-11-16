@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CREATINE CALCULATOR | Trainbloom</title>
+  <meta name="description" content="Figure out how much creatine to take each day for your bodyweight, with or without a loading phase.">
+  <link rel="canonical" href="https://www.trainbloom.com/creatine-calculator/">
+  <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+  <main class="wrap">
+    <h1 class="sr-only">Creatine Calculator</h1>
+    <div class="banner"><img src="/assets/img/banner-creatine.webp" alt="Creatine Calculator" width="1600" height="320"></div>
+    <p class="lede">Use the calculator below to figure out how much creatine to take each day for your desired goal</p>
+
+    <form class="calc" id="form" novalidate>
+      <h2>Your stats</h2>
+      <div class="fields">
+        <div class="field">
+          <span class="label">Units</span>
+          <div class="seg" data-name="units" data-remember>
+            <button data-value="imperial" aria-pressed="true">lb</button>
+            <button data-value="metric">kg</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="weight">Bodyweight</label>
+          <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="170"><span class="u" data-wu>lb</span></div>
+        </div>
+        <div class="field full">
+          <span class="label">Goal</span>
+          <div class="seg" data-name="goal">
+            <button data-value="steady" aria-pressed="true">Steady daily dose</button>
+            <button data-value="load">Saturate fast (load)</button>
+          </div>
+        </div>
+      </div>
+      <div class="actions"><button class="btn" type="submit">Calculate</button></div>
+
+      <div class="results" id="results" hidden aria-live="polite">
+        <div class="big">
+          <div class="k" id="r-k"></div>
+          <div class="v"><span id="r-dose"></span><small>g/day</small></div>
+          <div class="s" id="r-s"></div>
+        </div>
+        <div class="stats" id="r-stats"></div>
+        <div class="callout" id="r-tip"></div>
+        <p class="note">Based on creatine monohydrate research (about 0.03–0.06 g/kg/day to maintain, 0.3 g/kg/day to load). A level teaspoon is roughly 5 g, but check your product's label. If you have kidney problems or take medication, check with your doctor first.</p>
+      </div>
+    </form>
+  </main>
+
+  <script src="/assets/js/layout.js"></script>
+  <script src="/assets/js/calc.js"></script>
+  <script>
+    (function () {
+      var B = Bloom;
+      var units = B.unitSystem();
+      var goal = B.seg("goal");
+      var form = document.getElementById("form");
+      var half = function (x) { return Math.round(x * 2) / 2; };
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var kg = B.weightKg("weight", units());
+        if (!B.error(form, !(kg > 0) ? "Please enter your bodyweight." : "")) return;
+
+        var maint = Math.min(10, Math.max(3, half(kg * 0.06)));       // upper end of 0.03–0.06 g/kg, 3–10 g
+        var load = half(kg * 0.3);
+        var stats = document.getElementById("r-stats");
+
+        if (goal() === "load") {
+          document.getElementById("r-k").textContent = "Loading phase (days 1–7)";
+          document.getElementById("r-dose").textContent = load;
+          document.getElementById("r-s").textContent = "Split into 4 doses of ~" + half(load / 4) + " g";
+          stats.innerHTML =
+            '<div class="stat hl"><div class="k">After day 7</div><div class="v">' + maint + ' g</div><div class="s">Per day, every day</div></div>' +
+            '<div class="stat"><div class="k">Fully saturated</div><div class="v">~1 week</div><div class="s">vs. 3–4 weeks without loading</div></div>';
+          document.getElementById("r-tip").textContent = "Loading is optional. It just gets you to full muscle saturation faster. Some people get stomach upset at high doses, so splitting it up and taking it with food helps.";
+        } else {
+          document.getElementById("r-k").textContent = "Your daily dose";
+          document.getElementById("r-dose").textContent = maint;
+          var tsp = Math.round(maint / 5 * 2) / 2;
+          document.getElementById("r-s").textContent = "About " + (tsp < 1 ? "½" : String(tsp).replace(".5", "½")) + " level teaspoon" + (tsp > 1 ? "s" : "");
+          stats.innerHTML =
+            '<div class="stat"><div class="k">Fully saturated</div><div class="v">3–4 weeks</div><div class="s">Taken daily</div></div>' +
+            '<div class="stat hl"><div class="k">Timing</div><div class="v">Anytime</div><div class="s">Consistency beats timing</div></div>';
+          document.getElementById("r-tip").textContent = "Take it every day, including rest days. Muscle creatine builds up over time, so the daily habit matters more than when you take it.";
+        }
+        B.show(document.getElementById("results"));
+      });
+    })();
+  </script>
+</body>
+</html>

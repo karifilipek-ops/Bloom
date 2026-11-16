@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>STRENGTH STANDARDS CALCULATOR | Trainbloom</title>
+  <meta name="description" content="Compare your squat, bench, deadlift and overhead press against common strength standards and see where you fall, from beginner to elite.">
+  <link rel="canonical" href="https://www.trainbloom.com/strength-standards-calculator/">
+  <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+  <main class="wrap">
+    <h1 class="sr-only">Strength Standards Calculator</h1>
+    <div class="banner"><img src="/assets/img/banner-strength.webp" alt="Strength Standards" width="1600" height="320"></div>
+    <p class="lede">Use the table below to compare your lifts against common strength standards and see where you fall. From beginner to elite.</p>
+
+    <form class="calc" id="form" novalidate>
+      <h2>Your stats</h2>
+      <div class="fields">
+        <div class="field">
+          <span class="label">Units</span>
+          <div class="seg" data-name="units" data-remember>
+            <button data-value="imperial" aria-pressed="true">lb</button>
+            <button data-value="metric">kg</button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="label">Sex</span>
+          <div class="seg" data-name="sex">
+            <button data-value="m" aria-pressed="true">Male</button>
+            <button data-value="f">Female</button>
+          </div>
+        </div>
+        <div class="field full">
+          <label for="bw">Bodyweight</label>
+          <div class="unit-wrap"><input type="number" id="bw" inputmode="decimal" min="0" placeholder="180"><span class="u" data-wu>lb</span></div>
+        </div>
+      </div>
+
+      <h2 style="margin-top:24px">Your one-rep maxes <span style="font-family:var(--sans);text-transform:none;font-size:13px;color:var(--muted);letter-spacing:0">(optional)</span></h2>
+      <div class="fields">
+        <div class="field"><label for="l-squat">Squat</label><div class="unit-wrap"><input type="number" id="l-squat" inputmode="decimal" min="0"><span class="u" data-wu>lb</span></div></div>
+        <div class="field"><label for="l-bench">Bench press</label><div class="unit-wrap"><input type="number" id="l-bench" inputmode="decimal" min="0"><span class="u" data-wu>lb</span></div></div>
+        <div class="field"><label for="l-deadlift">Deadlift</label><div class="unit-wrap"><input type="number" id="l-deadlift" inputmode="decimal" min="0"><span class="u" data-wu>lb</span></div></div>
+        <div class="field"><label for="l-ohp">Overhead press</label><div class="unit-wrap"><input type="number" id="l-ohp" inputmode="decimal" min="0"><span class="u" data-wu>lb</span></div></div>
+      </div>
+      <p class="note">Don't know your max? Use the <a href="/1-rep-max-calculator/">one-rep max calculator</a> first.</p>
+      <div class="actions"><button class="btn" type="submit">Show standards</button></div>
+
+      <div class="results" id="results" hidden aria-live="polite">
+        <div class="stats" id="r-levels"></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Lift</th><th>Beginner</th><th>Novice</th><th>Intermediate</th><th>Advanced</th><th>Elite</th></tr></thead>
+            <tbody id="r-table"></tbody>
+          </table>
+        </div>
+        <p class="note">One-rep max standards for your bodyweight, based on common bodyweight-ratio benchmarks for drug-free lifters. Highlighted cells show the highest level you've reached.</p>
+      </div>
+    </form>
+  </main>
+
+  <script src="/assets/js/layout.js"></script>
+  <script src="/assets/js/calc.js"></script>
+  <script>
+    (function () {
+      var B = Bloom;
+      var units = B.unitSystem();
+      var sex = B.seg("sex");
+      var form = document.getElementById("form");
+      var LEVELS = ["Beginner", "Novice", "Intermediate", "Advanced", "Elite"];
+      var LIFTS = [["squat", "Squat"], ["bench", "Bench press"], ["deadlift", "Deadlift"], ["ohp", "Overhead press"]];
+      // 1RM as a multiple of bodyweight
+      var STANDARDS = {
+        m: { squat: [0.75, 1.25, 1.5, 2.25, 2.75], bench: [0.5, 0.75, 1.25, 1.75, 2.0], deadlift: [1.0, 1.5, 2.0, 2.5, 3.0], ohp: [0.4, 0.55, 0.8, 1.05, 1.35] },
+        f: { squat: [0.5, 0.75, 1.0, 1.5, 2.0], bench: [0.25, 0.5, 0.75, 1.0, 1.25], deadlift: [0.5, 1.0, 1.25, 1.75, 2.25], ohp: [0.2, 0.35, 0.5, 0.75, 0.9] }
+      };
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var bw = B.num("bw");
+        if (!B.error(form, !(bw > 0) ? "Please enter your bodyweight." : "")) return;
+        var step = units() === "metric" ? 2.5 : 5;
+        var std = STANDARDS[sex()];
+        var cards = "";
+
+        document.getElementById("r-table").innerHTML = LIFTS.map(function (l) {
+          var mine = B.num("l-" + l[0]);
+          var reached = -1;
+          var cells = std[l[0]].map(function (ratio, i) {
+            var target = Math.round(bw * ratio / step) * step;
+            if (mine >= target) reached = i;
+            return target;
+          });
+          if (mine > 0) {
+            var ratio = (mine / bw).toFixed(2);
+            cards += '<div class="stat' + (reached >= 2 ? " hl" : "") + '"><div class="k">' + l[1] + '</div><div class="v">' +
+              (reached < 0 ? "Untrained" : LEVELS[reached]) + '</div><div class="s">' + ratio + "× bodyweight</div></div>";
+          }
+          return "<tr><td>" + l[1] + "</td>" + cells.map(function (c, i) {
+            return "<td" + (i === reached ? ' class="hl"' : "") + ">" + B.fmt(c, step === 2.5 ? 1 : 0).replace(/\.0$/, "") + "</td>";
+          }).join("") + "</tr>";
+        }).join("");
+
+        var levels = document.getElementById("r-levels");
+        levels.innerHTML = cards;
+        levels.hidden = !cards;
+        B.show(document.getElementById("results"));
+      });
+    })();
+  </script>
+</body>
+</html>

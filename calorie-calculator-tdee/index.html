@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TDEE/CALORIE CALCULATOR | Trainbloom</title>
+  <meta name="description" content="Estimate how many calories you actually burn in a day. Free TDEE calculator with a breakdown of BMR, NEAT, TEF and exercise.">
+  <link rel="canonical" href="https://www.trainbloom.com/calorie-calculator-tdee/">
+  <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+  <main class="wrap">
+    <h1 class="sr-only">Calorie (TDEE) Calculator</h1>
+    <div class="banner"><img src="/assets/img/banner-tdee.webp" alt="Calorie (TDEE) Calculator" width="1600" height="320"></div>
+    <p class="lede">Use the calculator below to estimate how many calories you actually burn in a day. Probably more than your smartwatch says and less than you hope.</p>
+
+    <form class="calc" id="form" novalidate>
+      <h2>Your stats</h2>
+      <div class="fields">
+        <div class="field">
+          <span class="label">Units</span>
+          <div class="seg" data-name="units" data-remember>
+            <button data-value="imperial" aria-pressed="true">lb / ft</button>
+            <button data-value="metric">kg / cm</button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="label">Sex</span>
+          <div class="seg" data-name="sex">
+            <button data-value="m" aria-pressed="true">Male</button>
+            <button data-value="f">Female</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="age">Age</label>
+          <div class="unit-wrap"><input type="number" id="age" inputmode="numeric" min="15" max="90" placeholder="30"><span class="u">yrs</span></div>
+        </div>
+        <div class="field">
+          <label for="weight">Weight</label>
+          <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="170"><span class="u" data-wu>lb</span></div>
+        </div>
+        <div class="field full">
+          <span class="label">Height</span>
+          <div class="row" data-unit="imperial">
+            <div class="unit-wrap"><input type="number" id="height-ft" inputmode="numeric" placeholder="5" aria-label="Height feet"><span class="u">ft</span></div>
+            <div class="unit-wrap"><input type="number" id="height-in" inputmode="decimal" placeholder="9" aria-label="Height inches"><span class="u">in</span></div>
+          </div>
+          <div data-unit="metric" hidden>
+            <div class="unit-wrap"><input type="number" id="height-cm" inputmode="decimal" placeholder="175" aria-label="Height centimeters"><span class="u">cm</span></div>
+          </div>
+        </div>
+        <div class="field full">
+          <label for="steps">Daily activity (outside the gym)</label>
+          <select id="steps">
+            <option value="1.2">Mostly sitting — under 5,000 steps/day</option>
+            <option value="1.3" selected>Lightly active — 5,000–7,500 steps/day</option>
+            <option value="1.4">Active — 7,500–10,000 steps/day</option>
+            <option value="1.5">Very active — 10,000–12,500 steps/day</option>
+            <option value="1.6">On your feet all day — 12,500+ steps or physical job</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="training">Formal exercise</label>
+          <select id="training">
+            <option value="0">None</option>
+            <option value="0.05">1–2 workouts per week</option>
+            <option value="0.1" selected>3–4 workouts per week</option>
+            <option value="0.15">5–6 workouts per week</option>
+            <option value="0.2">Daily hard training / athlete</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions"><button class="btn" type="submit">Calculate</button></div>
+
+      <div class="results" id="results" hidden aria-live="polite">
+        <div class="big">
+          <div class="k">Estimated TDEE</div>
+          <div class="v"><span id="r-tdee"></span> <small>cal/day</small></div>
+          <div class="s">Your estimated maintenance calories</div>
+        </div>
+
+        <div class="label" style="font-family:var(--pixel);font-size:13px;text-transform:uppercase;letter-spacing:.8px">Where those calories go</div>
+        <div class="stack" id="r-stack"></div>
+        <div class="legend" id="r-legend"></div>
+
+        <div class="stats" style="margin-top:20px">
+          <div class="stat"><div class="k">Fat loss</div><div class="v" id="r-cut"></div><div class="s">~0.5–1% bodyweight / wk</div></div>
+          <div class="stat hl"><div class="k">Maintain</div><div class="v" id="r-maint"></div><div class="s">Hold your weight</div></div>
+          <div class="stat"><div class="k">Lean gain</div><div class="v" id="r-bulk"></div><div class="s">Slow, lean surplus</div></div>
+        </div>
+        <p class="note">BMR is estimated with the Mifflin-St Jeor equation. Treat the result as a starting point: track your weight for 2–3 weeks and adjust.</p>
+      </div>
+    </form>
+
+    <p class="cta"><strong style="font-weight:500">Feel like you’re doing everything right but still not seeing results?</strong><br><a href="https://xbkv4jg47ar.typeform.com/to/Xm4rWtQJ" target="_blank" rel="noopener">Apply here</a> to work with Tony for 1:1 coaching.</p>
+
+    <hr class="rule">
+
+    <article class="article">
+      <h2>What is TDEE?</h2>
+      <figure><img src="/assets/img/podcast-metabolism.webp" alt="Understanding your metabolism podcast cover" loading="lazy"></figure>
+      <hr class="rule">
+      <h2>TDEE = Total Daily Energy Expenditure</h2>
+      <p class="subtle">(aka where you burn calories in a day)</p>
+      <h3>It's made up of 4 parts:</h3>
+      <ol>
+        <li><strong>Basal metabolic rate (BMR):</strong> Your BMR is the number of calories your body burns at complete rest. The energy needed to keep your heart beating, lungs breathing, your brain thinking, your temperature regulated, and just about every other conscious bodily function that’s running 24/7. It accounts for about 70% of the total calories you burn in a day. This is the part that is subject to being suppressed with certain metabolic diseases (like Hypothyroidism which can down regulate the BMR by 5-15%).</li>
+        <li><strong>Non-exercise activity thermogenesis (NEAT):</strong> NEAT is the number of calories you burn from any physical activity that isn’t formal exercise (the calories you burn going about daily activities, basically). This includes your daily step count, fidgeting, standing vs. sitting throughout the day, etc. Depending on the lifestyle this can either make up the smallest chunk, or the second largest and is one of the best sections to focus on for burning more calories throughout the day (but more on that later)</li>
+        <li><strong>Thermic effect of food (TEF):</strong> TEF is the number of calories you burn by digesting food. Yeah, you burn the 3rd most calories per day just simply digesting the food you eat, pretty cool huh? On average, TEF can account for about 10-15% of your TDEE, but it can vary depending on the types of food you eat. For instance, protein has the highest TEF of all foods at around 20-30%, meaning if you eat 100 calories of protein, you burn 20-30 calories just digesting it. Where fats for example have a TEF of 0-3%, meaning if you eat 100 calories of fat, you only burn about 0-3 calories digesting it.</li>
+        <li><strong>Exercise activity thermogenesis (EAT):</strong> EAT is the number of calories you burn doing formal exercise. Shockingly, for most people, EAT is the smallest section and contributes about 5% to TDEE.</li>
+      </ol>
+      <h3>But at the end of the day, even the best calculation is still just a calculation.</h3>
+      <div class="closing">
+        <p>A calculation takes several metrics into account when in reality countless things influence how many calories you burn in a day (your sleep, hormone health, dietary intake, etc.)</p>
+        <p>If you want to learn more about how to dial in your metabolism, and how to use TDEE in your dietary approach for losing fat, building lean muscle, or a combination of the two…</p>
+        <p>Listen to my podcast <a href="https://podcasters.spotify.com/pod/show/fitnessstuff/episodes/87--Understanding-Metabolism-The-Truth-About-Boosting-Your-Metabolism-e29nkg9" target="_blank" rel="noopener">Episode 87: Understanding Your Metabolism</a> and let me know if you have any questions afterward.</p>
+        <p>And if you want to optimize the training/exercise section of your TDEE, you can apply to <a href="https://xbkv4jg47ar.typeform.com/to/Xm4rWtQJ" target="_blank" rel="noopener">work with me 1:1 here</a>.</p>
+      </div>
+    </article>
+  </main>
+
+  <script src="/assets/js/layout.js"></script>
+  <script src="/assets/js/calc.js"></script>
+  <script>
+    (function () {
+      var B = Bloom;
+      var units = B.unitSystem();
+      var sex = B.seg("sex");
+      var form = document.getElementById("form");
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var u = units();
+        var age = B.num("age"), kg = B.weightKg("weight", u), cm = B.heightCm(u);
+        if (!B.error(form, !(age > 0 && kg > 0 && cm > 0) ? "Please fill in your age, weight and height." : "")) return;
+
+        // Mifflin-St Jeor
+        var bmr = 10 * kg + 6.25 * cm - 5 * age + (sex() === "m" ? 5 : -161);
+        var neatMult = parseFloat(document.getElementById("steps").value);
+        var eatPct = parseFloat(document.getElementById("training").value);
+
+        var neat = bmr * (neatMult - 1);
+        var eat = bmr * neatMult * eatPct;
+        var pre = bmr + neat + eat;
+        var tdee = pre / 0.9;           // TEF ≈ 10% of total intake at maintenance
+        var tef = tdee - pre;
+
+        document.getElementById("r-tdee").textContent = B.fmt(Math.round(tdee / 10) * 10);
+        document.getElementById("r-maint").textContent = B.fmt(Math.round(tdee / 10) * 10);
+        document.getElementById("r-cut").textContent = B.fmt(Math.round(tdee * 0.8 / 10) * 10);
+        document.getElementById("r-bulk").textContent = B.fmt(Math.round(tdee * 1.1 / 10) * 10);
+
+        var parts = [
+          ["BMR", bmr, "#8e86c1"],
+          ["NEAT", neat, "#ffdae4"],
+          ["TEF", tef, "#e6eaeb"],
+          ["Exercise", eat, "#2b2b2b"]
+        ];
+        var stack = document.getElementById("r-stack"), legend = document.getElementById("r-legend");
+        stack.innerHTML = ""; legend.innerHTML = "";
+        parts.forEach(function (p) {
+          var pct = p[1] / tdee * 100;
+          if (pct <= 0) return;
+          var d = document.createElement("div");
+          d.style.flex = pct; d.style.background = p[2];
+          d.style.color = p[2] === "#2b2b2b" ? "#ffdae4" : "#2b2b2b";
+          d.textContent = pct >= 9 ? Math.round(pct) + "%" : "";
+          d.title = p[0] + ": " + Math.round(p[1]) + " cal";
+          stack.appendChild(d);
+          var l = document.createElement("span");
+          l.innerHTML = '<i style="background:' + p[2] + '"></i>' + p[0] + " · " + B.fmt(p[1]) + " cal";
+          legend.appendChild(l);
+        });
+
+        B.show(document.getElementById("results"));
+      });
+    })();
+  </script>
+</body>
+</html>

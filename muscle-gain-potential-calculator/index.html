@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MUSCLE GAIN POTENTIAL CALCULATOR | Trainbloom</title>
+  <meta name="description" content="Estimate how much muscle you may be able to build naturally and how close you already are to your potential.">
+  <link rel="canonical" href="https://www.trainbloom.com/muscle-gain-potential-calculator/">
+  <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+  <main class="wrap">
+    <h1 class="sr-only">Muscle Gain Potential Calculator</h1>
+    <div class="banner"><img src="/assets/img/banner-muscle.webp" alt="Muscle Gain Calculator" width="1600" height="320"></div>
+    <p class="lede">Use the calculator below to estimate how much muscle you may be able to build and how close you already are to your natural potential.</p>
+
+    <form class="calc" id="form" novalidate>
+      <h2>Your stats</h2>
+      <div class="fields">
+        <div class="field">
+          <span class="label">Units</span>
+          <div class="seg" data-name="units" data-remember>
+            <button data-value="imperial" aria-pressed="true">lb / ft</button>
+            <button data-value="metric">kg / cm</button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="label">Sex</span>
+          <div class="seg" data-name="sex">
+            <button data-value="m" aria-pressed="true">Male</button>
+            <button data-value="f">Female</button>
+          </div>
+        </div>
+        <div class="field full">
+          <span class="label">Height</span>
+          <div class="row" data-unit="imperial">
+            <div class="unit-wrap"><input type="number" id="height-ft" inputmode="numeric" placeholder="5" aria-label="Height feet"><span class="u">ft</span></div>
+            <div class="unit-wrap"><input type="number" id="height-in" inputmode="decimal" placeholder="10" aria-label="Height inches"><span class="u">in</span></div>
+          </div>
+          <div data-unit="metric" hidden>
+            <div class="unit-wrap"><input type="number" id="height-cm" inputmode="decimal" placeholder="178" aria-label="Height centimeters"><span class="u">cm</span></div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="weight">Weight</label>
+          <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="175"><span class="u" data-wu>lb</span></div>
+        </div>
+        <div class="field">
+          <label for="bf">Body fat</label>
+          <div class="unit-wrap"><input type="number" id="bf" inputmode="decimal" min="3" max="60" placeholder="18"><span class="u">%</span></div>
+          <div class="hint">Your best estimate is fine.</div>
+        </div>
+        <div class="field full">
+          <label for="years">Years of consistent lifting</label>
+          <select id="years">
+            <option value="0">Less than 1 year</option>
+            <option value="1">1–2 years</option>
+            <option value="2">2–3 years</option>
+            <option value="3">3–5 years</option>
+            <option value="4">5+ years</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions"><button class="btn" type="submit">Calculate</button></div>
+
+      <div class="results" id="results" hidden aria-live="polite">
+        <div class="big">
+          <div class="k">Natural potential reached</div>
+          <div class="v"><span id="r-pct"></span><small>%</small></div>
+          <div class="s" id="r-left"></div>
+        </div>
+        <div class="meter">
+          <div class="meter-track" style="background:#fff">
+            <span id="r-fill" style="flex:none;background:#8e86c1;border:0"></span>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="k">Lean mass now</div><div class="v" id="r-lean"></div><div class="s" id="r-ffmi"></div></div>
+          <div class="stat"><div class="k">Est. max lean mass</div><div class="v" id="r-max"></div><div class="s" id="r-maxffmi"></div></div>
+          <div class="stat hl"><div class="k">Next 12 months</div><div class="v" id="r-year"></div><div class="s">Realistic muscle gain</div></div>
+          <div class="stat"><div class="k" id="r-stage-k"></div><div class="v" id="r-stage"></div><div class="s">At your potential</div></div>
+        </div>
+        <p class="note">Uses fat-free mass index (FFMI). Most drug-free lifters top out around an FFMI of 25 (men) or 21 (women). Yearly rates follow common natural-lifter estimates and slow down as you get closer to your ceiling. Genetics vary, so treat this as a ballpark, not a limit.</p>
+      </div>
+    </form>
+  </main>
+
+  <script src="/assets/js/layout.js"></script>
+  <script src="/assets/js/calc.js"></script>
+  <script>
+    (function () {
+      var B = Bloom;
+      var units = B.unitSystem();
+      var sex = B.seg("sex");
+      var form = document.getElementById("form");
+
+      var CAP = { m: 25, f: 21 };            // normalized FFMI ceiling
+      var START = { m: 18, f: 15 };          // typical untrained normalized FFMI
+      var RATE = { m: [10, 5, 2.5, 1.2, 0.6], f: [5, 2.5, 1.2, 0.6, 0.3] }; // kg muscle / year by training age
+      var STAGE_BF = { m: 0.12, f: 0.22 };
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var u = units();
+        var kg = B.weightKg("weight", u), cm = B.heightCm(u), bf = B.num("bf");
+        if (!B.error(form, !(kg > 0 && cm > 0 && bf > 0 && bf < 70) ? "Please fill in your height, weight and body fat %." : "")) return;
+
+        var s = sex(), h = cm / 100;
+        var lean = kg * (1 - bf / 100);
+        var adj = 6.1 * (1.8 - h);
+        var ffmi = lean / (h * h) + adj;
+        var maxLean = (CAP[s] - adj) * h * h;
+        var startLean = (START[s] - adj) * h * h;
+        var left = Math.max(0, maxLean - lean);
+        var pct = Math.max(0, Math.min(100, (lean - startLean) / (maxLean - startLean) * 100));
+
+        var yrs = parseInt(document.getElementById("years").value, 10);
+        // slow the rate as you approach the ceiling (full speed until ~2/3 of the way there)
+        var remainingFrac = left / (maxLean - startLean);
+        var slowdown = Math.max(0.3, Math.min(1, remainingFrac * 1.5));
+        var year = Math.min(left, RATE[s][yrs] * slowdown);
+
+        var toU = function (k) { return u === "metric" ? k : k * B.LB_PER_KG; };
+        var wu = u === "metric" ? " kg" : " lb";
+
+        document.getElementById("r-pct").textContent = Math.round(pct);
+        document.getElementById("r-fill").style.width = pct + "%";
+        document.getElementById("r-left").textContent = left > 0.5
+          ? "About " + B.fmt(toU(left)) + wu + " of muscle left to build"
+          : "You're at or near your estimated natural ceiling";
+        document.getElementById("r-lean").textContent = B.fmt(toU(lean)) + wu;
+        document.getElementById("r-ffmi").textContent = "FFMI " + ffmi.toFixed(1);
+        document.getElementById("r-max").textContent = B.fmt(toU(maxLean)) + wu;
+        document.getElementById("r-maxffmi").textContent = "FFMI " + CAP[s];
+        document.getElementById("r-year").textContent = (left > 0.5 ? B.fmt(toU(year), 1) : "0") + wu;
+        document.getElementById("r-stage-k").textContent = "Weight at " + Math.round(STAGE_BF[s] * 100) + "% body fat";
+        document.getElementById("r-stage").textContent = B.fmt(toU(maxLean / (1 - STAGE_BF[s]))) + wu;
+
+        B.show(document.getElementById("results"));
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>1 REP MAX CALCULATOR | Trainbloom</title>
+  <meta name="description" content="Estimate your one-rep max from any set of 1–12 reps, plus a percentage chart to program your training.">
+  <link rel="canonical" href="https://www.trainbloom.com/1-rep-max-calculator/">
+  <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+  <main class="wrap">
+    <h1 class="sr-only">One-Rep Max Calculator</h1>
+    <div class="banner"><img src="/assets/img/banner-1rm.webp" alt="1 Rep Max Calculator" width="1600" height="320"></div>
+    <p class="lede">Use the calculator below to estimate your one-rep max.</p>
+    <p class="lede-sub">(Probably more than you think and slightly less than you’ve been telling people...)</p>
+
+    <form class="calc" id="form" novalidate>
+      <h2>Your best set</h2>
+      <div class="fields">
+        <div class="field full">
+          <span class="label">Units</span>
+          <div class="seg" data-name="units" data-remember>
+            <button data-value="imperial" aria-pressed="true">lb</button>
+            <button data-value="metric">kg</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="weight">Weight lifted</label>
+          <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="225"><span class="u" data-wu>lb</span></div>
+        </div>
+        <div class="field">
+          <label for="reps">Reps completed</label>
+          <select id="reps">
+            <option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option>
+            <option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option>
+          </select>
+          <div class="hint">Most accurate with sets of 10 reps or fewer, taken close to failure.</div>
+        </div>
+      </div>
+      <div class="actions"><button class="btn" type="submit">Calculate</button></div>
+
+      <div class="results" id="results" hidden aria-live="polite">
+        <div class="big">
+          <div class="k">Estimated one-rep max</div>
+          <div class="v"><span id="r-1rm"></span> <small data-wu>lb</small></div>
+          <div class="s" id="r-range"></div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>% of 1RM</th><th>Weight</th><th>≈ Reps</th></tr></thead>
+            <tbody id="r-table"></tbody>
+          </table>
+        </div>
+        <p class="note">Average of the Epley and Brzycki formulas. Weights rounded to the nearest 5 lb / 2.5 kg.</p>
+      </div>
+    </form>
+  </main>
+
+  <script src="/assets/js/layout.js"></script>
+  <script src="/assets/js/calc.js"></script>
+  <script>
+    (function () {
+      var B = Bloom;
+      var units = B.unitSystem();
+      var form = document.getElementById("form");
+      var ROWS = [[100, 1], [95, 2], [90, 4], [85, 6], [80, 8], [75, 10], [70, 12], [65, 15], [60, 18], [55, 20], [50, 24]];
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var w = B.num("weight"), reps = parseInt(document.getElementById("reps").value, 10);
+        if (!B.error(form, !(w > 0) ? "Please enter the weight you lifted." : "")) return;
+
+        var epley = reps === 1 ? w : w * (1 + reps / 30);
+        var brzycki = w * 36 / (37 - reps);
+        var orm = (epley + brzycki) / 2;
+        var step = units() === "metric" ? 2.5 : 5;
+        var round = function (x) { return Math.round(x / step) * step; };
+
+        document.getElementById("r-1rm").textContent = B.fmt(round(orm), step === 2.5 ? 1 : 0).replace(/\.0$/, "");
+        document.getElementById("r-range").textContent = "Range: " + B.fmt(Math.min(epley, brzycki)) + "–" + B.fmt(Math.max(epley, brzycki));
+        document.getElementById("r-table").innerHTML = ROWS.map(function (r) {
+          var val = round(orm * r[0] / 100);
+          return "<tr" + (r[0] === 100 ? ' class="hl"' : "") + "><td>" + r[0] + "%</td><td>" +
+            (val % 1 ? val.toFixed(1) : val) + "</td><td>" + r[1] + "</td></tr>";
+        }).join("");
+
+        B.show(document.getElementById("results"));
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PROTEIN CALCULATOR | Trainbloom</title>
+  <meta name="description" content="Figure out how much protein you actually need for fat loss, maintenance or building muscle. Probably less than TikTok told you.">
+  <link rel="canonical" href="https://www.trainbloom.com/protein-calculator-1/">
+  <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+  <main class="wrap">
+    <h1 class="sr-only">Protein Calculator</h1>
+    <div class="banner"><img src="/assets/img/banner-protein.webp" alt="Protein Calculator" width="1600" height="320"></div>
+    <p class="lede">Use the calculator below to figure out how much protein you actually need.</p>
+    <p class="lede-sub">(Probably less than TikTok told you)</p>
+
+    <form class="calc" id="form" novalidate>
+      <h2>Your stats</h2>
+      <div class="fields">
+        <div class="field">
+          <span class="label">Units</span>
+          <div class="seg" data-name="units" data-remember>
+            <button data-value="imperial" aria-pressed="true">lb</button>
+            <button data-value="metric">kg</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="weight">Current weight</label>
+          <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="170"><span class="u" data-wu>lb</span></div>
+        </div>
+        <div class="field full">
+          <span class="label">Goal</span>
+          <div class="seg" data-name="goal">
+            <button data-value="loss" aria-pressed="true">Lose fat</button>
+            <button data-value="maintain">Maintain</button>
+            <button data-value="gain">Build muscle</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="goalweight">Goal weight <span style="text-transform:none;color:var(--muted)">(optional)</span></label>
+          <div class="unit-wrap"><input type="number" id="goalweight" inputmode="decimal" min="0" placeholder="155"><span class="u" data-wu>lb</span></div>
+          <div class="hint">If you have a lot of weight to lose, we base protein on your goal weight.</div>
+        </div>
+        <div class="field">
+          <label for="meals">Meals per day</label>
+          <select id="meals">
+            <option>2</option><option selected>3</option><option>4</option><option>5</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions"><button class="btn" type="submit">Calculate</button></div>
+
+      <div class="results" id="results" hidden aria-live="polite">
+        <div class="stats">
+          <div class="stat"><div class="k">Minimum protein</div><div class="v"><span id="r-min"></span>g</div><div class="s">Per day — the floor to hit</div></div>
+          <div class="stat hl"><div class="k">Max protein</div><div class="v"><span id="r-max"></span>g</div><div class="s">Per day — past this, little extra benefit</div></div>
+        </div>
+        <div class="big">
+          <div class="k">Per meal</div>
+          <div class="v"><span id="r-meal"></span><small>g</small></div>
+          <div class="s" id="r-meal-s"></div>
+        </div>
+        <p class="note" id="r-basis"></p>
+      </div>
+    </form>
+
+    <p class="cta"><strong style="font-weight:500">Feel like you’re doing everything right but still not seeing results?</strong><br><a href="https://xbkv4jg47ar.typeform.com/to/Xm4rWtQJ" target="_blank" rel="noopener">Apply here</a> to work with Tony for 1:1 coaching.</p>
+
+    <article class="article faq">
+      <details>
+        <summary>Why is my protein goal higher for fat loss than it is for building muscle?</summary>
+        <div class="body">
+          <p>Protein serves two main purposes when it comes to body composition change:<br>Physiological &amp; Lifestyle</p>
+          <p>After a certain point, adding more protein to your diet won’t increase how much muscle you can build …</p>
+          <p>But there are several important physical and psychological benefits that come from going past that point when your goal is weight loss, like:</p>
+          <ul>
+            <li>Decreased hunger and cravings when eating in a calorie deficit</li>
+            <li>Less mood disturbances, stress, and fatigue during dieting phases</li>
+            <li>Increased metabolism (in the form of TEF)</li>
+            <li>And more muscle mass held onto during weight loss periods</li>
+          </ul>
+          <p>If you’ve ever gone through a successful dieting phase, you know how impactful these aspects can be</p>
+          <p>Protein isn’t just for getting jack3d broh…</p>
+        </div>
+      </details>
+      <details>
+        <summary>How much protein can I absorb in one sitting?</summary>
+        <div class="body">
+          <p>Have you heard you can only absorb 30g of protein at once?<br>And the rest just gets 💩’d out?</p>
+          <p>Good news is, that’s a myth.<br>Let us explain.</p>
+          <p>Absorption = Nutrients passing through the gut, then the intestinal wall, into the bloodstream, and circulation</p>
+          <p>In this phenomenal review paper titled Digestion and Absorption - researchers concluded that “Virtually all ingested protein is absorbed by healthy humans.”</p>
+          <p>Meaning we essentially have an unlimited capacity to absorb amino acids from the protein we eat.<br>(i.e. you could eat 250g of protein, and virtually all of it would get absorbed)</p>
+          <p>BUT this is where the confusion comes from…</p>
+          <p>There is a ceiling of protein intake for increasing something called Muscle Protein Synthesis (MPS - the process of producing new muscle protein)</p>
+          <p>That ceiling seems to be between 20-40g+, but the exact amount depends on the overall size of the person, how much muscle they have, and how old they are</p>
+          <p>But just because there is a ceiling on MPS, doesn’t mean that there’s a ceiling to how much you can use.</p>
+          <p>There are a good amount of studies done inside the intermittent fasting community where individuals who eat their entire daily protein amount in 1-2 sittings see nearly identical progress to those who spread it out through the day</p>
+          <p>When it comes to top-level physique athletes trying to maximize muscle growth and minimize muscle breakdown, protein timing can give you a slight edge</p>
+          <p>But for the 99%+ of people who don’t compete:<br>Stop worrying about the pebbles (protein timing throughout the day)<br>And focus on the boulders (how much total protein you get in the day)</p>
+        </div>
+      </details>
+      <details>
+        <summary>That's a big number... How can I get that much protein in my diet?</summary>
+        <div class="body">
+          <p>Below we left a list of all of the best protein sources. Find which one’s you like best and aim to structure each meal of the day around that.</p>
+          <figure style="max-width:420px"><img src="/assets/img/protein-sources.webp" alt="Macro cheat sheet: best protein sources" loading="lazy"></figure>
+        </div>
+      </details>
+      <details>
+        <summary>What happens if I eat more than my “Max Protein” goal?</summary>
+        <div class="body">
+          <p>Think of your max protein goal as a soft guideline, not a prison. That number is calculated based on the max grams of protein that you would detect benefit (i.e. you likely won’t get anything else out of eating more than that.)</p>
+          <p>But there’s nothing wrong with going over that number. Although it’s technically possible to gain excess fat from overeating protein (by consuming too many <em>total calories</em>, just like any macronutrient), it’s highly unlikely because of the satiating and metabolic effects protein has.</p>
+          <p>If you love protein, feel free to eat more than that. Just know that weight gain or loss will always come down to total calorie intake, not just how much protein you’re consuming.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Are protein shakes the same thing as food to help me hit my goal?</summary>
+        <div class="body">
+          <p><strong>Short answer:</strong><br>Yes</p>
+          <p><strong>Long answer:</strong><br>Kinda…</p>
+          <p>Whey protein comes from dairy.<br>More specifically:<br>Whey is the liquid remaining after milk has been curdled and strained.<br>That is then dried into powder form to create… Whey protein.</p>
+          <p>Whey protein isolate then just isolates away the protein from the carbs, fats, lactose, etc. that is left in dairy - so all you have left is the protein.</p>
+          <p>And it’s actually the highest available source of protein humans can consume. It has the highest rate of absorption, has the largest effect on muscle protein synthesis, and it contains all 9 essential amino acids making it a complete protein (unlike most plant sources)</p>
+          <p>Since it’s isolated away from all of the extra calories that come from carbohydrates and fat, this makes it a HUGE help when it comes to hitting your protein goal. Especially when you’re in a calorie deficit.</p>
+          <p>But here’s the thing:<br>Although it is one of the best sources of protein you could consume…<br>You shouldn’t live off of it.</p>
+          <p>Your body requires a diverse range of nutrients other than protein…<br>Nutrients that whole food sources contain. Like vitamins, minerals, fiber, and more.</p>
+          <p>So although a protein supplement can be a big help, it’s still a supplement.<br>Made to supplement your diet, not replace it.</p>
+        </div>
+      </details>
+    </article>
+  </main>
+
+  <script src="/assets/js/layout.js"></script>
+  <script src="/assets/js/calc.js"></script>
+  <script>
+    (function () {
+      var B = Bloom;
+      var units = B.unitSystem();
+      var goal = B.seg("goal");
+      var form = document.getElementById("form");
+
+      // grams per lb of reference bodyweight [min, max]
+      var RANGES = { loss: [0.8, 1.2], maintain: [0.6, 0.8], gain: [0.7, 1.0] };
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var u = units();
+        var lb = B.weightKg("weight", u) * B.LB_PER_KG;
+        var goalLb = B.weightKg("goalweight", u) * B.LB_PER_KG;
+        if (!B.error(form, !(lb > 0) ? "Please enter your current weight." : "")) return;
+
+        var ref = lb, basis = "current weight";
+        if (goalLb > 0 && goalLb < lb) { ref = goalLb; basis = "goal weight"; }
+
+        var r = RANGES[goal()];
+        var min = Math.round(ref * r[0] / 5) * 5;
+        var max = Math.round(ref * r[1] / 5) * 5;
+        var meals = parseInt(document.getElementById("meals").value, 10);
+
+        document.getElementById("r-min").textContent = min;
+        document.getElementById("r-max").textContent = max;
+        document.getElementById("r-meal").textContent = Math.round(min / meals) + "–" + Math.round(max / meals);
+        document.getElementById("r-meal-s").textContent = "grams of protein across " + meals + " meals";
+        document.getElementById("r-basis").textContent =
+          "Based on your " + basis + " (" + B.fmt(u === "metric" ? ref / B.LB_PER_KG : ref) + " " + (u === "metric" ? "kg" : "lb") +
+          ") at " + r[0] + "–" + r[1] + " g per lb (" + (r[0] * 2.2).toFixed(1) + "–" + (r[1] * 2.2).toFixed(1) + " g per kg).";
+
+        B.show(document.getElementById("results"));
+      });
+    })();
+  </script>
+</body>
+</html>
