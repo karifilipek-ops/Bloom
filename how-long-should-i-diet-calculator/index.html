@@ -22,59 +22,70 @@
     <p class="lede">Use the calculator below to estimate how long you’ll need to diet to reach your goal based on your current weight and planned rate of weight loss.</p>
 
     <form class="calc" id="form" novalidate>
-      <h2>Your plan</h2>
+      <h2>Your stats</h2>
       <div class="fields">
-        <div class="field full">
+        <div class="field">
           <span class="label">Units</span>
           <div class="seg" data-name="units" data-remember>
-            <button data-value="imperial" aria-pressed="true">lb</button>
+            <button data-value="imperial" aria-pressed="true">lbs</button>
             <button data-value="metric">kg</button>
           </div>
         </div>
         <div class="field">
-          <label for="weight">Current weight</label>
-          <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="200"><span class="u" data-wu>lb</span></div>
-        </div>
-        <div class="field">
-          <label for="goal">Goal weight</label>
-          <div class="unit-wrap"><input type="number" id="goal" inputmode="decimal" min="0" placeholder="175"><span class="u" data-wu>lb</span></div>
+          <span class="label">Gender</span>
+          <div class="seg" data-name="sex">
+            <button data-value="m" aria-pressed="true">Male</button>
+            <button data-value="f">Female</button>
+          </div>
         </div>
         <div class="field full">
-          <label for="rate">Rate of weight loss</label>
-          <select id="rate">
-            <option value="0.005">Slow — 0.5% of bodyweight per week (best muscle retention)</option>
-            <option value="0.0075" selected>Moderate — 0.75% of bodyweight per week</option>
-            <option value="0.01">Aggressive — 1% of bodyweight per week</option>
-          </select>
+          <label for="weight">Body weight</label>
+          <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="200"><span class="u" data-wu>lb</span></div>
+        </div>
+        <div class="field full">
+          <label for="bf">Current body fat: <span id="bf-out">20</span>%</label>
+          <input type="range" id="bf" min="5" max="60" step="1" value="20">
+          <div class="range-ends"><span>5%</span><span>60%</span></div>
+          <details class="bf-guide">
+            <summary>Not sure? Use the body fat guide</summary>
+            <p class="hint">Tap the description that looks most like you.</p>
+            <div class="bf-cards" id="bf-cards"></div>
+          </details>
+        </div>
+        <div class="field">
+          <label for="goal">Goal body fat</label>
+          <div class="unit-wrap"><input type="number" id="goal" inputmode="decimal" min="5" max="50" value="15"><span class="u">%</span></div>
         </div>
         <div class="field">
           <label for="start">Start date</label>
           <input type="date" id="start">
         </div>
-        <div class="field">
-          <span class="label">Diet breaks</span>
-          <div class="seg" data-name="breaks">
-            <button data-value="no" aria-pressed="true">No</button>
-            <button data-value="yes">1 wk every 8</button>
+        <div class="field full">
+          <span class="label">How aggressive are you going to be dieting?</span>
+          <div class="seg" data-name="aggr">
+            <button data-value="0" aria-pressed="true">Slow – Moderate</button>
+            <button data-value="0.0025">Moderate – Fast</button>
           </div>
+          <div class="hint">Slow–moderate = losing 0.5–0.75% of your bodyweight a week. Moderate–fast = 0.75–1%.</div>
         </div>
       </div>
       <div class="actions"><button class="btn" type="submit">Calculate</button></div>
 
       <div class="results" id="results" hidden aria-live="polite">
         <div class="big">
-          <div class="k">Time to reach your goal</div>
+          <div class="k">How long you should stay in a deficit</div>
           <div class="v"><span id="r-weeks"></span> <small>weeks</small></div>
-          <div class="s" id="r-date"></div>
+          <div class="s" id="r-sentence"></div>
         </div>
         <div class="stats">
-          <div class="stat"><div class="k">Total to lose</div><div class="v" id="r-total"></div></div>
-          <div class="stat"><div class="k">First week</div><div class="v" id="r-first"></div><div class="s">Slows as you get lighter</div></div>
-          <div class="stat"><div class="k">Last week</div><div class="v" id="r-last"></div></div>
+          <div class="stat"><div class="k">Fat to lose</div><div class="v" id="r-fat"></div><div class="s" id="r-fat-s"></div></div>
+          <div class="stat"><div class="k">Goal weight</div><div class="v" id="r-goalw"></div><div class="s" id="r-goalw-s"></div></div>
+          <div class="stat hl"><div class="k">Weekly loss</div><div class="v" id="r-rate"></div><div class="s">Your target pace</div></div>
         </div>
-        <svg class="chart" id="r-chart" viewBox="0 0 600 240" role="img" aria-label="Projected weight over time"></svg>
+        <svg class="chart" id="r-chart" viewBox="0 0 600 240" role="img" aria-label="Projected weight over time, fastest and slowest timeline"></svg>
+        <div class="legend" style="margin-top:8px"><span><i style="background:#242424"></i>Faster end of your range</span><span><i style="background:#9d91be"></i>Slower end of your range</span></div>
         <div class="callout" id="r-tip"></div>
-        <p class="note">Assumes you lose a steady percentage of your current bodyweight each week. Real progress is never a straight line, so expect water-weight swings week to week.</p>
+        <p class="note">Assumes your lean mass stays the same and all the weight you lose is fat, so treat it as a planning range. Expect water-weight swings week to week.</p>
       </div>
     </form>
   </main>
@@ -84,68 +95,75 @@
   <script>
     (function () {
       var B = Bloom;
+      var bodyFat = B.bodyFat();
       var units = B.unitSystem();
-      var breaks = B.seg("breaks");
+      var sex = B.seg("sex", function (v) {
+        bodyFat.render(v);
+        var g = document.getElementById("goal"); if (g.value === "15" || g.value === "25") g.value = v === "f" ? 25 : 15;
+      });
+      var aggr = B.seg("aggr");
       var form = document.getElementById("form");
       var start = document.getElementById("start");
       start.valueAsDate = new Date();
 
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        var w = B.num("weight"), g = B.num("goal"), rate = parseFloat(document.getElementById("rate").value);
-        var err = !(w > 0 && g > 0) ? "Please enter your current and goal weight." : (g >= w ? "Your goal weight should be lower than your current weight." : "");
+        var metric = units() === "metric", w = B.num("weight"), bf = bodyFat.value(), goal = B.num("goal");
+        var err = !(w > 0) ? "Please enter your body weight." :
+                  !(goal >= 3 && goal <= 50) ? "Enter a goal body fat between 3% and 50%." :
+                  goal >= bf ? "Your goal body fat should be lower than your current body fat." : "";
         if (!B.error(form, err)) return;
-        var wu = units() === "metric" ? " kg" : " lb";
 
-        var series = [w], cur = w, dietWeeks = 0, total = 0, useBreaks = breaks() === "yes", breakWeeks = [];
-        while (cur > g && total < 520) {
-          total++;
-          if (useBreaks && dietWeeks > 0 && dietWeeks % 8 === 0 && breakWeeks[breakWeeks.length - 1] !== total - 1) {
-            breakWeeks.push(total); series.push(cur); continue;   // maintenance week
-          }
-          cur = Math.max(g, cur - cur * rate); dietWeeks++; series.push(cur);
-        }
+        var lbm = w * (1 - bf / 100);
+        var goalW = lbm / (1 - goal / 100);
+        var fat = w - goalW;                                            // fat to lose, in the units entered
+        var a = parseFloat(aggr());
+        // Original formula: weeks = fat to lose ÷ (body weight × weekly rate)
+        var minWk = fat / (w * (0.0075 + a));
+        var maxWk = fat / (w * (0.005 + a));
+        var lo = Math.round(minWk), hi = Math.round(maxWk);
+        var u = metric ? " kg" : " lb", f1 = function (x) { return B.fmt(x, 1); };
 
-        var end = new Date(start.valueAsDate || new Date());
-        end.setDate(end.getDate() + total * 7);
-        document.getElementById("r-weeks").textContent = total;
-        document.getElementById("r-date").textContent = "Around " + end.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) +
-          (breakWeeks.length ? " (includes " + breakWeeks.length + " diet break week" + (breakWeeks.length > 1 ? "s" : "") + ")" : "");
-        document.getElementById("r-total").textContent = B.fmt(w - g, 1).replace(/\.0$/, "") + wu;
-        document.getElementById("r-first").textContent = B.fmt(w * rate, 1) + wu;
-        document.getElementById("r-last").textContent = B.fmt(series[series.length - 2] - series[series.length - 1] || w * rate, 1) + wu;
+        var d0 = start.valueAsDate || new Date();
+        var date = function (wk) { var d = new Date(d0); d.setDate(d.getDate() + Math.round(wk * 7)); return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); };
+
+        document.getElementById("r-weeks").textContent = lo === hi ? lo : lo + "–" + hi;
+        document.getElementById("r-sentence").textContent = "Aim to stay in a deficit between " + lo + " and " + hi + " weeks to reach your goal without losing muscle. That's roughly " + date(minWk) + " to " + date(maxWk) + ".";
+        document.getElementById("r-fat").textContent = f1(fat) + u;
+        document.getElementById("r-fat-s").textContent = "From " + bf + "% down to " + goal + "% body fat";
+        document.getElementById("r-goalw").textContent = f1(goalW) + u;
+        document.getElementById("r-goalw-s").textContent = "Keeping your " + f1(lbm) + u + " of lean mass";
+        document.getElementById("r-rate").textContent = f1(w * (0.005 + a)) + "–" + f1(w * (0.0075 + a)) + u;
 
         var tip = document.getElementById("r-tip");
-        if (dietWeeks > 16 && !useBreaks) tip.textContent = "That's a long diet. Consider adding diet breaks (a week at maintenance every 8 weeks or so) to manage hunger, fatigue and training performance.";
-        else if (rate >= 0.01 && dietWeeks > 8) tip.textContent = "Losing 1% per week is aggressive. It works for short pushes, but for a longer diet, a slower rate usually helps you keep more muscle.";
-        else tip.textContent = "Tip: weigh yourself daily and compare weekly averages. That's the most honest way to see if you're on pace.";
+        if (maxWk > 16) tip.textContent = "That's a long diet. Plan a diet break (1–2 weeks at maintenance) every 8–12 weeks to manage hunger, energy and training performance. It adds time but makes the whole thing far more sustainable.";
+        else if (a > 0) tip.textContent = "Going faster works for shorter diets, but keep protein high and keep lifting hard so the weight that comes off is fat, not muscle.";
+        else tip.textContent = "Weigh yourself daily and compare weekly averages. That's the most honest way to know if you're on pace.";
 
-        drawChart(series, breakWeeks, g, wu);
+        drawChart(w, goalW, w * (0.0075 + a), w * (0.005 + a), maxWk, u);
         B.show(document.getElementById("results"));
       });
 
-      function drawChart(s, breakWeeks, goal, wu) {
+      function drawChart(w, goalW, fastRate, slowRate, weeks, u) {
         var W = 600, H = 240, L = 52, R = 16, T = 16, Bm = 34;
-        var max = s[0], min = Math.min(goal, s[s.length - 1]);
-        var pad = (max - min) * 0.08 || 1; max += pad; min -= pad;
-        var x = function (i) { return L + (W - L - R) * i / Math.max(1, s.length - 1); };
-        var y = function (v) { return T + (H - T - Bm) * (max - v) / (max - min); };
+        var top = w + (w - goalW) * 0.08, bot = goalW - (w - goalW) * 0.15, span = Math.max(1, Math.ceil(weeks));
+        var x = function (wk) { return L + (W - L - R) * wk / span; };
+        var y = function (v) { return T + (H - T - Bm) * (top - v) / (top - bot); };
         var svg = "";
         for (var k = 0; k <= 4; k++) {
-          var v = min + (max - min) * k / 4, yy = y(v);
+          var v = bot + (top - bot) * k / 4, yy = y(v);
           svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + yy + '" y2="' + yy + '" stroke="#e2e2e8"/>';
-          svg += '<text x="' + (L - 8) + '" y="' + (yy + 4) + '" text-anchor="end" font-size="11" fill="#8a8c8d" font-family="Poppins,sans-serif">' + Math.round(v) + '</text>';
+          svg += '<text x="' + (L - 8) + '" y="' + (yy + 4) + '" text-anchor="end" font-size="11" fill="#8a8a93" font-family="Poppins,sans-serif">' + Math.round(v) + "</text>";
         }
-        breakWeeks.forEach(function (b) {
-          svg += '<rect x="' + x(b - 1) + '" y="' + T + '" width="' + (x(b) - x(b - 1)) + '" height="' + (H - T - Bm) + '" fill="#e9e6f3"/>';
-        });
-        svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(goal) + '" y2="' + y(goal) + '" stroke="#9d91be" stroke-dasharray="5 4" stroke-width="1.5"/>';
-        svg += '<text x="' + (L + 6) + '" y="' + (y(goal) + 15) + '" text-anchor="start" font-size="11" fill="#6f6496" font-family="Poppins,sans-serif">Goal ' + Math.round(goal) + wu + '</text>';
-        svg += '<polyline fill="none" stroke="#242424" stroke-width="3" stroke-linejoin="round" points="' + s.map(function (v, i) { return x(i).toFixed(1) + "," + y(v).toFixed(1); }).join(" ") + '"/>';
-        var ticks = Math.min(6, s.length - 1);
+        svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(goalW) + '" y2="' + y(goalW) + '" stroke="#6f6496" stroke-dasharray="5 4" stroke-width="1.5"/>';
+        svg += '<text x="' + (W - R) + '" y="' + (y(goalW) + 15) + '" text-anchor="end" font-size="11" fill="#6f6496" font-family="Poppins,sans-serif">Goal ' + Math.round(goalW) + u + "</text>";
+        var fastWk = (w - goalW) / fastRate;
+        svg += '<polyline fill="none" stroke="#9d91be" stroke-width="3" points="' + x(0) + "," + y(w) + " " + x(weeks) + "," + y(goalW) + '"/>';
+        svg += '<polyline fill="none" stroke="#242424" stroke-width="3" points="' + x(0) + "," + y(w) + " " + x(fastWk) + "," + y(goalW) + " " + x(span) + "," + y(goalW) + '"/>';
+        var ticks = Math.min(6, span);
         for (var t = 0; t <= ticks; t++) {
-          var i = Math.round((s.length - 1) * t / ticks);
-          svg += '<text x="' + x(i) + '" y="' + (H - 12) + '" text-anchor="middle" font-size="11" fill="#8a8c8d" font-family="Poppins,sans-serif">wk ' + i + '</text>';
+          var wk = Math.round(span * t / ticks);
+          svg += '<text x="' + x(wk) + '" y="' + (H - 12) + '" text-anchor="middle" font-size="11" fill="#8a8a93" font-family="Poppins,sans-serif">wk ' + wk + "</text>";
         }
         document.getElementById("r-chart").innerHTML = svg;
       }

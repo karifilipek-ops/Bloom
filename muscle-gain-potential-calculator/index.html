@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MUSCLE GAIN POTENTIAL CALCULATOR | Trainbloom</title>
-  <meta name="description" content="Estimate how much muscle you may be able to build naturally and how close you already are to your potential.">
+  <meta name="description" content="Estimate how much muscle you can build naturally based on your frame (height, wrist and ankle), how close you are to your genetic potential, and your year-by-year timeline.">
   <link rel="canonical" href="https://www.trainbloom.com/muscle-gain-potential-calculator/">
   <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="/assets/img/favicon.png">
@@ -27,7 +27,7 @@
         <div class="field">
           <span class="label">Units</span>
           <div class="seg" data-name="units" data-remember>
-            <button data-value="imperial" aria-pressed="true">lb / ft</button>
+            <button data-value="imperial" aria-pressed="true">lb / in</button>
             <button data-value="metric">kg / cm</button>
           </div>
         </div>
@@ -38,33 +38,52 @@
             <button data-value="f">Female</button>
           </div>
         </div>
-        <div class="field full">
+        <div class="field">
           <span class="label">Height</span>
           <div class="row" data-unit="imperial">
             <div class="unit-wrap"><input type="number" id="height-ft" inputmode="numeric" placeholder="5" aria-label="Height feet"><span class="u">ft</span></div>
-            <div class="unit-wrap"><input type="number" id="height-in" inputmode="decimal" placeholder="10" aria-label="Height inches"><span class="u">in</span></div>
+            <div class="unit-wrap"><input type="number" id="height-in" inputmode="decimal" placeholder="9" aria-label="Height inches"><span class="u">in</span></div>
           </div>
           <div data-unit="metric" hidden>
-            <div class="unit-wrap"><input type="number" id="height-cm" inputmode="decimal" placeholder="178" aria-label="Height centimeters"><span class="u">cm</span></div>
+            <div class="unit-wrap"><input type="number" id="height-cm" inputmode="decimal" placeholder="175" aria-label="Height centimeters"><span class="u">cm</span></div>
           </div>
         </div>
         <div class="field">
-          <label for="weight">Weight</label>
-          <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="175"><span class="u" data-wu>lb</span></div>
+          <label for="weight">Current weight</label>
+          <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="165"><span class="u" data-wu>lb</span></div>
         </div>
         <div class="field">
-          <label for="bf">Body fat</label>
-          <div class="unit-wrap"><input type="number" id="bf" inputmode="decimal" min="3" max="60" placeholder="18"><span class="u">%</span></div>
-          <div class="hint">Your best estimate is fine.</div>
+          <label for="wrist">Wrist</label>
+          <div class="unit-wrap"><input type="number" id="wrist" inputmode="decimal" min="0" step="0.05" placeholder="7"><span class="u" data-lu>in</span></div>
+          <div class="hint">Around the narrow spot just past the bony bump on the outside of your wrist (between the bump and your hand).</div>
+        </div>
+        <div class="field">
+          <label for="ankle">Ankle</label>
+          <div class="unit-wrap"><input type="number" id="ankle" inputmode="decimal" min="0" step="0.05" placeholder="8.75"><span class="u" data-lu>in</span></div>
+          <div class="hint">The narrowest point between your ankle bone and your calf.</div>
         </div>
         <div class="field full">
-          <label for="years">Years of consistent lifting</label>
+          <label for="bf">Current body fat: <span id="bf-out">20</span>%</label>
+          <input type="range" id="bf" min="5" max="60" step="1" value="20">
+          <div class="range-ends"><span>5%</span><span>60%</span></div>
+          <details class="bf-guide">
+            <summary>Not sure? Use the body fat guide</summary>
+            <p class="hint">Tap the description that looks most like you.</p>
+            <div class="bf-cards" id="bf-cards"></div>
+          </details>
+        </div>
+        <div class="field">
+          <label for="tbf">Target body fat at your peak</label>
+          <div class="unit-wrap"><input type="number" id="tbf" inputmode="decimal" min="5" max="35" value="10"><span class="u">%</span></div>
+          <div class="hint">The body fat you'd want to carry at your best. 10% is a lean, sustainable target for most men; around 20% for most women.</div>
+        </div>
+        <div class="field">
+          <label for="years">Years of proper training</label>
           <select id="years">
-            <option value="0">Less than 1 year</option>
+            <option value="0">Under 1 year</option>
             <option value="1">1–2 years</option>
             <option value="2">2–3 years</option>
-            <option value="3">3–5 years</option>
-            <option value="4">5+ years</option>
+            <option value="3">3+ years</option>
           </select>
         </div>
       </div>
@@ -72,22 +91,41 @@
 
       <div class="results" id="results" hidden aria-live="polite">
         <div class="big">
-          <div class="k">Natural potential reached</div>
+          <div class="k">Genetic potential reached</div>
           <div class="v"><span id="r-pct"></span><small>%</small></div>
           <div class="s" id="r-left"></div>
         </div>
-        <div class="meter">
-          <div class="meter-track" style="background:#fff">
-            <span id="r-fill" style="flex:none;background:#9d91be;border:0"></span>
+        <div class="gauge" id="gauge" aria-hidden="true">
+          <div class="gauge-pin" id="g-pin"><img class="px" src="/assets/icons/muscle.png" alt=""><span id="g-pin-t"></span></div>
+          <div class="gauge-track">
+            <span class="z-target" id="g-now"><em>You</em></span>
+            <span class="z-low" id="g-real"><em>Realistic</em></span>
+            <span class="z-high" id="g-max"><em>Max</em></span>
           </div>
         </div>
-        <div class="stats">
-          <div class="stat"><div class="k">Lean mass now</div><div class="v" id="r-lean"></div><div class="s" id="r-ffmi"></div></div>
-          <div class="stat"><div class="k">Est. max lean mass</div><div class="v" id="r-max"></div><div class="s" id="r-maxffmi"></div></div>
-          <div class="stat hl"><div class="k">Next 12 months</div><div class="v" id="r-year"></div><div class="s">Realistic muscle gain</div></div>
-          <div class="stat"><div class="k" id="r-stage-k"></div><div class="v" id="r-stage"></div><div class="s">At your potential</div></div>
+
+        <h2>Your steroid-free potential</h2>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th></th><th>Realistic</th><th>Maximum</th></tr></thead>
+            <tbody id="r-table"></tbody>
+          </table>
         </div>
-        <p class="note">Uses fat-free mass index (FFMI). Most drug-free lifters top out around an FFMI of 25 (men) or 21 (women). Yearly rates follow common natural-lifter estimates and slow down as you get closer to your ceiling. Genetics vary, so treat this as a ballpark, not a limit.</p>
+        <p class="note">Realistic = 95% of the maximum. Weights and tape measurements are at your target body fat.</p>
+
+        <h2>Your timeline</h2>
+        <div class="timeline" id="r-timeline"></div>
+        <p class="note" id="r-timeline-note"></p>
+
+        <details class="method">
+          <summary>How this is calculated</summary>
+          <div class="body">
+            <p><strong>Muscle potential:</strong> Casey Butt's model, built from the measurements of top drug-free bodybuilders. Bigger wrists and ankles mean a bigger frame, which can carry more muscle. Maximum lean mass (lb) = height<sup>1.5</sup> × (√wrist ÷ 22.667 + √ankle ÷ 17.0104) × (1 + target body fat% ÷ 224), using inches.</p>
+            <p><strong>Realistic vs. maximum:</strong> some "natural" champions in the original data likely weren't, and they were the genetic elite anyway. So treat the maximum as an absolute ceiling and the realistic number (95%) as what most dedicated lifters can expect.</p>
+            <p><strong>Timeline:</strong> Lyle McDonald's estimates for gains per year of proper training: men about 20–25 lb in year 1, 10–12 lb in year 2, 5–6 lb in year 3, then 2–3 lb a year. Women gain about half that.</p>
+            <p><strong>Women:</strong> Butt's model was built from male data. It's the best frame-based estimate available, but treat the results as a rough ceiling.</p>
+          </div>
+        </details>
       </div>
     </form>
   </main>
@@ -97,51 +135,77 @@
   <script>
     (function () {
       var B = Bloom;
-      var units = B.unitSystem();
-      var sex = B.seg("sex");
+      var bodyFat = B.bodyFat();
+      var units = B.unitSystem(function (v) { B.$$("[data-lu]").forEach(function (el) { el.textContent = v === "metric" ? "cm" : "in"; }); });
+      var sex = B.seg("sex", function (v) {
+        bodyFat.render(v);
+        var t = document.getElementById("tbf"); if (t.value === "10" || t.value === "20") t.value = v === "f" ? 20 : 10;
+      });
       var form = document.getElementById("form");
 
-      var CAP = { m: 25, f: 21 };            // normalized FFMI ceiling
-      var START = { m: 18, f: 15 };          // typical untrained normalized FFMI
-      var RATE = { m: [10, 5, 2.5, 1.2, 0.6], f: [5, 2.5, 1.2, 0.6, 0.3] }; // kg muscle / year by training age
-      var STAGE_BF = { m: 0.12, f: 0.22 };
+      // Casey Butt measurements: [label, wrist coef, ankle coef, height coef] (inches)
+      var TAPE = [["Chest", 1.6817, 1.3759, 0.3314], ["Biceps", 1.2033, 0, 0.1233], ["Forearms", 0.9626, 0, 0.0989],
+                  ["Neck", 1.1424, 0, 0.1236], ["Thighs", 0, 1.3868, 0.1805], ["Calves", 0, 0.9298, 0.1210]];
+      // Lyle McDonald: lb of muscle per year of proper training (men; women ≈ half)
+      var RATE = [22.5, 11, 5.5, 2.5];
 
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        var u = units();
-        var kg = B.weightKg("weight", u), cm = B.heightCm(u), bf = B.num("bf");
-        if (!B.error(form, !(kg > 0 && cm > 0 && bf > 0 && bf < 70) ? "Please fill in your height, weight and body fat %." : "")) return;
+        var metric = units() === "metric", s = sex();
+        var hIn = B.heightCm(units()) / 2.54;
+        var lenIn = function (id) { var v = B.num(id); return metric ? v / 2.54 : v; };
+        var wIn = lenIn("wrist"), aIn = lenIn("ankle");
+        var lb = metric ? B.num("weight") * B.LB_PER_KG : B.num("weight");
+        var tbf = B.num("tbf");
+        if (!B.error(form, !(hIn > 0 && lb > 0 && wIn > 0 && aIn > 0) ? "Please fill in your height, weight, wrist and ankle." :
+            !(tbf >= 3 && tbf <= 40) ? "Enter a target body fat between 3% and 40%." : "")) return;
 
-        var s = sex(), h = cm / 100;
-        var lean = kg * (1 - bf / 100);
-        var adj = 6.1 * (1.8 - h);
-        var ffmi = lean / (h * h) + adj;
-        var maxLean = (CAP[s] - adj) * h * h;
-        var startLean = (START[s] - adj) * h * h;
-        var left = Math.max(0, maxLean - lean);
-        var pct = Math.max(0, Math.min(100, (lean - startLean) / (maxLean - startLean) * 100));
+        var maxLbm = Math.pow(hIn, 1.5) * (Math.sqrt(wIn) / 22.667 + Math.sqrt(aIn) / 17.0104) * (1 + tbf / 224);
+        var realLbm = maxLbm * 0.95;
+        var nowLbm = lb * (1 - bodyFat.value() / 100);
+        var pct = nowLbm / maxLbm * 100;
+        var left = realLbm - nowLbm;
 
-        var yrs = parseInt(document.getElementById("years").value, 10);
-        // slow the rate as you approach the ceiling (full speed until ~2/3 of the way there)
-        var remainingFrac = left / (maxLean - startLean);
-        var slowdown = Math.max(0.3, Math.min(1, remainingFrac * 1.5));
-        var year = Math.min(left, RATE[s][yrs] * slowdown);
+        var W = function (x) { return metric ? x / B.LB_PER_KG : x; }, L = function (x) { return metric ? x * 2.54 : x; };
+        var wu = metric ? " kg" : " lb", lu = metric ? " cm" : " in";
+        var f1 = function (x) { return B.fmt(x, 1); };
 
-        var toU = function (k) { return u === "metric" ? k : k * B.LB_PER_KG; };
-        var wu = u === "metric" ? " kg" : " lb";
-
-        document.getElementById("r-pct").textContent = Math.round(pct);
-        document.getElementById("r-fill").style.width = pct + "%";
+        document.getElementById("r-pct").textContent = Math.min(100, Math.round(pct));
         document.getElementById("r-left").textContent = left > 0.5
-          ? "About " + B.fmt(toU(left)) + wu + " of muscle left to build"
-          : "You're at or near your estimated natural ceiling";
-        document.getElementById("r-lean").textContent = B.fmt(toU(lean)) + wu;
-        document.getElementById("r-ffmi").textContent = "FFMI " + ffmi.toFixed(1);
-        document.getElementById("r-max").textContent = B.fmt(toU(maxLean)) + wu;
-        document.getElementById("r-maxffmi").textContent = "FFMI " + CAP[s];
-        document.getElementById("r-year").textContent = (left > 0.5 ? B.fmt(toU(year), 1) : "0") + wu;
-        document.getElementById("r-stage-k").textContent = "Weight at " + Math.round(STAGE_BF[s] * 100) + "% body fat";
-        document.getElementById("r-stage").textContent = B.fmt(toU(maxLean / (1 - STAGE_BF[s]))) + wu;
+          ? "You could still build about " + f1(W(left)) + wu + " of muscle (" + f1(W(maxLbm - nowLbm)) + wu + " to your absolute max)."
+          : nowLbm < maxLbm ? "You're past the realistic limit. Only " + f1(W(maxLbm - nowLbm)) + wu + " stands between you and the absolute max."
+          : "You're at or beyond the model's maximum. Elite genetics (or a body fat estimate worth double-checking).";
+
+        // gauge from 0.7×max to max
+        var start = maxLbm * 0.6, span = maxLbm - start, at = function (v) { return Math.max(0, Math.min(100, (v - start) / span * 100)); };
+        document.getElementById("g-now").style.flex = at(nowLbm);
+        document.getElementById("g-real").style.flex = Math.max(0, at(realLbm) - at(nowLbm));
+        document.getElementById("g-max").style.flex = 100 - Math.max(at(realLbm), at(nowLbm));
+        document.getElementById("g-pin").style.left = at(nowLbm) + "%";
+        document.getElementById("g-pin-t").textContent = f1(W(nowLbm)) + wu;
+
+        var row = function (k, r, m, u) { return "<tr><td>" + k + "</td><td>" + f1(r) + u + "</td><td>" + f1(m) + u + "</td></tr>"; };
+        var rows = row("Total weight", W(realLbm / (1 - tbf / 100)), W(maxLbm / (1 - tbf / 100)), wu) +
+                   row("Lean body mass", W(realLbm), W(maxLbm), wu) +
+                   row("Fat mass", W(realLbm / (1 - tbf / 100) - realLbm), W(maxLbm / (1 - tbf / 100) - maxLbm), wu);
+        TAPE.forEach(function (t) {
+          var m = t[1] * wIn + t[2] * aIn + t[3] * hIn;
+          rows += row(t[0], L(m * 0.95), L(m), lu);
+        });
+        document.getElementById("r-table").innerHTML = rows;
+
+        // timeline: next 5 years, capped at the realistic limit
+        var yrs = parseInt(document.getElementById("years").value, 10), scale = s === "f" ? 0.5 : 1;
+        var remaining = Math.max(0, left), total = 0, bars = "", biggest = RATE[0] * scale;
+        for (var y = 0; y < 5 && (y === 0 || remaining > 0.05); y++) {
+          var g = Math.min(remaining, RATE[Math.min(3, yrs + y)] * scale); remaining -= g; total += g;
+          bars += '<div class="tl-row"><span class="tl-y">Year ' + (y + 1) + '</span><span class="tl-bar"><i style="width:' + (g / biggest * 100) + '%"></i></span><span class="tl-v">+' + f1(W(g)) + wu + "</span></div>";
+        }
+        if (remaining <= 0.05 && left > 0.5) bars += '<div class="tl-done">Realistic potential reached</div>';
+        document.getElementById("r-timeline").innerHTML = bars;
+        document.getElementById("r-timeline-note").textContent = left > 0.5
+          ? "About " + f1(W(total)) + wu + " of muscle in " + y + " year" + (y > 1 ? "s" : "") + " with proper training and nutrition" + (remaining <= 0.05 ? ", which gets you to your realistic potential." : ".")
+          : "Gains from here come slowly: think fine-tuning, not big jumps.";
 
         B.show(document.getElementById("results"));
       });

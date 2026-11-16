@@ -27,42 +27,93 @@
         <div class="field">
           <span class="label">Units</span>
           <div class="seg" data-name="units" data-remember>
-            <button data-value="imperial" aria-pressed="true">lb</button>
+            <button data-value="imperial" aria-pressed="true">lbs</button>
             <button data-value="metric">kg</button>
           </div>
         </div>
         <div class="field">
-          <span class="label">Sex</span>
+          <span class="label">Gender</span>
           <div class="seg" data-name="sex">
             <button data-value="m" aria-pressed="true">Male</button>
             <button data-value="f">Female</button>
           </div>
         </div>
-        <div class="field full">
+        <div class="field">
           <label for="bw">Bodyweight</label>
           <div class="unit-wrap"><input type="number" id="bw" inputmode="decimal" min="0" placeholder="180"><span class="u" data-wu>lb</span></div>
         </div>
+        <div class="field">
+          <label for="age">Age</label>
+          <select id="age">
+            <option value="1" selected>Under 35</option>
+            <option value="0.95">35–44</option>
+            <option value="0.88">45–54</option>
+            <option value="0.81">55–64</option>
+            <option value="0.74">65–74</option>
+            <option value="0.68">75+</option>
+          </select>
+        </div>
       </div>
 
-      <h2 style="margin-top:24px">Your one-rep maxes <span style="font-family:var(--sans);text-transform:none;font-size:13px;color:var(--muted);letter-spacing:0">(optional)</span></h2>
+      <h2 style="margin-top:26px">Your lifts</h2>
+      <p class="hint" style="margin:-8px 0 14px;font-size:13px;color:var(--muted)">Enter your best recent set for any lift: the weight and how many reps (1–12). Leave a lift blank to skip it.</p>
       <div class="fields">
-        <div class="field"><label for="l-squat">Squat</label><div class="unit-wrap"><input type="number" id="l-squat" inputmode="decimal" min="0"><span class="u" data-wu>lb</span></div></div>
-        <div class="field"><label for="l-bench">Bench press</label><div class="unit-wrap"><input type="number" id="l-bench" inputmode="decimal" min="0"><span class="u" data-wu>lb</span></div></div>
-        <div class="field"><label for="l-deadlift">Deadlift</label><div class="unit-wrap"><input type="number" id="l-deadlift" inputmode="decimal" min="0"><span class="u" data-wu>lb</span></div></div>
-        <div class="field"><label for="l-ohp">Overhead press</label><div class="unit-wrap"><input type="number" id="l-ohp" inputmode="decimal" min="0"><span class="u" data-wu>lb</span></div></div>
+        <div class="field full lift-row">
+          <span class="label">Squat</span>
+          <div class="row">
+            <div class="unit-wrap"><input type="number" id="w-squat" inputmode="decimal" min="0" aria-label="Squat weight"><span class="u" data-wu>lb</span></div>
+            <div class="unit-wrap"><input type="number" id="r-squat" inputmode="numeric" min="1" max="12" placeholder="1" aria-label="Squat reps"><span class="u">reps</span></div>
+          </div>
+        </div>
+        <div class="field full lift-row">
+          <span class="label">Bench press</span>
+          <div class="row">
+            <div class="unit-wrap"><input type="number" id="w-bench" inputmode="decimal" min="0" aria-label="Bench press weight"><span class="u" data-wu>lb</span></div>
+            <div class="unit-wrap"><input type="number" id="r-bench" inputmode="numeric" min="1" max="12" placeholder="1" aria-label="Bench press reps"><span class="u">reps</span></div>
+          </div>
+        </div>
+        <div class="field full lift-row">
+          <span class="label">Deadlift</span>
+          <div class="row">
+            <div class="unit-wrap"><input type="number" id="w-deadlift" inputmode="decimal" min="0" aria-label="Deadlift weight"><span class="u" data-wu>lb</span></div>
+            <div class="unit-wrap"><input type="number" id="r-deadlift" inputmode="numeric" min="1" max="12" placeholder="1" aria-label="Deadlift reps"><span class="u">reps</span></div>
+          </div>
+        </div>
+        <div class="field full lift-row">
+          <span class="label">Overhead press</span>
+          <div class="row">
+            <div class="unit-wrap"><input type="number" id="w-ohp" inputmode="decimal" min="0" aria-label="Overhead press weight"><span class="u" data-wu>lb</span></div>
+            <div class="unit-wrap"><input type="number" id="r-ohp" inputmode="numeric" min="1" max="12" placeholder="1" aria-label="Overhead press reps"><span class="u">reps</span></div>
+          </div>
+        </div>
       </div>
-      <p class="note">Don't know your max? Use the <a href="/1-rep-max-calculator/">one-rep max calculator</a> first.</p>
-      <div class="actions"><button class="btn" type="submit">Show standards</button></div>
+      <div class="actions"><button class="btn" type="submit">See my level</button></div>
 
       <div class="results" id="results" hidden aria-live="polite">
-        <div class="stats" id="r-levels"></div>
+        <div class="big" id="r-overall-box">
+          <div class="k">Overall strength level</div>
+          <div class="v" id="r-overall" style="font-size:clamp(34px,8vw,52px);letter-spacing:.12em;text-transform:uppercase"></div>
+          <div class="s" id="r-overall-s"></div>
+        </div>
+        <div id="r-lifts"></div>
+
+        <h2>Standards for your bodyweight</h2>
         <div class="tbl-wrap">
           <table class="tbl">
             <thead><tr><th>Lift</th><th>Beginner</th><th>Novice</th><th>Intermediate</th><th>Advanced</th><th>Elite</th></tr></thead>
             <tbody id="r-table"></tbody>
           </table>
         </div>
-        <p class="note">One-rep max standards for your bodyweight, based on common bodyweight-ratio benchmarks for drug-free lifters. Highlighted cells show the highest level you've reached.</p>
+
+        <details class="method">
+          <summary>How these standards work</summary>
+          <div class="body">
+            <p><strong>What each level means:</strong> Beginner = you can do the lift with good form. Novice = about 6–12 months of consistent training. Intermediate = 1–3 years. Advanced = roughly the average drug-free competitive powerlifter. Elite = roughly the top 10% of drug-free competitive powerlifters aged 18–35.</p>
+            <p><strong>Why it isn't just "times bodyweight":</strong> strength doesn't grow in a straight line with bodyweight. A lifter twice as heavy is not twice as strong; strength scales closer to bodyweight to the power of 0.67. Simple bodyweight multiples make lighter lifters look stronger and heavier lifters look weaker, so these standards are scaled allometrically instead.</p>
+            <p><strong>Age:</strong> relative strength peaks around 18–35 and declines gradually after that, so the standards are adjusted down for older age groups.</p>
+            <p><strong>Your 1RM:</strong> if you enter more than one rep, your one-rep max is estimated with the same Brzycki formula as the <a href="/1-rep-max-calculator/">1-rep max calculator</a>.</p>
+          </div>
+        </details>
       </div>
     </form>
   </main>
@@ -75,43 +126,66 @@
       var units = B.unitSystem();
       var sex = B.seg("sex");
       var form = document.getElementById("form");
+
       var LEVELS = ["Beginner", "Novice", "Intermediate", "Advanced", "Elite"];
       var LIFTS = [["squat", "Squat"], ["bench", "Bench press"], ["deadlift", "Deadlift"], ["ohp", "Overhead press"]];
-      // 1RM as a multiple of bodyweight
-      var STANDARDS = {
-        m: { squat: [0.75, 1.25, 1.5, 2.25, 2.75], bench: [0.5, 0.75, 1.25, 1.75, 2.0], deadlift: [1.0, 1.5, 2.0, 2.5, 3.0], ohp: [0.4, 0.55, 0.8, 1.05, 1.35] },
-        f: { squat: [0.5, 0.75, 1.0, 1.5, 2.0], bench: [0.25, 0.5, 0.75, 1.0, 1.25], deadlift: [0.5, 1.0, 1.25, 1.75, 2.25], ohp: [0.2, 0.35, 0.5, 0.75, 0.9] }
+
+      // 1RM as a multiple of bodyweight AT THE REFERENCE BODYWEIGHT (80 kg men, 60 kg women).
+      // Advanced ≈ median drug-free competitive lifter; Elite ≈ 90th percentile of competitors aged 18–35.
+      var REF_KG = { m: 80, f: 60 };
+      var RATIOS = {
+        m: { squat: [0.75, 1.25, 1.75, 2.25, 2.75], bench: [0.5, 0.75, 1.25, 1.5, 2.0], deadlift: [1.0, 1.5, 2.0, 2.5, 3.0], ohp: [0.4, 0.55, 0.8, 1.05, 1.35] },
+        f: { squat: [0.5, 0.75, 1.25, 1.75, 2.25], bench: [0.25, 0.5, 0.75, 1.0, 1.35], deadlift: [0.75, 1.0, 1.5, 2.0, 2.6], ohp: [0.2, 0.35, 0.5, 0.75, 0.9] }
       };
+      var EXPONENT = 0.67;                                              // allometric scaling: strength ∝ bodyweight^0.67
+
+      function standards(s, lift, bwKg, ageFactor) {
+        var ref = REF_KG[s];
+        return RATIOS[s][lift].map(function (r) { return r * ref * Math.pow(bwKg / ref, EXPONENT) * ageFactor; });   // kg
+      }
 
       form.addEventListener("submit", function (e) {
         e.preventDefault();
+        var metric = units() === "metric", toKg = metric ? 1 : 1 / B.LB_PER_KG;
         var bw = B.num("bw");
         if (!B.error(form, !(bw > 0) ? "Please enter your bodyweight." : "")) return;
-        var step = units() === "metric" ? 2.5 : 5;
-        var std = STANDARDS[sex()];
-        var cards = "";
+        var bwKg = bw * toKg, ageFactor = parseFloat(document.getElementById("age").value), s = sex();
+        var step = metric ? 2.5 : 5, unit = metric ? " kg" : " lb";
+        var show = function (kg) { var v = Math.round(kg / toKg / step) * step; return B.fmt(v, metric ? 1 : 0).replace(/\.0$/, ""); };
 
+        var cards = "", scores = [];
         document.getElementById("r-table").innerHTML = LIFTS.map(function (l) {
-          var mine = B.num("l-" + l[0]);
+          var std = standards(s, l[0], bwKg, ageFactor);
+          var w = B.num("w-" + l[0]), reps = Math.min(12, Math.max(1, Math.round(B.num("r-" + l[0]) || 1)));
           var reached = -1;
-          var cells = std[l[0]].map(function (ratio, i) {
-            var target = Math.round(bw * ratio / step) * step;
-            if (mine >= target) reached = i;
-            return target;
-          });
-          if (mine > 0) {
-            var ratio = (mine / bw).toFixed(2);
-            cards += '<div class="stat' + (reached >= 2 ? " hl" : "") + '"><div class="k">' + l[1] + '</div><div class="v">' +
-              (reached < 0 ? "Untrained" : LEVELS[reached]) + '</div><div class="s">' + ratio + "× bodyweight</div></div>";
+          if (w > 0) {
+            var orm = w * (36 / (37 - reps)) * toKg;                    // Brzycki, in kg
+            std.forEach(function (t, i) { if (orm >= t) reached = i; });
+            // position on a 0–5 scale: whole levels plus progress toward the next
+            var lo = reached < 0 ? 0 : std[reached], hi = reached < 4 ? std[reached + 1] : std[4] * 1.15;
+            var score = Math.min(5, (reached + 1) + Math.max(0, Math.min(1, (orm - lo) / (hi - lo))));
+            scores.push(score);
+            var next = reached < 4 ? "<strong>" + show(std[reached + 1] - orm) + unit + "</strong> to " + LEVELS[reached + 1] : "Top level reached";
+            cards += '<div class="lift-card"><div class="lift-head"><span class="k">' + l[1] + '</span><span class="lvl">' + (reached < 0 ? "Untrained" : LEVELS[reached]) + "</span></div>" +
+              '<div class="lift-sub">Est. 1RM ' + show(orm) + unit + " · " + (orm / bwKg).toFixed(2) + "× bodyweight · " + next + "</div>" +
+              '<div class="lvl-track">' + LEVELS.map(function (n, i) { return '<span class="' + (i <= reached ? "on" : "") + '"></span>'; }).join("") +
+              '<i class="meter-pin" style="left:' + (score / 5 * 100) + '%"></i></div>' +
+              '<div class="meter-labels"><span>Beg</span><span>Nov</span><span>Int</span><span>Adv</span><span>Elite</span></div></div>';
           }
-          return "<tr><td>" + l[1] + "</td>" + cells.map(function (c, i) {
-            return "<td" + (i === reached ? ' class="hl"' : "") + ">" + B.fmt(c, step === 2.5 ? 1 : 0).replace(/\.0$/, "") + "</td>";
+          return "<tr><td>" + l[1] + "</td>" + std.map(function (t, i) {
+            return "<td" + (i === reached ? ' class="hl"' : "") + ">" + show(t) + "</td>";
           }).join("") + "</tr>";
         }).join("");
 
-        var levels = document.getElementById("r-levels");
-        levels.innerHTML = cards;
-        levels.hidden = !cards;
+        document.getElementById("r-lifts").innerHTML = cards;
+        var box = document.getElementById("r-overall-box");
+        box.hidden = !scores.length;
+        if (scores.length) {
+          var avg = scores.reduce(function (a, b) { return a + b; }, 0) / scores.length;
+          var idx = Math.max(-1, Math.min(4, Math.floor(avg) - 1));
+          document.getElementById("r-overall").textContent = idx < 0 ? "Untrained" : LEVELS[idx];
+          document.getElementById("r-overall-s").textContent = "Based on " + scores.length + " lift" + (scores.length > 1 ? "s" : "") + ". Weights in the table are one-rep maxes" + unit.replace(" ", " in ") + ".";
+        }
         B.show(document.getElementById("results"));
       });
     })();

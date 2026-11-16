@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>VO2 MAX CALCULATOR | Trainbloom</title>
-  <meta name="description" content="Estimate your VO2 max from resting heart rate, a 12-minute run or a 1.5-mile run, and see how you compare for your age and sex.">
+  <meta name="description" content="Estimate your VO2 max with 6 field tests (resting heart rate, Rockport walk, step test, 6-minute walk, 1.5-mile run, Cooper run), plus your rating, percentile and fitness age.">
   <link rel="canonical" href="https://www.trainbloom.com/vo2-max-calculator/">
   <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="/assets/img/favicon.png">
@@ -23,14 +23,20 @@
 
     <form class="calc" id="form" novalidate>
       <h2>Pick a test</h2>
-      <div class="fields">
-        <div class="field full">
-          <div class="seg" data-name="method">
-            <button data-value="hr" aria-pressed="true">Heart rate</button>
-            <button data-value="cooper">12-min run</button>
-            <button data-value="mile">1.5-mile run</button>
-          </div>
+      <div class="field full" style="margin-bottom:16px">
+        <div class="seg multi" data-name="method">
+          <button data-value="rest" aria-pressed="true">Resting HR</button>
+          <button data-value="walk1">1-mile walk</button>
+          <button data-value="step">3-min step</button>
+          <button data-value="walk6">6-min walk</button>
+          <button data-value="run15">1.5-mile run</button>
+          <button data-value="cooper">12-min run</button>
         </div>
+      </div>
+
+      <div class="test-info" id="test-info"></div>
+
+      <div class="fields">
         <div class="field">
           <span class="label">Sex</span>
           <div class="seg" data-name="sex">
@@ -42,36 +48,69 @@
           <label for="age">Age</label>
           <div class="unit-wrap"><input type="number" id="age" inputmode="numeric" min="15" max="90" placeholder="30"><span class="u">yrs</span></div>
         </div>
-
-        <div class="field" data-method="hr">
-          <label for="rhr">Resting heart rate</label>
-          <div class="unit-wrap"><input type="number" id="rhr" inputmode="numeric" min="30" max="120" placeholder="60"><span class="u">bpm</span></div>
-          <div class="hint">Measure first thing in the morning, before getting up.</div>
+        <div class="field full" data-method="walk1 walk6">
+          <span class="label">Units</span>
+          <div class="seg" data-name="units" data-remember>
+            <button data-value="imperial" aria-pressed="true">lb / miles</button>
+            <button data-value="metric">kg / km</button>
+          </div>
         </div>
-        <div class="field" data-method="hr">
-          <label for="mhr">Max heart rate <span style="text-transform:none;color:var(--muted)">(optional)</span></label>
-          <div class="unit-wrap"><input type="number" id="mhr" inputmode="numeric" min="120" max="230" placeholder="auto"><span class="u">bpm</span></div>
-          <div class="hint">Leave blank to estimate from age.</div>
-        </div>
-
-        <div class="field" data-method="cooper" hidden>
-          <label for="dist">Distance covered in 12 minutes</label>
-          <div class="unit-wrap"><input type="number" id="dist" inputmode="decimal" min="0" step="0.01" placeholder="1.5"><span class="u" id="dist-u">mi</span></div>
-        </div>
-        <div class="field" data-method="cooper" hidden>
+        <div class="field full" data-method="cooper">
           <span class="label">Distance unit</span>
           <div class="seg" data-name="distunit">
             <button data-value="mi" aria-pressed="true">Miles</button>
             <button data-value="km">Km</button>
           </div>
         </div>
+        <div class="field" data-method="walk1 walk6">
+          <label for="weight">Weight</label>
+          <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="170"><span class="u" data-wu>lb</span></div>
+        </div>
 
-        <div class="field full" data-method="mile" hidden>
-          <span class="label">Time to run 1.5 miles (2.4 km)</span>
+        <div class="field" data-method="rest walk6">
+          <label for="rhr">Resting heart rate</label>
+          <div class="unit-wrap"><input type="number" id="rhr" inputmode="numeric" min="5" max="40" placeholder="17"><span class="u">beats / 15s</span></div>
+          <div class="hint">Count your pulse for 15 seconds after sitting still for 5 minutes.</div>
+        </div>
+        <div class="field" data-method="rest">
+          <label for="mhr">Max heart rate <span style="text-transform:none;color:var(--muted);letter-spacing:0;text-shadow:none;font-family:var(--sans);font-size:12px">(optional)</span></label>
+          <div class="unit-wrap"><input type="number" id="mhr" inputmode="numeric" min="120" max="230" placeholder="auto"><span class="u">bpm</span></div>
+          <div class="hint">If you know it from a hard test or a watch. Otherwise it's estimated from your age.</div>
+        </div>
+
+        <div class="field full" data-method="walk1">
+          <span class="label">Time to walk 1 mile</span>
           <div class="row">
-            <div class="unit-wrap"><input type="number" id="t-min" inputmode="numeric" min="0" placeholder="12" aria-label="Minutes"><span class="u">min</span></div>
-            <div class="unit-wrap"><input type="number" id="t-sec" inputmode="numeric" min="0" max="59" placeholder="30" aria-label="Seconds"><span class="u">sec</span></div>
+            <div class="unit-wrap"><input type="number" id="w1-min" inputmode="numeric" min="0" placeholder="15" aria-label="Minutes"><span class="u">min</span></div>
+            <div class="unit-wrap"><input type="number" id="w1-sec" inputmode="numeric" min="0" max="59" placeholder="0" aria-label="Seconds"><span class="u">sec</span></div>
           </div>
+        </div>
+        <div class="field full" data-method="walk1">
+          <label for="w1-hr">Heart rate at the finish</label>
+          <div class="unit-wrap"><input type="number" id="w1-hr" inputmode="numeric" min="5" max="60" placeholder="30"><span class="u">beats / 15s</span></div>
+        </div>
+
+        <div class="field full" data-method="step">
+          <label for="st-hr">Heart rate right after stepping</label>
+          <div class="unit-wrap"><input type="number" id="st-hr" inputmode="numeric" min="5" max="60" placeholder="30"><span class="u">beats / 15s</span></div>
+        </div>
+
+        <div class="field" data-method="walk6">
+          <label for="w6-d">Distance walked in 6 minutes</label>
+          <div class="unit-wrap"><input type="number" id="w6-d" inputmode="decimal" min="0" step="0.01" placeholder="0.4"><span class="u" data-du>mi</span></div>
+        </div>
+
+        <div class="field full" data-method="run15">
+          <span class="label">Time to cover 1.5 miles (2.4 km)</span>
+          <div class="row">
+            <div class="unit-wrap"><input type="number" id="r15-min" inputmode="numeric" min="0" placeholder="12" aria-label="Minutes"><span class="u">min</span></div>
+            <div class="unit-wrap"><input type="number" id="r15-sec" inputmode="numeric" min="0" max="59" placeholder="0" aria-label="Seconds"><span class="u">sec</span></div>
+          </div>
+        </div>
+
+        <div class="field full" data-method="cooper">
+          <label for="c-d">Distance covered in 12 minutes</label>
+          <div class="unit-wrap"><input type="number" id="c-d" inputmode="decimal" min="0" step="0.01" placeholder="1.5"><span class="u" id="c-du">mi</span></div>
         </div>
       </div>
       <div class="actions"><button class="btn" type="submit">Calculate</button></div>
@@ -83,13 +122,26 @@
           <div class="s" id="r-rating"></div>
         </div>
         <div class="meter">
-          <div class="meter-track" id="r-track">
+          <div class="meter-track">
             <span style="background:#ffffff"></span><span style="background:#e9e6f3"></span><span style="background:#c9c3e6"></span><span style="background:#b3a9d4"></span><span style="background:#9d91be"></span>
             <i class="meter-pin" id="r-pin"></i>
           </div>
           <div class="meter-labels"><span>Poor</span><span>Fair</span><span>Good</span><span>Excellent</span><span>Superior</span></div>
         </div>
-        <p class="note">Ratings are approximate norms for your age and sex. Field tests estimate VO₂ max; only a lab test with gas analysis measures it directly.</p>
+        <div class="stats">
+          <div class="stat hl"><div class="k">Fitness age</div><div class="v" id="r-fitage"></div><div class="s" id="r-fitage-s"></div></div>
+          <div class="stat"><div class="k">Percentile</div><div class="v" id="r-pct"></div><div class="s">vs. people your age and sex</div></div>
+        </div>
+        <p class="note" id="r-method"></p>
+
+        <h2>VO₂ max by age</h2>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Rating</th><th>20–29</th><th>30–39</th><th>40–49</th><th>50–59</th><th>60–69</th><th>70–79</th></tr></thead>
+            <tbody id="r-norms"></tbody>
+          </table>
+        </div>
+        <p class="note">Minimum VO₂ max (ml/kg/min) for each rating. Superior = 95th percentile, Excellent = 80th, Good = 60th, Fair = 40th. Norms from the American College of Sports Medicine (ACSM), based on Cooper Institute data.</p>
       </div>
     </form>
   </main>
@@ -99,55 +151,139 @@
   <script>
     (function () {
       var B = Bloom;
+      var TESTS = {
+        rest: {
+          name: "Resting Heart Rate Test",
+          about: "The quickest estimate: it only needs your resting pulse. It's the least accurate of the six, tends to flatter older or less active people, and works best for young, fit people.",
+          how: ["Sit or lie down and relax for 5 minutes.", "Find your pulse on your wrist or neck.", "Count the beats for 15 seconds and enter that number."],
+          cite: "Uth et al. (2004): VO₂ max = 15.3 × max HR ÷ resting HR. Max HR is estimated with Tanaka et al. (2001): 208 − 0.7 × age, unless you enter your own."
+        },
+        walk1: {
+          name: "Rockport 1-Mile Walk Test",
+          about: "Great if you don't run. It's fairly accurate for average and lower fitness levels, but it usually underestimates people who are already very fit.",
+          how: ["Warm up with a few minutes of easy walking.", "Walk 1 mile as fast as you can without breaking into a run.", "As soon as you finish, count your pulse for 15 seconds.", "Enter your time and that pulse count."],
+          cite: "Kline et al. (1987), the Rockport equation: 132.853 − 0.0769 × weight (lb) − 0.3877 × age + 6.315 × sex (male = 1, female = 0) − 3.2649 × time (min) − 0.1565 × finishing heart rate (bpm)."
+        },
+        step: {
+          name: "Queens College 3-Minute Step Test",
+          about: "Doable at home with a step and a metronome app. It's moderately accurate and less reliable at the very top and bottom of the fitness range.",
+          how: ["Find a step about 16 inches (41 cm) high.", "Set a metronome to 96 bpm for men or 88 bpm for women.", "Step up-up-down-down in time with the beat for 3 minutes.", "Stop, wait 5 seconds, then count your pulse for 15 seconds and enter it."],
+          cite: "McArdle et al. (1972): men = 111.33 − 0.42 × heart rate (bpm); women = 65.81 − 0.1847 × heart rate (bpm)."
+        },
+        walk6: {
+          name: "6-Minute Walk Test",
+          about: "Best for older adults or anyone returning to exercise. Fit people will usually be underestimated because the walk isn't hard enough to show their full capacity.",
+          how: ["Use a track or a running app to measure distance.", "Walk as far as you can in 6 minutes at a pace you can keep up.", "Enter the distance, plus your resting pulse taken before the walk."],
+          cite: "Burr et al. (2011), healthy adults: 70.161 + 0.023 × distance (m) − 0.276 × weight (kg) − 6.79 × sex (male = 0, female = 1) − 0.193 × resting HR (bpm) − 0.191 × age."
+        },
+        run15: {
+          name: "1.5-Mile Run Test",
+          about: "A well-validated test for recreational runners and reasonably fit people, as long as you truly push the pace.",
+          how: ["Warm up for a few minutes.", "Run (or run-walk) 1.5 miles as fast as you can, using a track or app to measure distance.", "Enter your finishing time."],
+          cite: "Standard 1.5-mile run equation: VO₂ max = 3.5 + 483 ÷ time (min)."
+        },
+        cooper: {
+          name: "Cooper 12-Minute Run Test",
+          about: "One of the most accurate field tests, and also the hardest. Pace it so you're completely spent at 12 minutes.",
+          how: ["Warm up for a few minutes.", "Run as far as you can in exactly 12 minutes, using a track or app to measure distance.", "Enter the distance."],
+          cite: "Cooper (1968): VO₂ max = (distance in meters − 504.9) ÷ 44.73."
+        }
+      };
+
+      // ACSM norms (Cooper Institute data): [superior 95th, excellent 80th, good 60th, fair 40th]
+      var AGES = [20, 30, 40, 50, 60, 70];
+      var NORMS = {
+        m: [[55.4, 51.1, 45.4, 41.7], [54.0, 48.3, 44.0, 40.5], [52.5, 46.4, 42.4, 38.5], [48.9, 43.4, 39.2, 35.6], [45.7, 39.5, 35.5, 32.3], [42.1, 36.7, 32.3, 29.4]],
+        f: [[49.6, 43.9, 39.5, 36.1], [47.4, 42.4, 37.8, 34.4], [45.3, 39.7, 36.3, 33.0], [41.1, 36.7, 33.0, 30.1], [37.8, 33.0, 30.0, 27.5], [36.7, 30.9, 28.1, 25.9]]
+      };
+      var RATINGS = ["Poor", "Fair", "Good", "Excellent", "Superior"];
+
+      var info = document.getElementById("test-info");
       var method = B.seg("method", function (m) {
-        B.$$("[data-method]").forEach(function (el) { el.hidden = el.dataset.method !== m; });
+        B.$$("[data-method]").forEach(function (el) { el.hidden = el.dataset.method.split(" ").indexOf(m) < 0; });
+        var t = TESTS[m];
+        info.innerHTML = '<p class="t-name">' + t.name + "</p><p>" + t.about + "</p>" +
+          '<details><summary>How to do the test</summary><ol>' + t.how.map(function (h) { return "<li>" + h + "</li>"; }).join("") + "</ol></details>";
+        document.getElementById("results").hidden = true;
       });
       var sex = B.seg("sex");
-      var distunit = B.seg("distunit", function (v) { document.getElementById("dist-u").textContent = v; });
+      var units = B.unitSystem(function (v) { document.querySelector("[data-du]").textContent = v === "metric" ? "km" : "mi"; });
+      var distunit = B.seg("distunit", function (v) { document.getElementById("c-du").textContent = v; });
       var form = document.getElementById("form");
 
-      // thresholds for [fair, good, excellent, superior] by age band
-      var NORMS = {
-        m: [[29, [38, 42, 46, 52]], [39, [36, 40, 44, 50]], [49, [34, 38, 42, 48]], [59, [31, 35, 39, 45]], [200, [28, 32, 36, 42]]],
-        f: [[29, [32, 36, 40, 46]], [39, [30, 34, 38, 44]], [49, [28, 32, 36, 41]], [59, [25, 29, 33, 37]], [200, [23, 27, 31, 35]]]
-      };
-      var LABELS = ["Poor", "Fair", "Good", "Excellent", "Superior"];
+      function mins(idM, idS) { var m = B.num(idM), s = B.num(idS); return (m > 0 ? m : 0) + (s > 0 ? s : 0) / 60; }
 
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        var age = B.num("age"), m = method(), vo2, err = "";
+        var m = method(), s = sex(), age = B.num("age"), metric = units() === "metric";
+        var lb = metric ? B.num("weight") * B.LB_PER_KG : B.num("weight"), kg = lb / B.LB_PER_KG;
+        var vo2, err = "";
         if (!(age > 0)) err = "Please enter your age.";
 
-        if (!err && m === "hr") {
-          var rhr = B.num("rhr"), mhr = B.num("mhr");
+        if (!err && m === "rest") {
+          var rhr = B.num("rhr") * 4, mhr = B.num("mhr");
           if (!(rhr > 0)) err = "Please enter your resting heart rate.";
-          if (!(mhr > 0)) mhr = 208 - 0.7 * age;                // Tanaka
-          vo2 = 15.3 * mhr / rhr;                                // Uth et al.
-        } else if (!err && m === "cooper") {
-          var d = B.num("dist");
-          if (!(d > 0)) err = "Please enter the distance you covered.";
-          var meters = distunit() === "mi" ? d * 1609.34 : d * 1000;
-          vo2 = (meters - 504.9) / 44.73;                        // Cooper
+          vo2 = 15.3 * ((mhr > 0 ? mhr : 208 - 0.7 * age)) / rhr;
+        } else if (!err && m === "walk1") {
+          var t = mins("w1-min", "w1-sec"), hr = B.num("w1-hr") * 4;
+          if (!(lb > 0 && t > 0 && hr > 0)) err = "Please enter your weight, walk time and finishing heart rate.";
+          vo2 = 132.853 - 0.0769 * lb - 0.3877 * age + 6.315 * (s === "m" ? 1 : 0) - 3.2649 * t - 0.1565 * hr;
+        } else if (!err && m === "step") {
+          var shr = B.num("st-hr") * 4;
+          if (!(shr > 0)) err = "Please enter your heart rate after stepping.";
+          vo2 = s === "m" ? 111.33 - 0.42 * shr : 65.81 - 0.1847 * shr;
+        } else if (!err && m === "walk6") {
+          var d = B.num("w6-d"), r6 = B.num("rhr") * 4;
+          if (!(lb > 0 && d > 0 && r6 > 0)) err = "Please enter your weight, distance and resting heart rate.";
+          var meters = d * (metric ? 1000 : 1609.34);
+          vo2 = 70.161 + 0.023 * meters - 0.276 * kg - 6.79 * (s === "f" ? 1 : 0) - 0.193 * r6 - 0.191 * age;
+        } else if (!err && m === "run15") {
+          var rt = mins("r15-min", "r15-sec");
+          if (!(rt > 0)) err = "Please enter your 1.5-mile time.";
+          vo2 = 3.5 + 483 / rt;
         } else if (!err) {
-          var mins = B.num("t-min"), secs = B.num("t-sec");
-          var t = (mins > 0 ? mins : 0) + (secs > 0 ? secs : 0) / 60;
-          if (!(t > 0)) err = "Please enter your 1.5-mile time.";
-          vo2 = 3.5 + 483 / t;                                   // 1.5-mile run
+          var cd = B.num("c-d");
+          if (!(cd > 0)) err = "Please enter the distance you covered.";
+          vo2 = (cd * (distunit() === "mi" ? 1609.34 : 1000) - 504.9) / 44.73;
         }
         if (!B.error(form, err)) return;
-        if (!(vo2 > 0)) { B.error(form, "That result doesn't look right — double-check your inputs."); return; }
+        if (!(vo2 > 5 && vo2 < 100)) { B.error(form, "That result doesn't look right. Double-check your numbers."); return; }
 
-        var band = NORMS[sex()].filter(function (b) { return age <= b[0]; })[0][1];
-        var idx = band.filter(function (t) { return vo2 >= t; }).length;
+        // rating for this age/sex
+        var bi = Math.max(0, Math.min(5, Math.floor((age - 20) / 10)));
+        var band = NORMS[s][bi];
+        var idx = band.filter(function (t) { return vo2 >= t; }).length;          // 0 poor … 4 superior
+        // percentile: interpolate between known points (40, 60, 80, 95), assume ~20th at fair-(good-fair)
+        var pts = [[band[3] - (band[2] - band[3]), 20], [band[3], 40], [band[2], 60], [band[1], 80], [band[0], 95]];
+        var pct;
+        if (vo2 <= pts[0][0]) pct = Math.max(1, 20 * vo2 / pts[0][0]);
+        else if (vo2 >= band[0]) pct = Math.min(99, 95 + 4 * (vo2 - band[0]) / (band[0] * 0.1));
+        else for (var i = 0; i < 4; i++) if (vo2 >= pts[i][0] && vo2 <= pts[i + 1][0]) pct = pts[i][1] + (pts[i + 1][1] - pts[i][1]) * (vo2 - pts[i][0]) / (pts[i + 1][0] - pts[i][0]);
+
+        // fitness age: the age whose median (≈ midway between 40th and 60th percentile) matches your VO2 max
+        var med = NORMS[s].map(function (b, k) { return [AGES[k] + 5, (b[2] + b[3]) / 2]; });
+        var fit;
+        if (vo2 >= med[0][1]) fit = "Under 25";
+        else if (vo2 <= med[5][1]) fit = "75+";
+        else for (var j = 0; j < 5; j++) if (vo2 <= med[j][1] && vo2 >= med[j + 1][1])
+          fit = Math.round(med[j][0] + 10 * (med[j][1] - vo2) / (med[j][1] - med[j + 1][1]));
 
         document.getElementById("r-vo2").textContent = vo2.toFixed(1);
-        document.getElementById("r-rating").textContent = LABELS[idx] + " for your age and sex";
-
-        // position pin: each segment spans one rating band
-        var lo = band[0] - (band[1] - band[0]), edges = [lo].concat(band, [band[3] + (band[3] - band[2])]);
-        var seg = Math.min(idx, 4), a = edges[seg], b = edges[seg + 1];
-        var within = Math.max(0, Math.min(1, (vo2 - a) / (b - a)));
-        document.getElementById("r-pin").style.left = ((seg + within) / 5 * 100) + "%";
+        document.getElementById("r-rating").textContent = RATINGS[idx] + " for a " + (s === "m" ? "man" : "woman") + " aged " + (AGES[bi]) + "–" + (AGES[bi] + 9);
+        var lo = [pts[0][0], band[3], band[2], band[1], band[0]][idx], hi = [band[3], band[2], band[1], band[0], band[0] * 1.12][idx];
+        document.getElementById("r-pin").style.left = ((idx + Math.max(0, Math.min(1, (vo2 - lo) / (hi - lo)))) / 5 * 100) + "%";
+        document.getElementById("r-fitage").textContent = fit;
+        var diff = typeof fit === "number" ? fit - age : null;
+        document.getElementById("r-fitage-s").textContent = diff === null ? "Based on average VO₂ max by age" :
+          (diff <= -1 ? Math.abs(diff) + " years younger than you" : diff >= 1 ? diff + " years older than you" : "Right on your real age");
+        var pr = Math.round(pct), suf = (pr % 100 >= 11 && pr % 100 <= 13) ? "th" : ["th", "st", "nd", "rd"][pr % 10] || "th";
+        document.getElementById("r-pct").textContent = pr + suf;
+        document.getElementById("r-method").textContent = TESTS[m].cite;
+        document.getElementById("r-norms").innerHTML = [0, 1, 2, 3].map(function (k) {
+          return "<tr><td>" + RATINGS[4 - k] + "</td>" + NORMS[s].map(function (b, a) {
+            return "<td" + (a === bi && 4 - k === idx ? ' class="hl"' : "") + ">" + b[k].toFixed(1) + "</td>";
+          }).join("") + "</tr>";
+        }).join("") + "<tr><td>Poor</td>" + NORMS[s].map(function (b, a) { return "<td" + (a === bi && idx === 0 ? ' class="hl"' : "") + ">&lt; " + b[3].toFixed(1) + "</td>"; }).join("") + "</tr>";
 
         B.show(document.getElementById("results"));
       });
