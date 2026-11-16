@@ -92,6 +92,10 @@
           <div class="s">Your estimated maintenance calories per day</div>
         </div>
 
+        <div style="font-family:var(--pixel);font-size:13px;text-transform:uppercase;letter-spacing:.8px;margin-top:20px">Where your calories go</div>
+        <div class="stack" id="r-stack"></div>
+        <div class="legend" id="r-legend"></div>
+
         <h2 style="margin-top:24px">&#11015; Calories to lose weight</h2>
         <div class="tbl-wrap">
           <table class="tbl">
@@ -204,6 +208,25 @@
         var bmr = (370 + lbmCoef * lbm + GENDER[sex()]) * parseFloat(age());
         var tdee = bmr * parseFloat(hours()) + parseFloat(steps());
         var lbs = u === "metric" ? w * B.LB_PER_KG : w;
+
+        // Breakdown: BMR, NEAT (steps), EAT (exercise multiplier), TEF.
+        // The formula has no separate TEF term, so TEF is set at 10% of TDEE
+        // and the other three share the remaining 90% in proportion.
+        var neat = parseFloat(steps()), eat = bmr * (parseFloat(hours()) - 1);
+        var parts = [["BMR", bmr, "#8e86c1", "#2b2b2b"], ["NEAT", neat, "#ffdae4", "#2b2b2b"], ["EAT", eat, "#2b2b2b", "#ffdae4"]];
+        var base = bmr + neat + eat;
+        parts = parts.map(function (p) { return [p[0], p[1] / base * 90, p[2], p[3]]; });
+        parts.splice(2, 0, ["TEF", 10, "#e6eaeb", "#2b2b2b"]);
+        parts.forEach(function (p) { p[1] = Math.round(p[1]); });
+        parts[0][1] += 100 - parts.reduce(function (t, p) { return t + p[1]; }, 0);   // keep total at 100%
+        var NAMES = { BMR: "Basal metabolic rate", NEAT: "Non-exercise activity (steps)", TEF: "Digesting food", EAT: "Exercise" };
+        document.getElementById("r-stack").innerHTML = parts.filter(function (p) { return p[1] > 0.05; }).map(function (p) {
+          return '<div style="flex:' + p[1] + ';background:' + p[2] + ';color:' + p[3] + '" title="' + p[0] + ': ' + Math.round(p[1]) + '%">' +
+            (p[1] >= 7 ? Math.round(p[1]) + "%" : "") + "</div>";
+        }).join("");
+        document.getElementById("r-legend").innerHTML = parts.map(function (p) {
+          return '<span><i style="background:' + p[2] + '"></i><strong style="font-weight:600">' + p[0] + " " + Math.round(p[1]) + "%</strong> · " + NAMES[p[0]] + "</span>";
+        }).join("");
 
         document.getElementById("r-lbm").textContent = B.fmt(lbm) + (u === "metric" ? " kg" : " lbs");
         document.getElementById("r-bmr").textContent = B.fmt(bmr) + " cal";
