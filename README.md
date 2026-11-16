@@ -7,6 +7,7 @@ Static rebuild of [trainbloom.com](https://www.trainbloom.com) — free fitness 
 ```
 index.html                              Home (calculator grid)
 calorie-calculator-tdee/index.html      TDEE / calorie calculator
+calorie-calculator/index.html           Same calculator, bold black/white theme (assets/css/bold.css)
 protein-calculator-1/index.html         Protein calculator
 vo2-max-calculator/index.html           VO2 max calculator
 1-rep-max-calculator/index.html         One-rep max calculator
