@@ -51,6 +51,10 @@
   var footer = document.createElement("footer");
   footer.className = "site-footer";
   footer.innerHTML =
+    '<div class="contact">' +
+    '<a href="https://xbkv4jg47ar.typeform.com/to/Xm4rWtQJ" target="_blank" rel="noopener">Apply for 1:1 coaching</a>' +
+    '<a href="mailto:anthony@trainbloom.com">Email me</a>' +
+    "</div>" +
     '<div class="social">' +
     '<a href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener" aria-label="Instagram">' +
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>' +
