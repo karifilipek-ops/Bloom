@@ -392,3 +392,12 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .method .body { padding: 0 14px 6px; font-size: 14px; }
 .method .body p { margin: 0 0 10px; }
 .method a { color: var(--lav-dark); }
+
+/* ---------- VO2 test info ---------- */
+.test-info { background: var(--paper); border: 2px solid var(--lav-line); border-left: 8px solid var(--lav); border-radius: var(--r-sm); padding: 12px 14px; margin: 0 0 18px; font-size: 14px; }
+.test-info p { margin: 0 0 6px; }
+.test-info .t-name { font-family: var(--pixel); font-size: 20px; letter-spacing: .14em; text-transform: uppercase; text-shadow: var(--px-shadow); margin-bottom: 4px; }
+.test-info summary { cursor: pointer; font-weight: 600; color: var(--lav-dark); }
+.test-info ol { margin: 8px 0 2px; padding-left: 20px; }
+.test-info li { margin-bottom: 4px; }
+@media (max-width: 560px) { .meter-labels { font-size: 12px; letter-spacing: 0; } }
