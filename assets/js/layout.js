@@ -2,7 +2,7 @@
 (function () {
   var CALCULATORS = [
     ["/calorie-calculator-tdee/", "Calorie (TDEE) Calculator"],
-    ["/calorie-calculator/", "Calorie Calculator (Bold)"],
+    ["/calorie-calculator/", "Calorie Calculator (Dark)"],
     ["/protein-calculator-1/", "Protein Calculator"],
     ["/vo2-max-calculator/", "VO2 Max Calculator"],
     ["/1-rep-max-calculator/", "One-Rep Max Calculator"],

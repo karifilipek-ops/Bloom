@@ -10,41 +10,40 @@
   <link rel="apple-touch-icon" href="/assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/bold.css">
 </head>
-<body class="bold">
-  <div class="ticker" aria-hidden="true">
-    <div class="ticker-track">
-      <span>4 inputs</span><span>60 seconds</span><span>0 smartwatch guessing</span><span>1 real number</span><span>Cut</span><span>Bulk</span><span>Recomp</span>
-      <span>4 inputs</span><span>60 seconds</span><span>0 smartwatch guessing</span><span>1 real number</span><span>Cut</span><span>Bulk</span><span>Recomp</span>
-    </div>
-  </div>
-
+<body>
   <main>
     <section class="hero">
-      <p class="eyebrow">Free tool / TDEE</p>
-      <h1>How many calories do you <em>actually</em> burn?</h1>
-      <p class="hero-sub">Probably more than your smartwatch says. Less than you hope.</p>
-      <ul class="claims">
-        <li><b>4</b><span>parts of your<br>metabolism</span></li>
-        <li><b>60s</b><span>to your<br>number</span></li>
-        <li><b>0</b><span>emails<br>required</span></li>
-      </ul>
-      <a class="btn" href="#form">Calculate mine</a>
+      <div class="hero-in">
+        <h1>Your metabolism has a number.</h1>
+        <p class="hero-sub">Probably more than your smartwatch says. Less than you hope.</p>
+        <div class="hero-btns">
+          <a class="pill" href="#form">Calculate</a>
+          <a class="pill" href="#learn">How it works</a>
+        </div>
+      </div>
+      <div class="ticker" aria-hidden="true">
+        <div class="ticker-track">
+          <span>Free forever</span><span>Based on lean body mass</span><span>No email required</span><span>Cut, bulk &amp; recomp targets</span><span>60 seconds</span>
+          <span>Free forever</span><span>Based on lean body mass</span><span>No email required</span><span>Cut, bulk &amp; recomp targets</span><span>60 seconds</span>
+        </div>
+      </div>
     </section>
 
     <form class="calc" id="form" novalidate>
-      <div class="calc-head">
-        <h2>Your stats</h2>
-        <span class="step">01</span>
+      <div class="calc-intro">
+        <p class="mono">TDEE / Calorie calculator</p>
+        <h2>Tell us about you.</h2>
       </div>
+
       <div class="fields">
         <div class="field">
           <span class="label">Units</span>
           <div class="seg" data-name="units" data-remember>
-            <button data-value="imperial" aria-pressed="true">Imperial (lb)</button>
-            <button data-value="metric">Metric (kg)</button>
+            <button data-value="imperial" aria-pressed="true">lb</button>
+            <button data-value="metric">kg</button>
           </div>
         </div>
         <div class="field">
@@ -59,7 +58,7 @@
           <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="175"><span class="u" data-wu>lb</span></div>
         </div>
         <div class="field full">
-          <label for="bf">Body fat <span class="bf-num"><span id="bf-out">20</span>%</span></label>
+          <label for="bf">Body fat <span class="val"><span id="bf-out">20</span>%</span></label>
           <input type="range" id="bf" min="5" max="60" step="1" value="20">
           <div class="range-ends"><span>5%</span><span>60%</span></div>
           <details class="bf-guide">
@@ -69,18 +68,18 @@
           </details>
         </div>
         <div class="field full">
-          <span class="label">Hours of training per week</span>
-          <div class="seg multi" data-name="hours">
-            <button data-value="1" aria-pressed="true">0–1</button>
-            <button data-value="1.125">1–3</button>
-            <button data-value="1.25">3–5</button>
-            <button data-value="1.375">6–8</button>
-            <button data-value="1.5">8+</button>
+          <span class="label">Training per week</span>
+          <div class="seg wrap" data-name="hours">
+            <button data-value="1" aria-pressed="true">0–1 hr</button>
+            <button data-value="1.125">1–3 hr</button>
+            <button data-value="1.25">3–5 hr</button>
+            <button data-value="1.375">6–8 hr</button>
+            <button data-value="1.5">8+ hr</button>
           </div>
         </div>
         <div class="field full">
-          <span class="label">Average daily steps</span>
-          <div class="seg multi" data-name="steps">
+          <span class="label">Daily steps</span>
+          <div class="seg wrap" data-name="steps">
             <button data-value="150" aria-pressed="true">3–5k</button>
             <button data-value="240">5–7k</button>
             <button data-value="330">7–9k</button>
@@ -97,103 +96,89 @@
           </div>
         </div>
       </div>
-      <div class="actions"><button class="btn" type="submit">Calculate</button></div>
+      <div class="actions"><button class="pill pill-lg" type="submit">Calculate</button></div>
 
       <div class="results" id="results" hidden aria-live="polite">
-        <div class="facts">
-          <div class="facts-title">Energy Facts</div>
-          <div class="facts-row thin"><span>Serving size</span><span>1 day</span></div>
-          <div class="facts-bar"></div>
-          <div class="facts-sm">Amount per day</div>
-          <div class="facts-cal"><span>Calories</span><span id="r-tdee"></span></div>
-          <div class="facts-row bold-row"><span>Maintenance (TDEE)</span><span>% of total</span></div>
-          <div id="r-legend"></div>
-          <div class="facts-row"><span><b>Basal metabolic rate</b></span><span id="r-bmr"></span></div>
-          <div class="facts-row"><span><b>Lean body mass</b></span><span id="r-lbm"></span></div>
-          <div class="stack" id="r-stack"></div>
-          <p class="facts-foot">* Estimate based on lean body mass, training volume and steps. TEF is set at 10% of TDEE.</p>
+        <div class="headline">
+          <p class="mono">Estimated maintenance</p>
+          <div class="big"><span id="r-tdee"></span><small>calories / day</small></div>
+          <div class="mini">
+            <div><span class="mono">BMR</span><span id="r-bmr"></span></div>
+            <div><span class="mono">Lean mass</span><span id="r-lbm"></span></div>
+          </div>
         </div>
 
-        <div class="block">
-          <h3><span class="tag tag-blue">Cut</span> Calories to lose weight</h3>
+        <div class="section">
+          <p class="mono">Where your calories go</p>
+          <div class="stack" id="r-stack"></div>
+          <div class="legend" id="r-legend"></div>
+        </div>
+
+        <div class="section">
+          <h3>To lose weight</h3>
           <table class="tbl">
-            <thead><tr><th>Rate (body weight / week)</th><th>Eat</th></tr></thead>
             <tbody id="r-cut"></tbody>
           </table>
-          <p class="note"><b>Important:</b> this is an estimate from a standard formula, and extreme restriction can do more harm than good. For some smaller, less active people the result may land below 1,200 calories. Intake that low likely won't cover the nutrients your body needs, risks muscle loss and other health problems, and isn't recommended. Talk to a registered dietitian before big dietary changes.</p>
+          <p class="note">This is an estimate from a standard formula, and extreme restriction can do more harm than good. For some smaller, less active people the result may land below 1,200 calories. Intake that low likely won't cover the nutrients your body needs, risks muscle loss and other health problems, and isn't recommended. Talk to a registered dietitian before big dietary changes.</p>
         </div>
 
-        <div class="block">
-          <h3><span class="tag tag-orange">Bulk</span> Calories to gain weight</h3>
-          <table class="tbl">
-            <thead><tr><th>Type</th><th>Eat</th></tr></thead>
-            <tbody id="r-bulk"></tbody>
-          </table>
+        <div class="section">
+          <h3>To gain weight</h3>
+          <table class="tbl"><tbody id="r-bulk"></tbody></table>
         </div>
 
-        <div class="block">
-          <h3><span class="tag tag-yellow">Recomp</span> Calories to recomp</h3>
-          <table class="tbl">
-            <thead><tr><th>Type</th><th>Eat</th></tr></thead>
-            <tbody id="r-recomp"></tbody>
-          </table>
+        <div class="section">
+          <h3>To recomp</h3>
+          <table class="tbl"><tbody id="r-recomp"></tbody></table>
         </div>
 
-        <div class="block">
-          <h3><span class="tag tag-pink">What if</span> Your TDEE if&hellip;</h3>
-          <p class="note">Different scenarios for what your TDEE <em>could</em> be with a few lifestyle changes. Like whether a short walk after each meal is worth it if it buys you a nighttime snack while dieting.</p>
-          <table class="tbl">
-            <thead><tr><th>TDEE if you&hellip;</th><th>Burn</th></tr></thead>
-            <tbody id="r-ifs"></tbody>
-          </table>
+        <div class="section">
+          <h3>Your TDEE <em>if</em>&hellip;</h3>
+          <p class="note">What your TDEE could be with a few lifestyle changes. Like whether a short walk after each meal is worth it if it buys you a nighttime snack while dieting.</p>
+          <table class="tbl"><tbody id="r-ifs"></tbody></table>
         </div>
       </div>
     </form>
 
-    <section class="cta-band">
-      <h2>Doing everything right and still not seeing results?</h2>
-      <a class="btn btn-invert" href="https://xbkv4jg47ar.typeform.com/to/Xm4rWtQJ" target="_blank" rel="noopener">Apply for 1:1 coaching</a>
-    </section>
-
-    <article class="article">
-      <p class="eyebrow">The breakdown</p>
-      <h2>TDEE = Total Daily Energy Expenditure</h2>
-      <p class="subtle">Where you actually burn calories in a day. It's made of 4 parts.</p>
+    <article class="article" id="learn">
+      <p class="mono">The breakdown</p>
+      <h2>Total Daily Energy Expenditure.</h2>
+      <p class="lede">Where you actually burn calories in a day. It's made of four parts.</p>
 
       <div class="parts">
-        <div class="part" style="--c:var(--orange)">
-          <div class="part-n">~70%</div>
-          <h3>BMR</h3>
-          <p class="part-sub">Basal metabolic rate</p>
-          <p>The calories your body burns at complete rest: keeping your heart beating, lungs breathing, brain thinking and temperature regulated, 24/7. It's about 70% of what you burn in a day, and it's the part that certain metabolic conditions can suppress (hypothyroidism can lower it by 5–15%).</p>
+        <div class="part">
+          <span class="mono">01 &mdash; ~70%</span>
+          <h3>Basal metabolic rate</h3>
+          <p>The calories your body burns at complete rest: keeping your heart beating, lungs breathing, brain thinking and temperature regulated, 24/7. It's about 70% of what you burn in a day, and the part certain metabolic conditions can suppress (hypothyroidism can lower it by 5–15%).</p>
         </div>
-        <div class="part" style="--c:var(--blue)">
-          <div class="part-n">Varies</div>
-          <h3>NEAT</h3>
-          <p class="part-sub">Non-exercise activity thermogenesis</p>
-          <p>Calories from any movement that isn't formal exercise: steps, fidgeting, standing instead of sitting. Depending on your lifestyle it's the smallest chunk or the second biggest, and it's one of the best levers for burning more in a day.</p>
+        <div class="part">
+          <span class="mono">02 &mdash; Varies</span>
+          <h3>Non-exercise activity</h3>
+          <p>Calories from any movement that isn't formal exercise: steps, fidgeting, standing instead of sitting. Depending on your lifestyle it's the smallest chunk or the second biggest, and it's one of the best levers for burning more.</p>
         </div>
-        <div class="part" style="--c:var(--yellow)">
-          <div class="part-n">10–15%</div>
-          <h3>TEF</h3>
-          <p class="part-sub">Thermic effect of food</p>
-          <p>Calories burned digesting food. It depends on what you eat: protein costs 20–30% of its calories to digest, so 100 calories of protein burns 20–30 just breaking it down. Fat costs only 0–3%.</p>
+        <div class="part">
+          <span class="mono">03 &mdash; 10–15%</span>
+          <h3>Thermic effect of food</h3>
+          <p>Calories burned digesting food. Protein costs 20–30% of its calories to digest, so 100 calories of protein burns 20–30 just breaking it down. Fat costs only 0–3%.</p>
         </div>
-        <div class="part" style="--c:var(--pink)">
-          <div class="part-n">~5%</div>
-          <h3>EAT</h3>
-          <p class="part-sub">Exercise activity thermogenesis</p>
+        <div class="part">
+          <span class="mono">04 &mdash; ~5%</span>
+          <h3>Exercise</h3>
           <p>Calories burned in formal exercise. Shockingly, for most people this is the smallest piece of the pie.</p>
         </div>
       </div>
 
-      <h2 class="mt">Even the best calculation is still just a calculation.</h2>
       <div class="closing">
+        <h2>Even the best calculation is still just a calculation.</h2>
         <p>A formula takes a few metrics into account. In reality, countless things change how much you burn in a day: sleep, hormone health, what you eat and more.</p>
-        <p>To learn how to dial in your metabolism and use TDEE to lose fat, build muscle or both, listen to <a href="https://podcasters.spotify.com/pod/show/fitnessstuff/episodes/87--Understanding-Metabolism-The-Truth-About-Boosting-Your-Metabolism-e29nkg9" target="_blank" rel="noopener">Episode 87: Understanding Your Metabolism</a> and send me your questions after.</p>
-        <p>And to optimize the training side of your TDEE, <a href="https://xbkv4jg47ar.typeform.com/to/Xm4rWtQJ" target="_blank" rel="noopener">apply to work with me 1:1</a>.</p>
+        <p>To learn how to dial in your metabolism, listen to <a href="https://podcasters.spotify.com/pod/show/fitnessstuff/episodes/87--Understanding-Metabolism-The-Truth-About-Boosting-Your-Metabolism-e29nkg9" target="_blank" rel="noopener">Episode 87: Understanding Your Metabolism</a>.</p>
       </div>
     </article>
+
+    <section class="cta-band">
+      <h2>Doing everything right and still not seeing results?</h2>
+      <a class="pill" href="https://xbkv4jg47ar.typeform.com/to/Xm4rWtQJ" target="_blank" rel="noopener">Apply for 1:1 coaching</a>
+    </section>
   </main>
 
   <script src="/assets/js/layout.js"></script>
@@ -248,19 +233,19 @@
         // The formula has no separate TEF term, so TEF is set at 10% of TDEE
         // and the other three share the remaining 90% in proportion.
         var neat = parseFloat(steps()), eat = bmr * (parseFloat(hours()) - 1);
-        var parts = [["BMR", bmr, "#ff5b14", "#000"], ["NEAT", neat, "#2f6bff", "#fff"], ["EAT", eat, "#ff9fd0", "#000"]];
+        var parts = [["BMR", bmr, "#f4f1ea", "#000"], ["NEAT", neat, "#3a86e0", "#fff"], ["EAT", eat, "#5c5c5c", "#fff"]];
         var base = bmr + neat + eat;
         parts = parts.map(function (p) { return [p[0], p[1] / base * 90, p[2], p[3]]; });
-        parts.splice(2, 0, ["TEF", 10, "#ffd500", "#000"]);
+        parts.splice(2, 0, ["TEF", 10, "#c9a45c", "#000"]);
         parts.forEach(function (p) { p[1] = Math.round(p[1]); });
         parts[0][1] += 100 - parts.reduce(function (t, p) { return t + p[1]; }, 0);   // keep total at 100%
         var NAMES = { BMR: "Basal metabolic rate", NEAT: "Non-exercise activity (steps)", TEF: "Digesting food", EAT: "Exercise" };
         document.getElementById("r-stack").innerHTML = parts.filter(function (p) { return p[1] > 0.05; }).map(function (p) {
           return '<div style="flex:' + p[1] + ';background:' + p[2] + ';color:' + p[3] + '" title="' + p[0] + ': ' + Math.round(p[1]) + '%">' +
-            (p[1] >= 7 ? Math.round(p[1]) + "%" : "") + "</div>";
+            "" + "</div>";
         }).join("");
         document.getElementById("r-legend").innerHTML = parts.map(function (p) {
-          return '<div class="facts-row indent"><span><i style="background:' + p[2] + '"></i><b>' + p[0] + "</b> " + NAMES[p[0]] + "</span><span><b>" + Math.round(p[1]) + "%</b></span></div>";
+          return '<div class="lg"><i style="background:' + p[2] + '"></i><span class="lg-k">' + p[0] + '</span><span class="lg-n">' + NAMES[p[0]] + '</span><span class="lg-v">' + Math.round(p[1]) + "%</span></div>";
         }).join("");
 
         document.getElementById("r-lbm").textContent = B.fmt(lbm) + (u === "metric" ? " kg" : " lbs");
