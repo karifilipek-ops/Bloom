@@ -101,7 +101,31 @@
         </div>
 
         <div class="callout">
-          <strong style="font-weight:600">Important note:</strong> Our calculator offers an estimate based off standard formula, please remember extreme calorie restriction can do much more harm than good. For some smaller, less active individuals the suggested intake may calculate to below 1,200 calories. Intake lower than this likely won't provide essential nutrients your body needs, risk of muscle loss, other health concerns, and is not recommended.
+          <strong style="font-weight:600">Important note:</strong> Our calculator offers an estimate based off standard formula, please remember extreme calorie restriction can do much more harm than good. For some smaller, less active individuals the suggested intake may calculate to below 1,200 calories. Intake lower than this likely won't provide essential nutrients your body needs, risk of muscle loss, other health concerns, and is not recommended. Always consult a registered dietitian before making major dietary adjustments.
+        </div>
+        <h2 style="margin-top:28px">&#11014; Calories to gain weight</h2>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Type</th><th>Calorie intake</th></tr></thead>
+            <tbody id="r-bulk"></tbody>
+          </table>
+        </div>
+
+        <h2 style="margin-top:28px">&#128260; Calories to recomp</h2>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Type</th><th>Calorie intake</th></tr></thead>
+            <tbody id="r-recomp"></tbody>
+          </table>
+        </div>
+
+        <h2 style="margin-top:28px">TDEE if&hellip;</h2>
+        <p style="font-size:14px;margin:0 0 8px">This section is looking at different scenarios of what your TDEE <strong style="font-weight:600"><em>could be</em></strong>... based on different lifestyle changes. This can give you different ideas on how you approach your goal, like whether or not it's worth adding a short walk after each meal if it allowed you to have an extra nighttime snack while dieting.</p>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>TDEE if you&hellip;</th><th>Potential</th></tr></thead>
+            <tbody id="r-ifs"></tbody>
+          </table>
         </div>
       </div>
     </form>
@@ -189,6 +213,26 @@
             var cals = tdee - (lbs * r[0] * 3500) / 7;                    // 3,500 cal per lb of fat
             return "<tr><td>&darr; " + r[1] + "</td><td>" + B.fmt(cals) + " cal</td></tr>";
           }).join("");
+
+        var rows = function (list) {
+          return list.map(function (r) { return "<tr><td>" + r[0] + "</td><td>" + B.fmt(r[1]) + " cal</td></tr>"; }).join("");
+        };
+        document.getElementById("r-bulk").innerHTML = rows([
+          ["Lean Bulk (minimum fat gain)", tdee * 1.08],
+          ["Standard Bulk (slight fat gain)", tdee * 1.15],
+          ["Dirty Bulk (moderate fat gain)", tdee * 1.3]
+        ]);
+        document.getElementById("r-recomp").innerHTML = rows([
+          ["Standard Recomp", tdee],
+          ["Fat Loss Focus", tdee * 0.92],
+          ["Muscle Gain Focus", tdee * 1.08]
+        ]);
+        document.getElementById("r-ifs").innerHTML = rows([
+          ["Added a 10-minute walk after each meal...", tdee + 210],
+          ["Stood +3 hours a day instead of sitting...", tdee + 385],
+          ["MAXED out active lifestyle (steps+exercise)...", bmr * 1.5 + 600],
+          ["Had the least active lifestyle...", bmr * 1 + 150]
+        ]);
 
         B.show(document.getElementById("results"));
       });
