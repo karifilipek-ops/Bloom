@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>WORKOUT TRACKER | Trainbloom</title>
+  <meta name="description" content="A fast, free workout log. Start a routine, log sets against last session in one tap, and see exactly what improved.">
+  <link rel="canonical" href="https://www.trainbloom.com/workout-tracker/">
+  <meta name="theme-color" content="#07070b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bloom Lift">
+  <link rel="manifest" href="/workout-tracker/manifest.webmanifest">
+  <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <link rel="stylesheet" href="/assets/css/lift.css">
+</head>
+<body class="lift-page">
+  <main id="app" class="lift" aria-live="polite">
+    <noscript><p class="lift-empty">The workout tracker needs JavaScript turned on.</p></noscript>
+  </main>
+
+  <nav class="tabbar" id="tabbar" aria-label="Tracker">
+    <a href="#/" data-tab="home"><span class="ti" data-pix="dumbbell"></span>Train</a>
+    <a href="#/routines" data-tab="routines"><span class="ti" data-pix="clipboard"></span>Routines</a>
+    <a href="#/lifts" data-tab="lifts"><span class="ti" data-pix="chart"></span>Lifts</a>
+  </nav>
+
+  <div class="restbar" id="restbar" hidden></div>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <div class="sheet-wrap" id="sheet" hidden>
+    <div class="sheet-bg" data-act="sheet-close"></div>
+    <div class="sheet" role="dialog" aria-modal="true"></div>
+  </div>
+
+  <script src="/assets/js/layout.js"></script>
+  <script src="/assets/js/lift.js"></script>
+</body>
+</html>

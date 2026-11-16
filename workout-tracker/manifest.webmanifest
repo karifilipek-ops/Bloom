@@ -1,0 +1,10 @@
+{
+  "name": "Bloom Lift Log",
+  "short_name": "Lift Log",
+  "start_url": "/workout-tracker/",
+  "scope": "/workout-tracker/",
+  "display": "standalone",
+  "background_color": "#f6f6f6",
+  "theme_color": "#07070b",
+  "icons": [{ "src": "/assets/img/favicon.png", "sizes": "any", "type": "image/png" }]
+}
