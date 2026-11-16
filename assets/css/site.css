@@ -401,3 +401,19 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .test-info ol { margin: 8px 0 2px; padding-left: 20px; }
 .test-info li { margin-bottom: 4px; }
 @media (max-width: 560px) { .meter-labels { font-size: 12px; letter-spacing: 0; } }
+
+/* ---------- Muscle gain timeline ---------- */
+.timeline { display: grid; gap: 8px; margin: 6px 0; }
+.tl-row { display: grid; grid-template-columns: 74px 1fr 82px; align-items: center; gap: 10px; }
+.tl-y { font-family: var(--pixel); font-size: 17px; letter-spacing: .12em; text-transform: uppercase; }
+.tl-bar { height: 22px; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper); overflow: hidden; }
+.tl-bar i { display: block; height: 100%; background: var(--lav); border-right: 2px solid var(--ink); transition: width .5s cubic-bezier(.2,.8,.2,1); }
+.tl-bar i[style*="width:0%"] { border-right: 0; }
+.tl-v { font-family: var(--pixel); font-size: 19px; letter-spacing: .04em; text-align: right; }
+.tl-done { font-family: var(--pixel); font-size: 17px; letter-spacing: .14em; text-transform: uppercase; color: var(--lav-dark); padding-left: 84px; }
+@media (max-width: 560px) { .tl-row { grid-template-columns: 64px 1fr 74px; } .tl-done { padding-left: 0; } }
+@media (max-width: 560px) {
+  table.tbl th, table.tbl td { padding: 8px; }
+  table.tbl th { font-size: 14px; letter-spacing: .08em; }
+}
+.big + .gauge { margin-top: 86px; }
