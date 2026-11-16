@@ -646,10 +646,45 @@
     });
   }
 
+  /* ---------------------------------------------------------------- exercise art + info */
+
+  var Art = window.LiftArt || { has: function () { return false; } };
+  // Animated two-frame figure (start ↔ end) for the info card.
+  function artAnim(exId) {
+    if (!Art.has(exId)) return '<div class="art art-none">' + pix("dumbbell", 4) + "<span>No illustration for custom lifts yet</span></div>";
+    return '<div class="art art-anim" role="img" aria-label="' + esc(getEx(exId).name) + ' demonstration"><img src="' + Art.url(exId, 0) + '" alt=""><img class="b" src="' + Art.url(exId, 1) + '" alt=""></div>';
+  }
+  function artThumb(exId) {
+    return Art.has(exId) ? '<img class="art-th" src="' + Art.url(exId, 0) + '" alt="" loading="lazy">' : '<span class="art-th none">' + pix("dumbbell", 2) + "</span>";
+  }
+  // opts: { onAdd: fn, addLabel, onBack: fn }
+  function openInfo(exId, opts) {
+    opts = opts || {};
+    var ex = getEx(exId), info = Art.has(exId) ? Art.info(exId) : null, hist = historyFor(exId), last = hist[0];
+    openSheet('<div class="info">' + artAnim(exId) +
+      '<h2 class="sheet-h info-h">' + esc(ex.name) + "</h2>" +
+      (info ? '<div class="mchips">' + info.muscles.map(function (m) { return "<span>" + esc(m) + "</span>"; }).join("") + "</div>" +
+        '<p class="cue">' + esc(info.cue) + "</p>" : '<p class="cue muted">' + esc(ex.group) + "</p>") +
+      (last ? '<p class="info-last">Last: ' + esc(dateLabel(last.session.startedAt)) + " · " + last.sets.map(function (x) { return setTxt(dw(x), x.r, ex); }).join(", ") + "</p>" : "") +
+      '<div class="menu">' + (opts.onAdd ? '<button class="primary" data-info="add">' + esc(opts.addLabel || "Add") + "</button>" : "") +
+      (hist.length ? '<button data-info="hist">History for this lift</button>' : "") +
+      (opts.onBack ? '<button data-info="back">‹ Back to list</button>' : '<button data-info="close">Close</button>') + "</div></div>",
+      function (root) {
+        root.querySelector(".menu").addEventListener("click", function (e) {
+          var b = e.target.closest("[data-info]"); if (!b) return;
+          var k = b.dataset.info;
+          if (k === "add") { closeSheet(); opts.onAdd(exId); }
+          else if (k === "back") opts.onBack();
+          else if (k === "hist") { closeSheet(); go("#/lift/" + encodeURIComponent(exId)); }
+          else closeSheet();
+        });
+      });
+  }
+
   // Exercise picker: used for adding, swapping and building routines.
   function openPicker(title, onPick, opts) {
     opts = opts || {};
-    var similarGroup = opts.group;
+    var similarGroup = opts.group, startQ = opts.q || "";
     openSheet(
       '<h2 class="sheet-h">' + esc(title) + "</h2>" +
       '<input class="pick-q" type="search" placeholder="Search or name a new lift" autocomplete="off" enterkeyhint="done">' +
@@ -674,12 +709,19 @@
         }
         function row(e) {
           var last = lastDone[e.id];
-          return '<button class="pick-row" data-id="' + esc(e.id) + '"><span>' + esc(e.name) + '<small>' + esc(e.group) +
-            (last ? " · last " + esc(dateLabel(last)) : "") + "</small></span><b>+</b></button>";
+          return '<div class="pick-item"><button class="pick-peek" data-peek="' + esc(e.id) + '" aria-label="How to do ' + esc(e.name) + '">' + artThumb(e.id) + '<i>i</i></button>' +
+            '<button class="pick-row" data-id="' + esc(e.id) + '"><span>' + esc(e.name) + '<small>' + esc(e.group) +
+            (last ? " · last " + esc(dateLabel(last)) : "") + "</small></span><b>+</b></button></div>";
         }
+        q.value = startQ;
         q.addEventListener("input", draw);
         list.addEventListener("click", function (ev) {
           var b = ev.target.closest("button"); if (!b) return;
+          if (b.dataset.peek) {
+            var term = q.value;
+            openInfo(b.dataset.peek, { onAdd: onPick, addLabel: "+ " + title, onBack: function () { openPicker(title, onPick, Object.assign({}, opts, { q: term })); } });
+            return;
+          }
           var id = b.dataset.new ? ensureExercise(q.value, similarGroup) : b.dataset.id;
           save(); closeSheet(); onPick(id);
         });
@@ -777,7 +819,7 @@
       var t = it.sets[0] && it.sets[0].t, open = it.sets.some(function (x) { return !x.done; });
       var allDone = !open;
       html += '<section class="ex-card' + (allDone ? " complete" : "") + '" id="it-' + it.id + '">' +
-        '<header class="ex-h"><button class="ex-name" data-act="lift-hist" data-ex="' + esc(it.ex) + '">' + esc(ex.name) + "</button>" +
+        '<header class="ex-h"><button class="ex-name" data-act="info" data-ex="' + esc(it.ex) + '">' + esc(ex.name) + ' <span class="info-i">i</span></button>' +
         '<button class="kebab" data-act="ex-menu" data-item="' + it.id + '" aria-label="Exercise options">•••</button></header>' +
         '<div class="ex-meta">' + (it.swappedFrom ? '<span class="tag">swapped from ' + esc(getEx(it.swappedFrom).name) + "</span>" : "") +
         (t ? "<span>Target " + it.sets.length + " × " + t.min + (t.max !== t.min ? "–" + t.max : "") + "</span>" : "") +
@@ -870,7 +912,7 @@
     p.routines.forEach(function (r) {
       html += '<section class="ex-card"><header class="ex-h"><span class="ex-name">' + esc(r.name) + "</span>" +
         '<button class="chip dark" data-act="start-program" data-id="' + p.id + '" data-key="' + r.key + '">Start</button></header><ul class="plan">' +
-        r.items.map(function (i) { return "<li><span>" + esc(i.name) + "</span><b>" + i.sets + " × " + i.min + "–" + i.max + "</b></li>"; }).join("") +
+        r.items.map(function (i) { var hit = findExByName(i.name); return "<li>" + (hit ? '<button class="plan-name" data-act="info" data-ex="' + esc(hit.id) + '">' + artThumb(hit.id) + "<span>" + esc(i.name) + "</span></button>" : "<span>" + esc(i.name) + "</span>") + "<b>" + i.sets + " × " + i.min + "–" + i.max + "</b></li>"; }).join("") +
         '</ul><div class="ex-foot"><button class="ghost-btn" data-act="copy-program" data-id="' + p.id + '" data-key="' + r.key + '">Copy to my routines</button></div></section>';
     });
     html += '<p class="note center">Your lift history stays yours. Switch programs any time and every lift keeps its past.</p>';
@@ -883,7 +925,7 @@
       '" value="' + esc(r.name) + '" placeholder="Name it (e.g. Push Day)" aria-label="Routine name"></div><p class="vsub saved">Saves as you type.</p>';
     r.items.forEach(function (it, i) {
       var t = it.sets[0] || { min: 8, max: 10 };
-      html += '<section class="ex-card r-item"><header class="ex-h"><span class="ex-name">' + esc(getEx(it.ex).name) + "</span>" +
+      html += '<section class="ex-card r-item"><header class="ex-h"><button class="ex-name" data-act="info" data-ex="' + esc(it.ex) + '">' + esc(getEx(it.ex).name) + ' <span class="info-i">i</span></button>' +
         '<span class="r-move"><button data-act="r-up" data-i="' + i + '" aria-label="Move up">↑</button><button data-act="r-down" data-i="' + i + '" aria-label="Move down">↓</button>' +
         '<button data-act="r-del" data-i="' + i + '" aria-label="Remove">✕</button></span></header>' +
         '<div class="r-grid">' +
@@ -930,8 +972,9 @@
   }
   function viewLift(id) {
     var ex = getEx(id), H = historyFor(id);
-    var html = head(esc(ex.name), esc(ex.group), "#/lifts");
-    if (!H.length) return html + '<div class="lift-empty">' + pix("dumbbell", 4) + "<p>No sets logged for this lift yet.</p></div>";
+    var html = head(esc(ex.name), esc(ex.group), "#/lifts"), info = Art.has(id) ? Art.info(id) : null;
+    html += '<div class="lift-art">' + artAnim(id) + (info ? '<div class="mchips">' + info.muscles.map(function (m) { return "<span>" + esc(m) + "</span>"; }).join("") + '</div><p class="cue">' + esc(info.cue) + "</p>" : "") + "</div>";
+    if (!H.length) return html + '<div class="lift-empty sm"><p>No sets logged for this lift yet.</p></div>';
     var latest = compareSets(plain(H[0].sets), H[1] ? plain(H[1].sets) : null);
     var all = []; H.forEach(function (h) { all = all.concat(plain(h.sets)); });
     var heavy = all.reduce(function (b, x) { return !b || x.w > b.w || (x.w === b.w && x.r > b.r) ? x : b; }, null);
@@ -1055,6 +1098,7 @@
     "add-ex": function () { openPicker("Add exercise", addExercise); },
     "swap": function (b) { var it = itemById(active(), b.dataset.item); openPicker("Swap " + getEx(it.ex).name, function (id) { swapExercise(it.id, id); }, { group: getEx(it.ex).group, exclude: it.ex }); },
     "lift-hist": function (b) { go("#/lift/" + encodeURIComponent(b.dataset.ex)); },
+    "info": function (b) { openInfo(b.dataset.ex); },
     "ex-menu": function (b) {
       var s = active(), it = itemById(s, b.dataset.item), i = s.items.indexOf(it);
       openSheet('<h2 class="sheet-h">' + esc(getEx(it.ex).name) + '</h2><div class="menu">' +
