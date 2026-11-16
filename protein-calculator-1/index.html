@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PROTEIN CALCULATOR | Trainbloom</title>
-  <meta name="description" content="Figure out how much protein you actually need for fat loss, maintenance or building muscle. Probably less than TikTok told you.">
+  <meta name="description" content="Figure out how much protein you actually need based on your lean body mass, age, training and diet. Probably less than TikTok told you.">
   <link rel="canonical" href="https://www.trainbloom.com/protein-calculator-1/">
   <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="/assets/img/favicon.png">
@@ -26,47 +26,71 @@
       <h2>Your stats</h2>
       <div class="fields">
         <div class="field">
-          <span class="label">Units</span>
+          <span class="label">Imperial / Metric</span>
           <div class="seg" data-name="units" data-remember>
-            <button data-value="imperial" aria-pressed="true">lb</button>
+            <button data-value="imperial" aria-pressed="true">lbs</button>
             <button data-value="metric">kg</button>
           </div>
         </div>
         <div class="field">
-          <label for="weight">Current weight</label>
-          <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="170"><span class="u" data-wu>lb</span></div>
-        </div>
-        <div class="field full">
-          <span class="label">Goal</span>
-          <div class="seg" data-name="goal">
-            <button data-value="loss" aria-pressed="true">Lose fat</button>
-            <button data-value="maintain">Maintain</button>
-            <button data-value="gain">Build muscle</button>
+          <span class="label">Gender</span>
+          <div class="seg" data-name="sex">
+            <button data-value="m" aria-pressed="true">Male</button>
+            <button data-value="f">Female</button>
           </div>
         </div>
-        <div class="field">
-          <label for="goalweight">Goal weight <span style="text-transform:none;color:var(--muted)">(optional)</span></label>
-          <div class="unit-wrap"><input type="number" id="goalweight" inputmode="decimal" min="0" placeholder="155"><span class="u" data-wu>lb</span></div>
-          <div class="hint">If you have a lot of weight to lose, we base protein on your goal weight.</div>
+        <div class="field full">
+          <label for="weight">Weight</label>
+          <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="180"><span class="u" data-wu>lb</span></div>
         </div>
-        <div class="field">
-          <label for="meals">Meals per day</label>
-          <select id="meals">
-            <option>2</option><option selected>3</option><option>4</option><option>5</option>
+        <div class="field full">
+          <span class="label">Age range</span>
+          <div class="seg" data-name="age">
+            <button data-value="1" aria-pressed="true">Under 35</button>
+            <button data-value="1.15">35–60</button>
+            <button data-value="1.3">61+</button>
+          </div>
+        </div>
+        <div class="field full">
+          <label for="bf">Body fat percentage: <span id="bf-out">20</span>%</label>
+          <input type="range" id="bf" min="5" max="60" step="1" value="20">
+          <div class="range-ends"><span>5%</span><span>60%</span></div>
+          <details class="bf-guide">
+            <summary>Not sure? Use the body fat guide</summary>
+            <p class="hint">Tap the description that looks most like you.</p>
+            <div class="bf-cards" id="bf-cards"></div>
+          </details>
+        </div>
+        <div class="field full">
+          <span class="label">How many hours do you work out each week?</span>
+          <div class="seg multi" data-name="hours">
+            <button data-value="1" aria-pressed="true">0–1</button>
+            <button data-value="1.1">1–3</button>
+            <button data-value="1.2">4–6</button>
+            <button data-value="1.3">7+</button>
+          </div>
+        </div>
+        <div class="field full">
+          <label for="plant">Do you eat a mostly plant-based diet?</label>
+          <select id="plant">
+            <option value="1" selected>No</option>
+            <option value="1.1">Yes</option>
           </select>
+          <div class="hint">If 90%+ of your food comes from plant-based foods.</div>
         </div>
       </div>
       <div class="actions"><button class="btn" type="submit">Calculate</button></div>
 
       <div class="results" id="results" hidden aria-live="polite">
+        <h2>Protein goals</h2>
         <div class="stats">
-          <div class="stat"><div class="k">Minimum protein</div><div class="v"><span id="r-min"></span>g</div><div class="s">Per day — the floor to hit</div></div>
-          <div class="stat hl"><div class="k">Max protein</div><div class="v"><span id="r-max"></span>g</div><div class="s">Per day — past this, little extra benefit</div></div>
+          <div class="stat"><div class="k">Minimum</div><div class="v"><span id="r-min"></span>g/day</div><div class="s">The minimum to optimize physical progress</div></div>
+          <div class="stat"><div class="k">Maximum</div><div class="v"><span id="r-max"></span>g/day</div><div class="s">Past this, little extra benefit</div></div>
         </div>
-        <div class="big">
-          <div class="k">Per meal</div>
-          <div class="v"><span id="r-meal"></span><small>g</small></div>
-          <div class="s" id="r-meal-s"></div>
+        <div class="big" style="background:var(--pink)">
+          <div class="k">Optimal intake</div>
+          <div class="v"><span id="r-opt"></span> <small>g/day</small></div>
+          <div class="s">Your estimated optimal protein intake based on your inputs</div>
         </div>
         <p class="note" id="r-basis"></p>
       </div>
@@ -145,35 +169,31 @@
   <script>
     (function () {
       var B = Bloom;
+      var bodyFat = B.bodyFat();
       var units = B.unitSystem();
-      var goal = B.seg("goal");
+      var sex = B.seg("sex", bodyFat.render);
+      var age = B.seg("age");
+      var hours = B.seg("hours");
       var form = document.getElementById("form");
 
-      // grams per lb of reference bodyweight [min, max]
-      var RANGES = { loss: [0.8, 1.2], maintain: [0.6, 0.8], gain: [0.7, 1.0] };
+      // Option values from the original calculator
+      var GENDER = { m: 1, f: 0.9 };
 
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         var u = units();
-        var lb = B.weightKg("weight", u) * B.LB_PER_KG;
-        var goalLb = B.weightKg("goalweight", u) * B.LB_PER_KG;
-        if (!B.error(form, !(lb > 0) ? "Please enter your current weight." : "")) return;
+        var w = B.num("weight");
+        if (!B.error(form, !(w > 0) ? "Please enter your weight." : "")) return;
 
-        var ref = lb, basis = "current weight";
-        if (goalLb > 0 && goalLb < lb) { ref = goalLb; basis = "goal weight"; }
+        var lbs = u === "metric" ? w * B.LB_PER_KG : w;
+        var lbm = lbs - lbs * bodyFat.value() * 0.01;                 // lean body mass, lbs
+        var factor = (GENDER[sex()] + parseFloat(age()) + parseFloat(hours()) + parseFloat(document.getElementById("plant").value)) / 4;
 
-        var r = RANGES[goal()];
-        var min = Math.round(ref * r[0] / 5) * 5;
-        var max = Math.round(ref * r[1] / 5) * 5;
-        var meals = parseInt(document.getElementById("meals").value, 10);
-
-        document.getElementById("r-min").textContent = min;
-        document.getElementById("r-max").textContent = max;
-        document.getElementById("r-meal").textContent = Math.round(min / meals) + "–" + Math.round(max / meals);
-        document.getElementById("r-meal-s").textContent = "grams of protein across " + meals + " meals";
-        document.getElementById("r-basis").textContent =
-          "Based on your " + basis + " (" + B.fmt(u === "metric" ? ref / B.LB_PER_KG : ref) + " " + (u === "metric" ? "kg" : "lb") +
-          ") at " + r[0] + "–" + r[1] + " g per lb (" + (r[0] * 2.2).toFixed(1) + "–" + (r[1] * 2.2).toFixed(1) + " g per kg).";
+        document.getElementById("r-min").textContent = B.fmt(lbm * 0.8);
+        document.getElementById("r-max").textContent = B.fmt(lbm * 1.2);
+        document.getElementById("r-opt").textContent = B.fmt(lbm * factor);
+        document.getElementById("r-basis").textContent = "Based on your lean body mass of " +
+          (u === "metric" ? B.fmt(lbm / B.LB_PER_KG) + " kg" : B.fmt(lbm) + " lbs") + ".";
 
         B.show(document.getElementById("results"));
       });
