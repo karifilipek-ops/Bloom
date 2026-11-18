@@ -434,3 +434,5 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 /* body fat guide labels: site pixel type */
 .bf-card .r { font-family: var(--pixel); font-weight: 400; font-size: 19px; letter-spacing: .12em; line-height: 1.25; padding: 0 9px 0 11px; text-shadow: 1px 1px 0 var(--lav-dark); }
 @media (max-width: 560px) { .bf-card .r { font-size: 16px; letter-spacing: .08em; padding: 0 6px 0 8px; } }
+.bf-card.photo.round { padding: 6px 6px 16px; }
+.bf-card.photo.round img { border-radius: 50%; }
