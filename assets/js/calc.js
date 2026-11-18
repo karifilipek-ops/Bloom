@@ -103,8 +103,8 @@ window.Bloom = (function () {
       var wrap = document.getElementById("bf-cards");
       wrap.innerHTML = BF_LEVELS[s].map(function (g) {
         // illustrations live in assets/img/bodyfat/<m|f>-<value>.webp
-        var art = '<img src="/assets/img/bodyfat/' + s + "-" + g[0] + '.webp" alt="" width="360" height="' + (s === "m" ? 258 : 360) + '" loading="lazy">';
-        return '<button type="button" class="bf-card photo' + (s === "f" ? " round" : "") + '" data-val="' + g[0] + '" aria-label="' + g[1] + ' body fat">' +
+        var art = '<img src="/assets/img/bodyfat/' + s + "-" + g[0] + '.webp" alt="" width="360" height="360" loading="lazy">';
+        return '<button type="button" class="bf-card photo round" data-val="' + g[0] + '" aria-label="' + g[1] + ' body fat">' +
           art + '<span class="r">' + g[1] + "</span></button>";
       }).join("");
       $$(".bf-card", wrap).forEach(function (c) {
