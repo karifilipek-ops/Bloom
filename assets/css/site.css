@@ -436,3 +436,15 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 @media (max-width: 560px) { .bf-card .r { font-size: 16px; letter-spacing: .08em; padding: 0 6px 0 8px; } }
 .bf-card.photo.round { padding: 6px 6px 16px; }
 .bf-card.photo.round img { border-radius: 50%; }
+
+/* ---------- Hero banners on phones: bigger titles, tighter box ---------- */
+@media (max-width: 560px) {
+  .hero { margin: 18px auto 18px; padding: 30px 14px 78px; border-radius: 18px; }
+  .hero h1 { font-size: 12.5vw; letter-spacing: .14em; margin-right: -.14em; line-height: 1.02; }
+  .hero p { font-size: 14px; margin-top: 10px; }
+  .hero::after { height: 150px; background-size: 40px 28px; }
+  .hero.sm { padding: 22px 12px 64px; }
+  .hero.sm h1 { font-size: 9.6vw; letter-spacing: .1em; margin-right: -.1em; }
+  .hero.sm .px { height: 52px; margin-bottom: 10px; }
+  .hero.sm::after { height: 120px; }
+}
