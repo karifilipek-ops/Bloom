@@ -448,3 +448,8 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
   .hero.sm .px { height: 52px; margin-bottom: 10px; }
   .hero.sm::after { height: 120px; }
 }
+@media (max-width: 560px) {
+  .hero:not(.sm) { padding: 24px 14px 58px; }
+  .hero:not(.sm)::after { height: 118px; }
+  .hero:not(.sm) p { margin-top: 8px; }
+}
