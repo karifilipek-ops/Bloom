@@ -874,7 +874,7 @@
     if (!keys.length) return "";
     var max = planned[keys[0]], lv = {};
     keys.forEach(function (k) { lv[k] = planned[k] / max; });
-    var map = window.LiftBody ? LiftBody.map(lv) : "";
+    var map = window.LiftBody ? LiftBody.map(lv, (db.profile || {}).sex) : "";
     return '<div class="tm' + (opts.open ? " open" : "") + '">' + (map ? '<div class="tm-map">' + map + "</div>" : "") +
       '<div class="tm-chips">' + keys.map(function (k) {
         return '<span class="' + (planned[k] >= max * 0.5 ? "hi" : "") + '">' + esc(MLABEL[k]) + " <b>" + fmtSets(planned[k]) + "</b></span>";
@@ -1138,7 +1138,7 @@
     var per = {}; Object.keys(res.sets).forEach(function (k) { per[k] = res.sets[k] / weeks; });
     var lv = {}; Object.keys(MLABEL).forEach(function (k) { lv[k] = (per[k] || 0) / setTarget(k); });
     var total = 0; Object.keys(per).forEach(function (k) { if (!MINOR[k]) total += per[k]; });
-    var map = window.LiftBody ? LiftBody.map(lv) : "", RAMP = window.LiftBody ? LiftBody.RAMP : ["#555"];
+    var map = window.LiftBody ? LiftBody.map(lv, (db.profile || {}).sex) : "", RAMP = window.LiftBody ? LiftBody.RAMP : ["#555"];
     var html = head("Levels", "Sets per muscle. Brighter means more work.") +
       '<div class="seg lv-seg"><button data-act="lv-range" data-v="week" aria-pressed="' + (levelsRange === "week") + '">This week</button>' +
       '<button data-act="lv-range" data-v="4w" aria-pressed="' + (levelsRange === "4w") + '">4-week average</button></div>' +

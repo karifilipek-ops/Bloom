@@ -1,11 +1,11 @@
 /* Trainbloom body graphics (smooth vector, not pixel art).
  *
- *  LiftBody.map(levels)        front + back anatomical figure, each muscle its own shape,
+ *  LiftBody.map(levels, sex)   front + back faceted figure, each muscle its own flat shape,
  *                              filled by how much work it got (levels: { chest: 0..1+, ... }).
  *  LiftBody.torso(level, sex)  shaded torso for the body-fat picker (level 0 = leanest .. 8).
  *
- * Shapes are written for the figure's left side (viewer's right) and mirrored, then smoothed
- * with Catmull-Rom curves, so editing a muscle is just nudging a few points.
+ * Muscle-map shapes are straight-edged polygons written for one side and mirrored. The torsos use
+ * smoothed curves (Catmull-Rom), since skin should look soft and muscles should look sharp.
  */
 window.LiftBody = (function () {
   "use strict";
@@ -26,72 +26,98 @@ window.LiftBody = (function () {
   function sym(right, cx) { return right.concat(mirror(right, cx).reverse()); }
 
   /* ---------------------------------------------------------------- muscle map */
+  // Faceted figure: flat polygons that tile the body edge to edge, outlined like a line drawing.
+  // Points are [u, v]: u = distance right of the centre line, v = height (traced at 1104 units tall).
+  // Each shape is drawn on the right and mirrored. "whole" shapes straddle the centre line and are
+  // joined into one piece instead of two halves.
 
   var RAMP = ["#3a3552", "#4e4577", "#665a9f", "#8170c8", "#a08ef0", "#d6ccff"];
-  var BASE = "#2b2841", GAP = "#0d0c16";
+  var BASE = "#2b2841", LINE = "#0d0c16";
   function rampIdx(v) { return v == null ? 0 : v <= 0 ? 0 : v < 0.25 ? 1 : v < 0.5 ? 2 : v < 0.75 ? 3 : v < 1 ? 4 : 5; }
 
-  // Silhouette pieces (right side of a figure centred on x=50).
-  var TORSO = [[54, 21], [55.5, 28], [62, 31], [69, 33.5], [68, 46], [66.5, 58], [64, 72], [64.5, 84], [67, 95], [66, 104], [56, 110], [50, 111]];
-  var ARM = [[64, 31.5], [70.5, 31.8], [75.5, 37], [77.2, 48], [78, 62], [80, 74], [81.5, 86], [82.5, 98], [84, 104], [83, 113], [79.5, 113.5], [77.5, 105], [76, 98],
-    [73.5, 86], [72, 76], [70, 64], [68.5, 52], [66.5, 40]];
-  var LEG = [[51.5, 106], [56, 99], [66.5, 96], [69, 108], [68.5, 124], [66.5, 140], [64.5, 150], [65.5, 162], [64.5, 178], [61.5, 193], [63.5, 199], [64, 205], [56.5, 206],
-    [55, 199], [55.2, 188], [53.8, 172], [53.2, 156], [52.4, 142], [51.6, 124]];
+  var HEAD = [[0, 64], [27.5, 64], [52.5, 90], [54, 152.5], [40, 170], [37.5, 185], [12.5, 209], [0, 209]];
+  var NECK = [[0, 209], [12.5, 209], [34, 191], [34, 222.5], [12.5, 269], [0, 281]];
+  var DELT = [[92.5, 272.5], [112.5, 262.5], [150, 266], [177.5, 300], [175, 357.5], [127.5, 331]];
+  var BICEP = [[127.5, 331], [160, 350], [177.5, 450], [172.5, 469], [147.5, 464], [120, 410], [112.5, 364]];
+  var ARMSTRIP = [[160, 350], [175, 357.5], [189, 384], [187.5, 435], [177.5, 450]];
+  var FOREARM = [[147.5, 464], [172.5, 469], [187.5, 435], [202.5, 464], [202.5, 560], [199, 585], [199, 625], [175, 625], [172.5, 577], [162.5, 560], [147.5, 515]];
+  var HAND = [[175, 625], [199, 625], [200, 680], [182.5, 695], [159, 695], [159, 642.5]];
+  var KNEECAP = [[40, 810], [75, 787.5], [97.5, 810], [95, 840], [85, 832.5], [60, 832.5], [50, 842.5]];
+  var KNEE = [[50, 842.5], [60, 832.5], [85, 832.5], [95, 840], [96, 860], [85, 872.5], [60, 872.5], [52.5, 865]];
+  var KNEESIDE_IN = [[40, 810], [50, 842.5], [52.5, 865], [44, 858]];
+  var KNEESIDE_OUT = [[97.5, 810], [95, 840], [96, 860], [99, 835]];
+  var FOOT = [[59, 1100], [91, 1100], [95, 1128], [128, 1150], [128, 1168], [55, 1168], [55, 1122]];
+
   var FRONT = [
-    ["traps", [[53.5, 25.5], [58, 28.8], [65, 31.8], [59, 32.6], [54.5, 30.5]]],
-    ["shoulders", [[64.5, 32.2], [70.5, 32.4], [75, 37.5], [76.2, 46], [73.5, 51.5], [70.5, 47], [66.5, 39]]],
-    ["chest", [[50.8, 35], [57, 33.6], [64.5, 35.5], [68.2, 41.5], [66.8, 48.5], [62, 52.4], [55.5, 53.2], [50.8, 51]]],
-    ["biceps", [[69.2, 50.5], [73.2, 52.5], [75.8, 58.5], [76.2, 67], [73.8, 73.5], [71, 69], [69.4, 60]]],
-    ["forearms", [[73.2, 77.5], [78.2, 78.8], [80.6, 87], [81.2, 97.5], [78, 99.5], [75.6, 92], [73.6, 84.5]]],
-    ["abs", [[51, 56], [56, 55.6], [56.4, 63.5], [51, 64]]],
-    ["abs", [[51, 66], [56.4, 65.6], [56.6, 73.5], [51, 74]]],
-    ["abs", [[51, 76], [56.6, 75.6], [56.4, 84], [51, 84.5]]],
-    ["abs", [[51, 86.5], [56, 86.2], [54.8, 97], [51, 99]]],
-    ["abs", [[58.4, 56.5], [64.2, 59.5], [63.6, 71], [61.8, 83.5], [60, 92], [57.8, 87], [58.2, 70]]],
-    ["quads", [[56.5, 103.5], [63, 100], [67.6, 106.5], [67.6, 122], [65.6, 137], [61.6, 146.5], [58.4, 143], [57, 130], [55.2, 116]]],
-    ["quads", [[53.2, 112], [55.6, 118], [57.6, 132], [59.6, 143], [56.8, 147.2], [53.6, 140], [52.6, 126]]],
-    ["calves", [[63.2, 157], [65, 165], [64.2, 177], [62, 180], [61.4, 168]]],
-    ["calves", [[54, 158], [55.6, 164], [55.4, 176], [54.4, 178], [53.6, 168]]]
+    ["base", HEAD, 1], ["base", NECK, 1],
+    ["traps", [[34, 222.5], [112.5, 262.5], [92.5, 272.5], [12.5, 269]]],
+    ["shoulders", DELT],
+    ["chest", [[0, 281], [12.5, 269], [92.5, 272.5], [127.5, 331], [112.5, 364], [74, 394], [45, 394], [0, 380]]],
+    ["biceps", BICEP], ["triceps", ARMSTRIP], ["forearms", FOREARM], ["base", HAND],
+    ["abs", [[0, 380], [45, 394], [74, 394], [61, 432.5], [32.5, 437.5], [0, 432.5]]],
+    ["abs", [[0, 432.5], [32.5, 437.5], [61, 432.5], [61, 467.5], [50, 481], [32.5, 485], [0, 477.5]]],
+    ["abs", [[0, 477.5], [32.5, 485], [50, 481], [50, 500], [39, 542.5], [0, 542.5]]],
+    ["abs", [[74, 394], [112.5, 364], [82.5, 454], [61, 467.5], [61, 432.5]]],
+    ["abs", [[61, 467.5], [82.5, 454], [82.5, 517.5], [39, 542.5], [50, 500], [50, 481]]],
+    ["base", [[0, 542.5], [39, 542.5], [82.5, 517.5], [95, 550], [70, 572.5], [50, 587.5], [14, 640], [0, 641]], 1],
+    ["quads", [[70, 572.5], [95, 550], [102.5, 560], [120, 610], [120, 730], [112.5, 745], [97.5, 810], [75, 787.5], [102.5, 655]]],
+    ["quads", [[14, 640], [50, 587.5], [70, 572.5], [102.5, 655], [75, 787.5], [40, 810], [27.5, 745], [20, 730]]],
+    ["base", KNEECAP], ["base", KNEE], ["base", KNEESIDE_IN], ["base", KNEESIDE_OUT],
+    ["base", [[52.5, 865], [60, 872.5], [85, 872.5], [96, 860], [112.5, 887.5], [112.5, 960], [105, 980], [95, 1040], [91, 1100], [59, 1100], [57.5, 1045], [47.5, 975], [39, 957.5], [40, 890]]],
+    ["base", FOOT]
   ];
   var BACK = [
-    ["traps", [[50.6, 22.5], [55, 27], [64.5, 31.8], [59, 35.5], [55.5, 42], [52.5, 52], [50.6, 55]]],
-    ["shoulders", [[64.5, 32.2], [70.5, 32.4], [75, 37.5], [76.2, 46], [73.5, 51.5], [70.5, 47], [66.5, 39]]],
-    ["back", [[56.5, 38.5], [63, 36.6], [67.4, 40.2], [63, 43.6], [56.6, 43.8]]],
-    ["back", [[54.8, 47], [61, 46.5], [67.4, 46], [67.6, 54], [65.2, 64], [60.8, 73.5], [56, 77.5], [53.6, 62]]],
-    ["lowback", [[51, 72], [55.4, 77.6], [57, 88], [55.6, 94], [51, 93]]],
-    ["triceps", [[69.2, 50.5], [73.6, 51.5], [76.2, 59], [75.8, 69], [73, 74], [70.6, 67], [69.2, 58]]],
-    ["forearms", [[73.2, 77.5], [78.2, 78.8], [80.6, 87], [81.2, 97.5], [78, 99.5], [75.6, 92], [73.6, 84.5]]],
-    ["glutes", [[51, 95.5], [57.5, 92], [65.4, 95.5], [68, 104], [66, 113.5], [59, 117.5], [51, 114.5]]],
-    ["hamstrings", [[59.4, 120], [65.6, 121.5], [66.4, 133], [64, 144], [60.4, 147], [59.2, 134]]],
-    ["hamstrings", [[52.8, 120.5], [57.6, 120], [57.8, 134], [58.6, 146.5], [55, 145], [52.8, 132]]],
-    ["calves", [[59, 152.5], [63.8, 155], [65.4, 165], [63, 177], [59.6, 171]]],
-    ["calves", [[54, 153], [57.8, 154], [58, 168], [55.6, 179], [53.6, 167]]]
+    ["base", HEAD, 1], ["base", [[0, 209], [12.5, 209], [34, 191], [34, 222.5], [0, 218]], 1],
+    ["traps", [[0, 218], [34, 222.5], [112.5, 262.5], [92.5, 272.5], [50, 312], [18, 362], [0, 398]], 1],
+    ["shoulders", DELT],
+    ["back", [[50, 312], [92.5, 272.5], [127.5, 331], [100, 352], [55, 352], [18, 362]]],
+    ["back", [[18, 362], [55, 352], [100, 352], [112.5, 364], [82.5, 454], [55, 494], [25, 470], [18, 420]]],
+    ["lowback", [[0, 398], [18, 362], [18, 420], [25, 470], [39, 542.5], [0, 542.5]], 1],
+    ["abs", [[25, 470], [55, 494], [82.5, 454], [82.5, 517.5], [39, 542.5]]],
+    ["triceps", BICEP], ["triceps", ARMSTRIP], ["forearms", FOREARM], ["base", HAND],
+    ["glutes", [[0, 542.5], [39, 542.5], [82.5, 517.5], [95, 550], [102.5, 560], [118, 602], [106, 640], [60, 656], [14, 640], [0, 641]]],
+    ["hamstrings", [[60, 656], [106, 640], [118, 602], [120, 610], [120, 730], [112.5, 745], [97.5, 810], [75, 790], [66, 702]]],
+    ["hamstrings", [[14, 640], [60, 656], [66, 702], [75, 790], [40, 810], [27.5, 745], [20, 730]]],
+    ["base", KNEECAP], ["base", KNEE], ["base", KNEESIDE_IN], ["base", KNEESIDE_OUT],
+    ["calves", [[75, 872.5], [85, 872.5], [96, 860], [112.5, 887.5], [112.5, 960], [105, 980], [82, 968]]],
+    ["calves", [[52.5, 865], [60, 872.5], [75, 872.5], [82, 968], [62, 992], [39, 957.5], [40, 890]]],
+    ["base", [[39, 957.5], [62, 992], [82, 968], [105, 980], [95, 1040], [91, 1100], [59, 1100], [57.5, 1045], [47.5, 975]]],
+    ["base", FOOT]
   ];
 
-  function figure(cx, shapes, levels, head) {
-    var dx = cx - 50, out = '<g transform="translate(' + dx + ',0)">';
-    // silhouette
-    out += '<ellipse cx="50" cy="12.5" rx="7.4" ry="9.4" fill="' + BASE + '"/>';
-    out += '<path d="' + smooth(sym(TORSO, 50)) + '" fill="' + BASE + '"/>';
-    [ARM, LEG].forEach(function (p) {
-      out += '<path d="' + smooth(p) + '" fill="' + BASE + '" stroke="' + GAP + '" stroke-width="0.9"/>';
-      out += '<path d="' + smooth(mirror(p, 50)) + '" fill="' + BASE + '" stroke="' + GAP + '" stroke-width="0.9"/>';
-    });
-    if (head) out += head;
-    shapes.forEach(function (s) {
-      var c = RAMP[rampIdx(levels[s[0]])], glow = rampIdx(levels[s[0]]) >= 4;
-      [s[1], mirror(s[1], 50)].forEach(function (pts) {
-        out += '<path class="m-' + s[0] + '" d="' + smooth(pts) + '" fill="' + c + '" stroke="' + GAP + '" stroke-width="1.15" stroke-linejoin="round"' + (glow ? ' filter="url(#lb-glow)"' : "") + "/>";
-      });
-    });
-    return out + "</g>";
+  var K = 0.2, TOP = 58;
+  // Female figure: same tiling, narrower shoulders and waist, fuller hips.
+  function femaleU(u, v) {
+    var stops = [[0, 0.86], [400, 0.87], [470, 0.8], [560, 1.0], [700, 0.97], [1200, 0.95]], a = stops[0], b = stops[stops.length - 1];
+    for (var i = 0; i < stops.length - 1; i++) if (v >= stops[i][0] && v <= stops[i + 1][0]) { a = stops[i]; b = stops[i + 1]; break; }
+    return u * (a[1] + (b[1] - a[1]) * ((v - a[0]) / ((b[0] - a[0]) || 1)));
   }
-  function map(levels) {
+  function pts(list, cx, side, fem) {
+    return list.map(function (p) {
+      var u = fem ? femaleU(p[0], p[1]) : p[0], v = fem ? 64 + (p[1] - 64) * 0.96 : p[1];
+      return f(cx + side * u * K) + "," + f((v - TOP) * K);
+    }).join(" ");
+  }
+  function figure(cx, shapes, levels, fem) {
+    var out = "";
+    shapes.forEach(function (s) {
+      var key = s[0], fill = key === "base" ? BASE : RAMP[rampIdx(levels[key])], cls = key === "base" ? "" : ' class="m-' + key + '"';
+      var attrs = ' fill="' + fill + '" stroke="' + LINE + '" stroke-width="1.25" stroke-linejoin="round"' + cls;
+      if (s[2]) { // one piece across the centre line
+        var whole = s[1].concat(s[1].slice(1, -1).reverse().map(function (p) { return [-p[0], p[1]]; }));
+        out += '<polygon points="' + pts(whole, cx, 1, fem) + '"' + attrs + "/>";
+      } else {
+        out += '<polygon points="' + pts(s[1], cx, 1, fem) + '"' + attrs + "/>";
+        out += '<polygon points="' + pts(s[1], cx, -1, fem) + '"' + attrs + "/>";
+      }
+    });
+    return out;
+  }
+  function map(levels, sex) {
     levels = levels || {};
-    return '<svg class="bodymap" viewBox="0 0 210 212" role="img" aria-label="Body map, front and back">' +
-      '<defs><filter id="lb-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>' +
-      figure(55, FRONT, levels) +
-      figure(155, BACK, levels) + "</svg>";
+    var fem = sex === "female";
+    return '<svg class="bodymap" viewBox="0 -2 186 228" role="img" aria-label="Body map, front and back">' +
+      figure(46, FRONT, levels, fem) + figure(140, BACK, levels, fem) + "</svg>";
   }
 
   /* ---------------------------------------------------------------- body-fat torsos */

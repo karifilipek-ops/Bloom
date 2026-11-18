@@ -1,6 +1,6 @@
 // Offline support for the workout tracker: gym basements have bad signal.
 // Network first (so updates land), cache fallback (so a refresh mid-workout still loads).
-var CACHE = "bloom-lift-v4";
+var CACHE = "bloom-lift-v5";
 var CORE = ["/workout-tracker/", "/assets/css/site.css", "/assets/css/lift.css", "/assets/js/layout.js", "/assets/js/lift-art.js", "/assets/js/lift-body.js", "/assets/js/lift.js", "/assets/img/favicon-32.png"];
 
 self.addEventListener("install", function (e) {
