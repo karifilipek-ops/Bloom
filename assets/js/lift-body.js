@@ -40,13 +40,13 @@ window.LiftBody = (function () {
   var DELT = [[92.5, 272.5], [112.5, 262.5], [150, 266], [177.5, 300], [175, 357.5], [127.5, 331]];
   var BICEP = [[127.5, 331], [160, 350], [177.5, 450], [172.5, 469], [147.5, 464], [120, 410], [112.5, 364]];
   var ARMSTRIP = [[160, 350], [175, 357.5], [189, 384], [187.5, 435], [177.5, 450]];
-  var FOREARM = [[147.5, 464], [172.5, 469], [187.5, 435], [202.5, 464], [202.5, 560], [199, 585], [199, 625], [175, 625], [172.5, 577], [162.5, 560], [147.5, 515]];
-  var HAND = [[175, 625], [199, 625], [200, 680], [182.5, 695], [159, 695], [159, 642.5]];
+  var FOREARM = [[147.5, 464], [172.5, 469], [187.5, 435], [205, 464], [207, 560], [203, 585], [203, 625], [175, 625], [172.5, 577], [162.5, 560], [147.5, 515]];
+  var HAND = [[175, 625], [203, 625], [205, 680], [186, 695], [160, 695], [159, 642.5]];
   var KNEECAP = [[40, 810], [75, 787.5], [97.5, 810], [95, 840], [85, 832.5], [60, 832.5], [50, 842.5]];
   var KNEE = [[50, 842.5], [60, 832.5], [85, 832.5], [95, 840], [96, 860], [85, 872.5], [60, 872.5], [52.5, 865]];
   var KNEESIDE_IN = [[40, 810], [50, 842.5], [52.5, 865], [44, 858]];
   var KNEESIDE_OUT = [[97.5, 810], [95, 840], [96, 860], [99, 835]];
-  var FOOT = [[59, 1100], [91, 1100], [95, 1128], [128, 1150], [128, 1168], [55, 1168], [55, 1122]];
+  var FOOT = [[59, 1100], [91, 1100], [93, 1122], [136, 1152], [136, 1168], [50, 1168], [50, 1108]];
 
   var FRONT = [
     ["base", HEAD, 1], ["base", NECK, 1],
@@ -63,7 +63,7 @@ window.LiftBody = (function () {
     ["quads", [[70, 572.5], [95, 550], [102.5, 560], [120, 610], [120, 730], [112.5, 745], [97.5, 810], [75, 787.5], [102.5, 655]]],
     ["quads", [[14, 640], [50, 587.5], [70, 572.5], [102.5, 655], [75, 787.5], [40, 810], [27.5, 745], [20, 730]]],
     ["base", KNEECAP], ["base", KNEE], ["base", KNEESIDE_IN], ["base", KNEESIDE_OUT],
-    ["base", [[52.5, 865], [60, 872.5], [85, 872.5], [96, 860], [112.5, 887.5], [112.5, 960], [105, 980], [95, 1040], [91, 1100], [59, 1100], [57.5, 1045], [47.5, 975], [39, 957.5], [40, 890]]],
+    ["base", [[52.5, 865], [60, 872.5], [85, 872.5], [96, 860], [115, 887.5], [115, 960], [107, 980], [95, 1040], [91, 1100], [59, 1100], [57.5, 1045], [47.5, 975], [39, 957.5], [40, 890]]],
     ["base", FOOT]
   ];
   var BACK = [
@@ -79,45 +79,84 @@ window.LiftBody = (function () {
     ["hamstrings", [[60, 656], [106, 640], [118, 602], [120, 610], [120, 730], [112.5, 745], [97.5, 810], [75, 790], [66, 702]]],
     ["hamstrings", [[14, 640], [60, 656], [66, 702], [75, 790], [40, 810], [27.5, 745], [20, 730]]],
     ["base", KNEECAP], ["base", KNEE], ["base", KNEESIDE_IN], ["base", KNEESIDE_OUT],
-    ["calves", [[75, 872.5], [85, 872.5], [96, 860], [112.5, 887.5], [112.5, 960], [105, 980], [82, 968]]],
+    ["calves", [[75, 872.5], [85, 872.5], [96, 860], [115, 887.5], [115, 960], [107, 980], [82, 968]]],
     ["calves", [[52.5, 865], [60, 872.5], [75, 872.5], [82, 968], [62, 992], [39, 957.5], [40, 890]]],
-    ["base", [[39, 957.5], [62, 992], [82, 968], [105, 980], [95, 1040], [91, 1100], [59, 1100], [57.5, 1045], [47.5, 975]]],
+    ["base", [[39, 957.5], [62, 992], [82, 968], [107, 980], [95, 1040], [91, 1100], [59, 1100], [57.5, 1045], [47.5, 975]]],
     ["base", FOOT]
   ];
 
-  var K = 0.2, TOP = 58;
-  // Female figure: same tiling, narrower shoulders and waist, fuller hips.
-  function femaleU(u, v) {
-    var stops = [[0, 0.86], [400, 0.87], [470, 0.8], [560, 1.0], [700, 0.97], [1200, 0.95]], a = stops[0], b = stops[stops.length - 1];
-    for (var i = 0; i < stops.length - 1; i++) if (v >= stops[i][0] && v <= stops[i + 1][0]) { a = stops[i]; b = stops[i + 1]; break; }
-    return u * (a[1] + (b[1] - a[1]) * ((v - a[0]) / ((b[0] - a[0]) || 1)));
+  // Female front, traced from the same reference, vertex for vertex with the male FRONT list.
+  var F_HEAD = [[0, 114], [27.5, 114], [52.5, 139], [54, 199], [37.5, 216], [35, 232.5], [11, 252.5], [0, 252.5]];
+  var F_NECK = [[0, 252.5], [11, 252.5], [26.5, 238], [26.5, 275], [9, 312.5], [0, 320]];
+  var F_DELT = [[65, 312.5], [80, 304], [112.5, 307.5], [136, 335], [135, 382.5], [97.5, 360]];
+  var F_BICEP = [[97.5, 360], [122.5, 375], [142.5, 472.5], [137.5, 482.5], [120, 482.5], [95, 440], [82.5, 392.5]];
+  var F_STRIP = [[122.5, 375], [135, 382.5], [147.5, 405], [149, 462.5], [142.5, 472.5]];
+  var F_FOREARM = [[120, 482.5], [137.5, 482.5], [142.5, 472.5], [149, 462.5], [165, 490], [167.5, 590], [170, 632.5], [150, 632.5], [140, 587.5], [130, 560], [120, 527.5]];
+  var F_HAND = [[150, 634], [170, 634], [172.5, 680], [157.5, 694], [140, 694], [139, 649]];
+  var F_KNEECAP = [[36, 812.5], [67.5, 787.5], [90, 812.5], [89, 837.5], [80, 835], [55, 835], [44, 842.5]];
+  var F_KNEE = [[44, 842.5], [55, 835], [80, 835], [89, 840], [90, 865], [80, 874], [55, 874], [47.5, 867.5]];
+  var F_KIN = [[36, 812.5], [44, 842.5], [47.5, 867.5], [39, 850]];
+  var F_KOUT = [[90, 812.5], [89, 837.5], [90, 865], [92, 838]];
+  var F_FOOT = [[56, 1101], [85, 1101], [86, 1122.5], [131, 1155], [131, 1166], [49, 1166], [49, 1112.5]];
+  var FEMALE_FRONT = [
+    ["base", F_HEAD, 1], ["base", F_NECK, 1],
+    ["traps", [[26.5, 275], [80, 304], [65, 312.5], [9, 312.5]]],
+    ["shoulders", F_DELT],
+    ["chest", [[0, 320], [9, 312.5], [65, 312.5], [97.5, 360], [82.5, 392.5], [52.5, 412.5], [20, 409], [0, 402.5]]],
+    ["biceps", F_BICEP], ["triceps", F_STRIP], ["forearms", F_FOREARM], ["base", F_HAND],
+    ["abs", [[0, 402.5], [20, 409], [52.5, 412.5], [47.5, 447.5], [25, 452.5], [0, 446]]],
+    ["abs", [[0, 446], [25, 452.5], [47.5, 447.5], [47.5, 477.5], [40, 494], [20, 496], [0, 491]]],
+    ["abs", [[0, 491], [20, 496], [40, 494], [41, 515], [35, 555], [0, 555]]],
+    ["abs", [[52.5, 412.5], [82.5, 392.5], [55, 477.5], [47.5, 477.5], [47.5, 447.5]]],
+    ["abs", [[47.5, 477.5], [55, 477.5], [77.5, 532.5], [35, 555], [41, 515], [40, 494]]],
+    ["base", [[0, 555], [35, 555], [77.5, 532.5], [90, 557.5], [67.5, 580], [45, 592.5], [10, 637.5], [0, 640]], 1],
+    ["quads", [[67.5, 580], [90, 557.5], [100, 585], [115, 620], [116, 702.5], [107.5, 740], [90, 812.5], [67.5, 787.5], [97.5, 655]]],
+    ["quads", [[10, 637.5], [45, 592.5], [67.5, 580], [97.5, 655], [67.5, 787.5], [36, 812.5], [20, 720], [12.5, 702.5]]],
+    ["base", F_KNEECAP], ["base", F_KNEE], ["base", F_KIN], ["base", F_KOUT],
+    ["base", [[47.5, 867.5], [55, 874], [80, 874], [90, 865], [106, 892.5], [106, 962.5], [97.5, 982.5], [87.5, 1060], [85, 1101], [56, 1101], [52.5, 1060], [42.5, 980], [35, 960], [35, 897.5]]],
+    ["base", F_FOOT]
+  ];
+  // Female back: every point shared with the front takes the female position; back-only points
+  // (spine, lats, glute fold) are placed by proportion between the two figures.
+  var CORR = {};
+  function key(p) { return p[0] + "," + p[1]; }
+  function lerpTable(t, x) {
+    if (x <= t[0][0]) return t[0][1];
+    for (var i = 0; i < t.length - 1; i++) if (x <= t[i + 1][0]) return t[i][1] + (t[i + 1][1] - t[i][1]) * (x - t[i][0]) / (t[i + 1][0] - t[i][0]);
+    return t[t.length - 1][1];
   }
-  function pts(list, cx, side, fem) {
-    return list.map(function (p) {
-      var u = fem ? femaleU(p[0], p[1]) : p[0], v = fem ? 64 + (p[1] - 64) * 0.96 : p[1];
-      return f(cx + side * u * K) + "," + f((v - TOP) * K);
-    }).join(" ");
-  }
-  function figure(cx, shapes, levels, fem) {
+  var V_MAP = [[64, 114], [209, 252.5], [262.5, 304], [380, 402.5], [542.5, 555], [641, 640], [842.5, 842.5], [1100, 1101], [1168, 1166]];
+  var U_RATIO = [[209, 0.78], [262.5, 0.71], [331, 0.76], [364, 0.73], [454, 0.67], [517.5, 0.94], [560, 0.9], [640, 0.95], [810, 0.92], [960, 0.92], [1168, 0.96]];
+  function toFemale(p) { return CORR[key(p)] || [p[0] * lerpTable(U_RATIO, p[1]), lerpTable(V_MAP, p[1])]; }
+  var K = 0.2, TOP = 58, FCX = 873;
+  function pts(list, cx, side) { return list.map(function (p) { return f(cx + side * p[0] * K) + "," + f((p[1] - TOP) * K); }).join(" "); }
+  function figure(cx, shapes, levels) {
     var out = "";
     shapes.forEach(function (s) {
-      var key = s[0], fill = key === "base" ? BASE : RAMP[rampIdx(levels[key])], cls = key === "base" ? "" : ' class="m-' + key + '"';
+      var k = s[0], fill = k === "base" ? BASE : RAMP[rampIdx(levels[k])], cls = k === "base" ? "" : ' class="m-' + k + '"';
       var attrs = ' fill="' + fill + '" stroke="' + LINE + '" stroke-width="1.25" stroke-linejoin="round"' + cls;
       if (s[2]) { // one piece across the centre line
         var whole = s[1].concat(s[1].slice(1, -1).reverse().map(function (p) { return [-p[0], p[1]]; }));
-        out += '<polygon points="' + pts(whole, cx, 1, fem) + '"' + attrs + "/>";
+        out += '<polygon points="' + pts(whole, cx, 1) + '"' + attrs + "/>";
       } else {
-        out += '<polygon points="' + pts(s[1], cx, 1, fem) + '"' + attrs + "/>";
-        out += '<polygon points="' + pts(s[1], cx, -1, fem) + '"' + attrs + "/>";
+        out += '<polygon points="' + pts(s[1], cx, 1) + '"' + attrs + "/>";
+        out += '<polygon points="' + pts(s[1], cx, -1) + '"' + attrs + "/>";
       }
     });
     return out;
+  }
+  var FEMALE_BACK = null;
+  function femaleBack() {
+    if (FEMALE_BACK) return FEMALE_BACK;
+    FRONT.forEach(function (sh, i) { sh[1].forEach(function (p, j) { CORR[key(p)] = FEMALE_FRONT[i][1][j]; }); });
+    FEMALE_BACK = BACK.map(function (sh) { return [sh[0], sh[1].map(toFemale), sh[2]]; });
+    return FEMALE_BACK;
   }
   function map(levels, sex) {
     levels = levels || {};
     var fem = sex === "female";
     return '<svg class="bodymap" viewBox="0 -2 186 228" role="img" aria-label="Body map, front and back">' +
-      figure(46, FRONT, levels, fem) + figure(140, BACK, levels, fem) + "</svg>";
+      figure(46, fem ? FEMALE_FRONT : FRONT, levels) + figure(140, fem ? femaleBack() : BACK, levels) + "</svg>";
   }
 
   /* ---------------------------------------------------------------- body-fat torsos */
@@ -173,5 +212,7 @@ window.LiftBody = (function () {
     return s;
   }
 
-  return { map: map, torso: torso, RAMP: RAMP };
+  // For checking a trace against its reference drawing (image coordinates).
+  function _shapes(which) { return (which === "female" ? FEMALE_FRONT : FRONT).map(function (x) { return { pts: x[1], cx: which === "female" ? FCX : 390 }; }); }
+  return { map: map, torso: torso, RAMP: RAMP, _shapes: _shapes };
 })();
