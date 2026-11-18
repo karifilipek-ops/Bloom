@@ -42,4 +42,6 @@ Any static host works (Netlify, Vercel, Cloudflare Pages, GitHub Pages). Point i
 
 `/workout-tracker/` is a single-page app (hash routes) that saves every tap to `localStorage` (`bloom.lift.v1`), works offline via `workout-tracker/sw.js`, and can export/import a JSON backup from Settings.
 
+First run walks through a short setup (basics, gym & equipment, goals) stored in `db.profile`; it drives the exercise picker's equipment filter, default rep ranges, weekly set targets on the Levels tab, and the calendar's days-per-week goal. Sets can carry an optional RIR rating.
+
 Programs and user routines share one template shape and open in the same logger. Lift history is keyed by exercise, not by routine or program, so it survives switching programs. To ship a real Trainbloom program later, add it to `PROGRAMS` in `assets/js/lift.js` (or fetch that list from a server in the same shape).

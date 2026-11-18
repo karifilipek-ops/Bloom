@@ -53,7 +53,6 @@
   footer.className = "site-footer";
   footer.innerHTML =
     '<div class="contact">' +
-    '<a href="https://xbkv4jg47ar.typeform.com/to/Xm4rWtQJ" target="_blank" rel="noopener">Apply for 1:1 coaching</a>' +
     '<a href="mailto:anthony@trainbloom.com">Email me</a>' +
     "</div>" +
     '<div class="social">' +
