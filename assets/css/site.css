@@ -295,16 +295,21 @@ table.tbl tr.hl td, table.tbl td.hl { background: var(--lav-soft); font-weight: 
 /* body fat guide */
 .bf-guide { margin-top: 10px; }
 .bf-guide summary { cursor: pointer; font-size: 14px; font-weight: 500; color: var(--lav-dark); text-decoration: underline; }
-.bf-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 8px; }
+.bf-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 10px; padding: 12px; background: var(--night); border-radius: var(--r-md); }
 .bf-card {
-  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px;
-  background: var(--paper); border: 2px solid var(--ink); border-radius: var(--r-md); padding: 10px 8px; cursor: pointer; font: inherit; color: var(--text);
+  position: relative; display: block; padding: 6px 4px 18px; margin-bottom: 12px; cursor: pointer; font: inherit;
+  background: #1c1c21; border: 2px solid #3a3a42; border-radius: 12px; overflow: visible;
 }
-.bf-card svg { width: 34px; height: 54px; fill: var(--lav); stroke: var(--lav); margin-bottom: 4px; }
-.bf-card .r { font-family: var(--pixel); font-size: 22px; letter-spacing: .08em; }
-.bf-card .n { font-family: var(--pixel); font-size: 15px; text-transform: uppercase; letter-spacing: .16em; color: var(--ink-soft); }
-.bf-card .d { font-size: 12px; line-height: 1.4; color: var(--ink-soft); margin-top: 4px; }
-.bf-card[aria-pressed="true"] { background: var(--lav-soft); box-shadow: inset 0 0 0 2px var(--lav); }
+.bf-card svg { display: block; width: 100%; height: auto; border-radius: 8px; }
+.bf-card .r {
+  position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); white-space: nowrap;
+  font-family: var(--sans); font-weight: 500; font-size: 13px; color: #fff; background: #1c1c21;
+  border: 2px solid #3a3a42; border-radius: 8px; padding: 1px 8px;
+}
+.bf-card:hover { border-color: var(--lav-line); }
+.bf-card[aria-pressed="true"] { border-color: var(--lav); box-shadow: 0 0 0 2px var(--lav); }
+.bf-card[aria-pressed="true"] .r { background: var(--lav); border-color: var(--lav); color: #fff; }
+@media (max-width: 560px) { .bf-cards { gap: 8px; padding: 10px; } .bf-card .r { font-size: 11px; padding: 1px 5px; } }
 
 /* ---------- Article content ---------- */
 .cta { text-align: center; color: var(--muted); font-size: 16px; margin: 0 auto 32px; max-width: 560px; }
