@@ -295,21 +295,21 @@ table.tbl tr.hl td, table.tbl td.hl { background: var(--lav-soft); font-weight: 
 /* body fat guide */
 .bf-guide { margin-top: 10px; }
 .bf-guide summary { cursor: pointer; font-size: 14px; font-weight: 500; color: var(--lav-dark); text-decoration: underline; }
-.bf-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 10px; padding: 12px; background: var(--night); border-radius: var(--r-md); }
+.bf-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 10px; margin-top: 10px; }
 .bf-card {
-  position: relative; display: block; padding: 6px 4px 18px; margin-bottom: 12px; cursor: pointer; font: inherit;
-  background: #1c1c21; border: 2px solid #3a3a42; border-radius: 12px; overflow: visible;
+  position: relative; display: block; padding: 8px 6px 16px; margin-bottom: 12px; cursor: pointer; font: inherit;
+  background: var(--paper); border: 2px solid var(--ink); border-radius: 12px; overflow: visible;
 }
-.bf-card svg { display: block; width: 100%; height: auto; border-radius: 8px; }
+.bf-card svg { display: block; width: 100%; height: auto; }
 .bf-card .r {
   position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); white-space: nowrap;
-  font-family: var(--sans); font-weight: 500; font-size: 13px; color: #fff; background: #1c1c21;
-  border: 2px solid #3a3a42; border-radius: 8px; padding: 1px 8px;
+  font-family: var(--sans); font-weight: 600; font-size: 13px; color: var(--text); background: var(--paper);
+  border: 2px solid var(--ink); border-radius: 8px; padding: 1px 8px;
 }
-.bf-card:hover { border-color: var(--lav-line); }
-.bf-card[aria-pressed="true"] { border-color: var(--lav); box-shadow: 0 0 0 2px var(--lav); }
-.bf-card[aria-pressed="true"] .r { background: var(--lav); border-color: var(--lav); color: #fff; }
-@media (max-width: 560px) { .bf-cards { gap: 8px; padding: 10px; } .bf-card .r { font-size: 11px; padding: 1px 5px; } }
+.bf-card:hover { background: var(--lav-soft); }
+.bf-card[aria-pressed="true"] { background: var(--lav-soft); box-shadow: 0 0 0 3px var(--lav); }
+.bf-card[aria-pressed="true"] .r { background: var(--lav); color: #fff; }
+@media (max-width: 560px) { .bf-cards { gap: 8px; } .bf-card .r { font-size: 11px; padding: 1px 5px; } }
 
 /* ---------- Article content ---------- */
 .cta { text-align: center; color: var(--muted); font-size: 16px; margin: 0 auto 32px; max-width: 560px; }
