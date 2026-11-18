@@ -802,18 +802,7 @@
     return { p: g ? [g] : [], s: [] };
   }
 
-  // Equipment: a short list, not every machine in the building.
-  var EQUIP = [
-    ["barbell", "Barbells & a rack", "Squat rack or power rack, barbell, plates"],
-    ["dumbbells", "Dumbbells", "A rack of fixed or adjustable dumbbells"],
-    ["bench", "Benches", "Flat and adjustable benches"],
-    ["cables", "Cable machines", "Cable stack, lat pulldown, cable row"],
-    ["machines", "Pin-loaded machines", "Chest press, leg extension, leg curl and similar"],
-    ["plate", "Plate-loaded machines", "Leg press, hack squat"],
-    ["pullup", "Pull-up bar & dip station", ""],
-    ["kettlebells", "Kettlebells", ""],
-    ["bands", "Resistance bands", ""]
-  ];
+  // What each lift needs. Gym presets below decide what counts as available.
   var NEEDS = {
     "bench-press": "barbell bench", "incline-bench": "barbell bench", "db-bench": "dumbbells bench", "incline-db-press": "dumbbells bench",
     "machine-chest-press": "machines", "cable-fly": "cables", "pec-deck": "machines", "dips": "pullup", "push-up": "",
@@ -833,7 +822,7 @@
     ["local", "Local gym", "The essentials: racks, barbells, plates, benches and cable machines", "barbell dumbbells bench cables machines pullup"],
     ["garage", "Garage gym", "A home setup with a rack, barbell, plates, a bench and dumbbells", "barbell dumbbells bench pullup"],
     ["home", "Home gym", "Dumbbells, kettlebells, bands and household furniture", "dumbbells kettlebells bands"],
-    ["custom", "Build your own", "Start from scratch and pick what you have", ""]
+    ["other", "Somewhere else / not sure", "Show every exercise", ""]
   ];
   function gymHas() {
     var p = db.profile; if (!p || !p.equipment) return null;
@@ -885,9 +874,8 @@
     if (!keys.length) return "";
     var max = planned[keys[0]], lv = {};
     keys.forEach(function (k) { lv[k] = planned[k] / max; });
-    var map = Art.bodyMap ? Art.bodyMap(lv) : null;
-    return '<div class="tm' + (opts.open ? " open" : "") + '">' +
-      (map ? '<img class="tm-map" src="' + map + '" alt="Muscles trained">' : "") +
+    var map = window.LiftBody ? LiftBody.map(lv) : "";
+    return '<div class="tm' + (opts.open ? " open" : "") + '">' + (map ? '<div class="tm-map">' + map + "</div>" : "") +
       '<div class="tm-chips">' + keys.map(function (k) {
         return '<span class="' + (planned[k] >= max * 0.5 ? "hi" : "") + '">' + esc(MLABEL[k]) + " <b>" + fmtSets(planned[k]) + "</b></span>";
       }).join("") + "</div></div>";
@@ -918,10 +906,10 @@
 
   var SETUP = [
     ["basics", "sex"], ["basics", "birth"], ["basics", "height"], ["basics", "weight"], ["basics", "bodyfat"], ["basics", "lifting"], ["basics", "cardio"],
-    ["gym", "gym"], ["gym", "equipment"],
+    ["gym", "gym"],
     ["goals", "goal"], ["goals", "days"], ["goals", "rir"]
   ];
-  var SECTIONS = [["basics", "Basics", "Height, weight and experience, so your numbers have context."], ["gym", "Gym & equipment", "Where you train and what’s there. The exercise list follows it."], ["goals", "Goals", "Muscle, strength or both, and how often you want to lift."]];
+  var SECTIONS = [["basics", "Basics", "Height, weight and experience, so your numbers have context."], ["gym", "Your gym", "Where you train, so the exercise list shows lifts you can actually do."], ["goals", "Goals", "Muscle, strength or both, and how often you want to lift."]];
   var BF = {
     male: ["3–4%", "5–7%", "8–12%", "13–17%", "18–23%", "24–29%", "30–34%", "35–39%", "40%+"],
     female: ["10–13%", "14–17%", "18–21%", "22–25%", "26–29%", "30–34%", "35–39%", "40–44%", "45%+"]
@@ -943,7 +931,6 @@
       case "lifting": return !!p.lifting;
       case "cardio": return !!p.cardio;
       case "gym": return !!p.gym;
-      case "equipment": return !!p.equipment;
       case "goal": return !!p.goal;
       case "days": return p.days > 0;
       default: return true;
@@ -954,45 +941,67 @@
       '<span class="opt-t"><b>' + esc(title) + "</b>" + (sub ? "<small>" + esc(sub) + "</small>" : "") + '</span><i class="radio"></i></button>';
   }
   function bars(n) { var h = ""; for (var i = 1; i <= 3; i++) h += "<i" + (i <= n ? ' class="f"' : "") + "></i>"; return '<span class="bars">' + h + "</span>"; }
-  // A tiny pixel torso for the body-fat picker: waist and belly grow with the level.
-  function torso(level) {
-    var W = 23, cx = 11.5, out = "", L = "#e9e6f3", D = "#6f6496", M = "#b3abd0";
-    var waist = [5.6, 6.1, 6.7, 7.4, 8.1, 8.9, 9.6, 10.2, 10.7][level], belly = [0, 0, 0, 0, 0.3, 0.7, 1.2, 1.7, 2.2][level];
-    var rows = [];
-    for (var y = 0; y < 23; y++) {
-      var h;
-      if (y < 3) h = 2.4;                                   // neck
-      else if (y === 3) h = 6.5;                            // traps
-      else if (y === 4) h = 9.5;
-      else if (y < 9) h = 11;                               // shoulders
-      else if (y < 12) h = 9 + (level > 5 ? 0.5 : 0);       // chest
-      else if (y < 21) {                                    // taper to the waist, belly on top
-        var t = Math.min(1, (y - 11) / 5), base = 9 + (waist - 9) * t;
-        if (y > 17) base = waist + (y - 17) * 0.5;          // hips
-        h = base + belly * Math.sin(Math.PI * Math.max(0, Math.min(1, (y - 12) / 8)));
-      } else h = waist + 1.5;
-      rows.push(Math.min(11, h));
-    }
-    function px(x, y, c) { out += '<rect x="' + x + '" y="' + y + '" width="1" height="1" fill="' + c + '"/>'; }
-    rows.forEach(function (h, y) {
-      var x0 = Math.round(cx - h), x1 = Math.round(cx + h) - 1;
-      out += '<rect x="' + x0 + '" y="' + y + '" width="' + (x1 - x0 + 1) + '" height="1" fill="' + L + '"/>';
-      px(x0, y, D); px(x1, y, D);
+  function torso(level, sex) { return window.LiftBody ? LiftBody.torso(level, sex) : ""; }
+
+  /* Scroll-wheel picker (like iOS) and a horizontal ruler: both just native scrolling with snap,
+     so they glide with momentum on a phone. */
+  var WH = 40, RPX = 4; // wheel row height; ruler pixels per 0.1
+  function wheel(name, items, cur) {
+    return '<div class="wheel" data-wheel="' + name + '" data-cur="' + cur + '" role="listbox" aria-label="' + name + '"><div class="wh-pad"></div>' +
+      items.map(function (it) { return '<div class="wh-it" data-v="' + it[0] + '">' + esc(it[1]) + "</div>"; }).join("") + '<div class="wh-pad"></div></div>';
+  }
+  function ruler(min, max, v) {
+    var labels = "";
+    for (var n = Math.ceil(min); n <= max; n++) labels += '<span style="left:' + ((n - min) * 10 * RPX) + 'px">' + n + "</span>";
+    return '<div class="ruler-wrap"><div class="hruler" data-min="' + min + '" data-max="' + max + '" data-v="' + v + '"><i class="hr-sp"></i><div class="hr-track" style="width:' + ((max - min) * 10 * RPX) + 'px">' +
+      labels + '</div><i class="hr-sp"></i></div><div class="hr-needle"></div></div>';
+  }
+  function suSet(su, v) {
+    var p = prof();
+    if (su === "height") p.heightCm = v;
+    else if (su === "weight") { p.weight = round1(v); p.weightUnit = U(); }
+    else { p.birth = p.birth || {}; p.birth[su.slice(6)] = v; }
+    save();
+  }
+  function initPickers() {
+    app.querySelectorAll(".wheel").forEach(function (el) {
+      var items = [].slice.call(el.querySelectorAll(".wh-it")), cur = el.dataset.cur, t = null;
+      var idx = Math.max(0, items.findIndex(function (it) { return it.dataset.v === cur; }));
+      function mark(i) { items.forEach(function (it, k) { it.className = "wh-it" + (k === i ? " on" : Math.abs(k - i) === 1 ? " near" : ""); }); }
+      el.scrollTop = idx * WH; mark(idx);
+      el.addEventListener("scroll", function () {
+        var i = Math.max(0, Math.min(items.length - 1, Math.round(el.scrollTop / WH)));
+        mark(i); clearTimeout(t);
+        t = setTimeout(function () { suSet(el.dataset.wheel, +items[i].dataset.v); }, 120);
+      }, { passive: true });
+      el.addEventListener("click", function (e) {
+        var it = e.target.closest(".wh-it"); if (it) el.scrollTo({ top: items.indexOf(it) * WH, behavior: "smooth" });
+      });
     });
-    // shoulder / arm crease, then chest and core detail by level
-    [[2, 9], [20, 9], [3, 10], [19, 10]].forEach(function (q) { px(q[0], q[1], D); });
-    if (level <= 5) { for (var x = 6; x <= 9; x++) px(x, 11, level <= 2 ? D : M); for (x = 13; x <= 16; x++) px(x, 11, level <= 2 ? D : M); }
-    if (level <= 2) {
-      var a = level === 0 ? D : M;
-      [13, 15, 17].forEach(function (y3) { px(9, y3, a); px(10, y3, a); px(12, y3, a); px(13, y3, a); });
-    } else if (level <= 4) { for (var y4 = 13; y4 <= 17; y4++) px(11, y4, M); }
-    px(11, 18, D); // navel
-    return '<svg viewBox="0 0 23 23" width="69" height="69" shape-rendering="crispEdges" aria-hidden="true">' + out + "</svg>";
+    app.querySelectorAll(".hruler").forEach(function (el) {
+      var min = +el.dataset.min, max = +el.dataset.max, input = document.getElementById("su-weight"), t = null, half = el.clientWidth / 2;
+      el.querySelectorAll(".hr-sp").forEach(function (sp) { sp.style.width = half + "px"; });
+      function toX(v) { return (v - min) * 10 * RPX; }
+      el.scrollLeft = toX(+el.dataset.v);
+      el.addEventListener("scroll", function () {
+        var v = Math.max(min, Math.min(max, min + Math.round(el.scrollLeft / RPX) / 10));
+        if (document.activeElement !== input) input.value = fmtN(v);
+        clearTimeout(t);
+        t = setTimeout(function () {
+          suSet("weight", v);
+          if (Math.abs(el.scrollLeft - toX(v)) > 0.5) el.scrollTo({ left: toX(v), behavior: "smooth" });
+        }, 140);
+      }, { passive: true });
+      input.addEventListener("input", function () {
+        var v = parseFloat(input.value.replace(",", ".")); if (!(v >= min && v <= max)) return;
+        suSet("weight", v); el.scrollLeft = toX(v);
+      });
+    });
   }
   function viewSetup(step) {
     var p = db.profile || {};
     if (!step) { // intro
-      var doneSec = { basics: SETUP.slice(0, 7).every(function (x) { return setupValid(x[1]); }), gym: setupValid("gym") && setupValid("equipment"), goals: setupValid("goal") && setupValid("days") };
+      var doneSec = { basics: SETUP.slice(0, 7).every(function (x) { return setupValid(x[1]); }), gym: setupValid("gym"), goals: setupValid("goal") && setupValid("days") };
       var next = SECTIONS.filter(function (x) { return !doneSec[x[0]]; })[0];
       return '<div class="su su-intro"><div class="su-top"><a class="su-x" href="#/" data-act="su-skip" aria-label="Close">✕</a></div>' +
         '<h1 class="vtitle center">Let’s get started</h1><p class="vsub center">A minute of setup makes every number in your log mean more.</p>' +
@@ -1004,7 +1013,9 @@
           '<a class="btn big-btn" href="#/" data-act="su-finish">Start lifting</a>') +
         '<button class="linkish" data-act="su-skip">' + (next ? "Skip for now" : "") + "</button></div></div>";
     }
-    var idx = SETUP.map(function (s) { return s[1]; }).indexOf(step), sec = SETUP[idx][0];
+    var idx = SETUP.map(function (s) { return s[1]; }).indexOf(step);
+    if (idx < 0) { location.replace("#/setup"); return ""; }
+    var sec = SETUP[idx][0];
     var secSteps = SETUP.filter(function (s) { return s[0] === sec; }), pos = secSteps.map(function (s) { return s[1]; }).indexOf(step);
     var title = SECTIONS.filter(function (x) { return x[0] === sec; })[0][1];
     var body = "", q = "", hint = "";
@@ -1016,31 +1027,29 @@
         q = "When were you born?";
         var b = p.birth || { m: 6, d: 15, y: new Date().getFullYear() - 28 };
         if (!p.birth) { prof().birth = b; save(); }
-        var yrs = ""; for (var y = new Date().getFullYear() - 13; y >= 1930; y--) yrs += '<option value="' + y + '"' + (y === b.y ? " selected" : "") + ">" + y + "</option>";
-        var days = ""; for (var d = 1; d <= 31; d++) days += '<option value="' + d + '"' + (d === b.d ? " selected" : "") + ">" + d + "</option>";
-        body = '<div class="wheel3"><select data-su="birth-m" aria-label="Month">' + MONTHS.map(function (m, i) { return '<option value="' + (i + 1) + '"' + (i + 1 === b.m ? " selected" : "") + ">" + m + "</option>"; }).join("") +
-          '</select><select data-su="birth-d" aria-label="Day">' + days + '</select><select data-su="birth-y" aria-label="Year">' + yrs + "</select></div>"; break;
+        var yrs = [], dys = [];
+        for (var y = 1930; y <= new Date().getFullYear() - 13; y++) yrs.push([y, y]);
+        for (var d = 1; d <= 31; d++) dys.push([d, d]);
+        body = '<div class="wheels w3">' + wheel("birth-m", MONTHS.map(function (m, i) { return [i + 1, m]; }), b.m) + wheel("birth-d", dys, b.d) + wheel("birth-y", yrs, b.y) + '<div class="wh-band"></div></div>'; break;
       case "height":
         q = "What is your height?";
-        var hu = p.heightUnit || (U() === "kg" ? "cm" : "ftin"), hc = p.heightCm || 175, ho = "";
-        if (hu === "ftin") { for (var inch = 54; inch <= 86; inch++) { var cm = Math.round(inch * 2.54 * 10) / 10; ho += '<option value="' + cm + '"' + (Math.abs(cm - hc) < 1.3 ? " selected" : "") + ">" + Math.floor(inch / 12) + " ft " + (inch % 12) + " in</option>"; } }
-        else { for (var c = 137; c <= 218; c++) ho += '<option value="' + c + '"' + (Math.round(hc) === c ? " selected" : "") + ">" + c + " cm</option>"; }
+        var hu = p.heightUnit || (U() === "kg" ? "cm" : "ftin"), hc = p.heightCm || 175.3, hs = [], cur = null;
+        if (hu === "ftin") { for (var inch = 54; inch <= 86; inch++) { var cm = Math.round(inch * 2.54 * 10) / 10; hs.push([cm, Math.floor(inch / 12) + " ft " + (inch % 12) + " in"]); if (Math.abs(cm - hc) < 1.3) cur = cm; } }
+        else { for (var c = 137; c <= 218; c++) { hs.push([c, c + " cm"]); if (Math.round(hc) === c) cur = c; } }
         if (!p.heightCm) { prof().heightCm = 175.3; prof().heightUnit = hu; save(); }
         body = '<div class="seg su-seg"><button data-act="su-unit" data-k="heightUnit" data-v="ftin" aria-pressed="' + (hu === "ftin") + '">Feet & inches</button><button data-act="su-unit" data-k="heightUnit" data-v="cm" aria-pressed="' + (hu === "cm") + '">Centimeters</button></div>' +
-          '<div class="wheel1"><select data-su="height" aria-label="Height">' + ho + "</select></div>"; break;
+          '<div class="wheels w1">' + wheel("height", hs, cur == null ? hs[Math.floor(hs.length / 2)][0] : cur) + '<div class="wh-band"></div></div>'; break;
       case "weight":
         q = "What is your weight?"; hint = "This also sets the units for the whole log.";
         var wu = U(), wv = p.weight ? round1(conv(p.weight, p.weightUnit || "lb", wu)) : (wu === "kg" ? 80 : 180);
         if (!p.weight) { prof().weight = wv; prof().weightUnit = wu; save(); }
         body = '<div class="seg su-seg"><button data-act="su-wunit" data-v="lb" aria-pressed="' + (wu === "lb") + '">Pounds</button><button data-act="su-wunit" data-v="kg" aria-pressed="' + (wu === "kg") + '">Kilograms</button></div>' +
-          '<div class="bigw"><button data-act="su-w" data-d="-1" aria-label="Less">−</button><div><input id="su-weight" inputmode="decimal" value="' + fmtN(wv) + '"><span>' + wu + "</span></div>" +
-          '<button data-act="su-w" data-d="1" aria-label="More">+</button></div>' +
-          '<input type="range" class="ruler" id="su-ruler" min="' + (wu === "kg" ? 35 : 80) + '" max="' + (wu === "kg" ? 200 : 440) + '" step="0.5" value="' + wv + '" aria-label="Weight">'; break;
+          '<div class="bigw"><input id="su-weight" inputmode="decimal" value="' + fmtN(wv) + '" aria-label="Weight"><span>' + wu + "</span></div>" + ruler(wu === "kg" ? 35 : 80, wu === "kg" ? 200 : 440, wv); break;
       case "bodyfat":
         q = "What is your body fat level?"; hint = "A quick visual guess is plenty.";
         var r = BF[p.sex === "female" ? "female" : "male"];
         body = '<div class="bf-grid">' + r.map(function (lab, i) {
-          return '<button class="bf' + (p.bodyfat === i ? " on" : "") + '" data-act="su-pick" data-v="' + i + '">' + torso(i) + "<span>" + lab + "</span></button>";
+          return '<button class="bf' + (p.bodyfat === i ? " on" : "") + '" data-act="su-pick" data-v="' + i + '">' + torso(i, p.sex) + "<span>" + lab + "</span></button>";
         }).join("") + "</div>"; break;
       case "lifting":
         q = "What is your experience level with lifting?";
@@ -1049,14 +1058,8 @@
         q = "What is your experience level with cardio?";
         body = CARDIO.map(function (e, i) { return opt(e[0], p.cardio, e[1], e[2], bars(i)); }).join(""); break;
       case "gym":
-        q = "Where do you work out?"; hint = "Next you’ll check what’s there. You can change it anytime.";
+        q = "Where do you work out?"; hint = "The exercise list shows what that kind of gym usually has. “Show all” is always one tap away.";
         body = GYMS.map(function (g) { return opt(g[0], p.gym, g[1], g[2]); }).join(""); break;
-      case "equipment":
-        q = "What’s in your gym?"; hint = "The exercise list shows lifts you can actually do here.";
-        var has = {}; (p.equipment || []).forEach(function (e) { has[e] = 1; });
-        body = EQUIP.map(function (e) {
-          return '<button class="opt chk' + (has[e[0]] ? " on" : "") + '" data-act="su-eq" data-v="' + e[0] + '"><span class="opt-t"><b>' + esc(e[1]) + "</b>" + (e[2] ? "<small>" + esc(e[2]) + "</small>" : "") + '</span><i class="box"></i></button>';
-        }).join(""); break;
       case "goal":
         q = "What’s your main goal?"; hint = "Sets your default rep ranges and weekly set targets.";
         body = GOALS.map(function (g) { return opt(g[0], p.goal, g[1], g[2]); }).join(""); break;
@@ -1088,10 +1091,10 @@
     if (step === "rir") { db.settings.rir = v === "on"; save(); render(); return; }
     var key = { sex: "sex", bodyfat: "bodyfat", lifting: "lifting", cardio: "cardio", gym: "gym", goal: "goal", days: "days" }[step];
     p[key] = v;
-    if (step === "gym") { var g = GYMS.filter(function (x) { return x[0] === v; })[0]; p.equipment = g[3].split(" ").filter(Boolean); }
+    if (step === "gym") { var g = GYMS.filter(function (x) { return x[0] === v; })[0]; p.equipment = g[3] ? g[3].split(" ") : null; }
     if (step === "sex" && p.bodyfat != null) p.bodyfat = p.bodyfat; // ranges re-label, index stays
     save(); render();
-    if (step !== "gym") setTimeout(function () { setupNext(step); }, 180); // single-choice screens advance on tap
+    setTimeout(function () { setupNext(step); }, 180); // single-choice screens advance on tap
   }
 
   /* ---------------------------------------------------------------- calendar */
@@ -1135,12 +1138,12 @@
     var per = {}; Object.keys(res.sets).forEach(function (k) { per[k] = res.sets[k] / weeks; });
     var lv = {}; Object.keys(MLABEL).forEach(function (k) { lv[k] = (per[k] || 0) / setTarget(k); });
     var total = 0; Object.keys(per).forEach(function (k) { if (!MINOR[k]) total += per[k]; });
-    var map = Art.bodyMap ? Art.bodyMap(lv) : null;
+    var map = window.LiftBody ? LiftBody.map(lv) : "", RAMP = window.LiftBody ? LiftBody.RAMP : ["#555"];
     var html = head("Levels", "Sets per muscle. Brighter means more work.") +
       '<div class="seg lv-seg"><button data-act="lv-range" data-v="week" aria-pressed="' + (levelsRange === "week") + '">This week</button>' +
       '<button data-act="lv-range" data-v="4w" aria-pressed="' + (levelsRange === "4w") + '">4-week average</button></div>' +
-      '<div class="lv-map">' + (map ? '<img src="' + map + '" alt="Body map of weekly sets">' : "") + '<div class="lv-lab"><span>Front</span><span>Back</span></div>' +
-      '<div class="lv-legend"><span>Less</span>' + Art.RAMP.map(function (c) { return '<i style="background:' + c + '"></i>'; }).join("") + "<span>On target</span></div></div>";
+      '<div class="lv-map">' + map + '<div class="lv-lab"><span>Front</span><span>Back</span></div>' +
+      '<div class="lv-legend"><span>Less</span>' + RAMP.map(function (c) { return '<i style="background:' + c + '"></i>'; }).join("") + "<span>On target</span></div></div>";
     if (!total) html += '<p class="note center">' + (levelsRange === "week" ? "No sets logged since Sunday. Log a workout and your map lights up." : "Nothing logged in the last four weeks yet.") + "</p>";
     MGROUPS.forEach(function (g) {
       html += '<h2 class="sec">' + g[0] + '</h2><div class="lv-list">';
@@ -1148,7 +1151,7 @@
         var n = per[k] || 0, t = setTarget(k), pct = Math.min(100, n / t * 100);
         var top = res.by[k] ? Object.keys(res.by[k]).sort(function (a, b) { return res.by[k][b] - res.by[k][a]; }).slice(0, 3) : [];
         html += '<div class="lv-row"><div class="lv-t"><b>' + esc(MLABEL[k]) + '</b><span><b>' + fmtSets(round1(n)) + "</b> / " + t + " sets" + (weeks > 1 ? " a week" : "") + "</span></div>" +
-          '<div class="lv-bar"><i style="width:' + pct + "%;background:" + Art.RAMP[Math.max(1, rampOf(n / t))] + '"></i></div>' +
+          '<div class="lv-bar"><i style="width:' + pct + "%;background:" + RAMP[Math.max(1, rampOf(n / t))] + '"></i></div>' +
           (top.length ? '<small>' + top.map(function (e) { return esc(getEx(e).name); }).join(" · ") + "</small>" : "") + "</div>";
       });
       html += "</div>";
@@ -1191,6 +1194,7 @@
     document.querySelectorAll("#tabbar a").forEach(function (a) { a.classList.toggle("on", a.dataset.tab === tab); });
     paintRest(); syncWake(); tick();
     var q = app.querySelector("#lift-q"); if (q) q.addEventListener("input", filterLifts);
+    if (r.name === "setup") initPickers();
   }
 
   /* ---------------------------------------------------------------- views */
@@ -1483,11 +1487,11 @@
     if (p.heightCm) rows.push(["Height", (p.heightUnit === "cm" ? Math.round(p.heightCm) + " cm" : Math.floor(Math.round(p.heightCm / 2.54) / 12) + " ft " + Math.round(p.heightCm / 2.54) % 12 + " in")]);
     if (p.weight) rows.push(["Weight", fmtN(conv(p.weight, p.weightUnit || "lb", U())) + " " + U()]);
     if (p.lifting) rows.push(["Experience", EXP.filter(function (x) { return x[0] === p.lifting; })[0][1]]);
-    if (g) rows.push(["Gym", g[1] + " · " + plural((p.equipment || []).length, "equipment type")]);
+    if (g) rows.push(["Gym", g[1]]);
     if (goal) rows.push(["Goal", goal[1] + (p.days ? " · " + p.days + " days a week" : "")]);
     return '<h2 class="sec">Profile & gym</h2>' + (rows.length ? '<div class="prof">' + rows.map(function (r) { return "<div><span>" + r[0] + "</span><b>" + esc(r[1]) + "</b></div>"; }).join("") + "</div>" : '<p class="note">Not set up yet.</p>') +
       '<div class="settings-actions"><a class="ghost-btn wide" href="#/setup">' + (rows.length ? "Edit profile, gym & goals" : "Set up profile") + "</a>" +
-      (p.gym ? '<a class="ghost-btn wide" href="#/setup/equipment">Change equipment</a>' : "") + "</div>";
+      "</div>";
   }
   function viewSettings() {
     var st = db.settings;
@@ -1531,8 +1535,6 @@
     "su-next": function (b) { if (setupValid(b.dataset.v)) setupNext(b.dataset.v); },
     "su-unit": function (b) { prof()[b.dataset.k] = b.dataset.v; save(); render(); },
     "su-wunit": function (b) { var p = prof(), w = conv(p.weight, p.weightUnit || "lb", b.dataset.v); p.weight = round1(w); p.weightUnit = b.dataset.v; db.settings.unit = b.dataset.v; save(); render(); },
-    "su-w": function (b) { var p = prof(); p.weight = Math.max(1, round1((p.weight || 0) + +b.dataset.d)); p.weightUnit = U(); save(); render(); },
-    "su-eq": function (b) { var p = prof(), e = p.equipment || [], i = e.indexOf(b.dataset.v); if (i > -1) e.splice(i, 1); else e.push(b.dataset.v); p.equipment = e; save(); render(); },
     "cal-nav": function (b) { var now = new Date(), m = calMonth || new Date(now.getFullYear(), now.getMonth(), 1); calMonth = new Date(m.getFullYear(), m.getMonth() + +b.dataset.d, 1); render(); },
     "cal-day": function (b) {
       var list = finished().concat(active() ? [active()] : []).filter(function (s) { return dayKey(s.startedAt) === b.dataset.k; });
@@ -1690,13 +1692,6 @@
 
   document.addEventListener("input", function (e) {
     var el = e.target;
-    if (el.id === "su-weight" || el.id === "su-ruler") {
-      var wv = parseFloat(el.value.replace(",", ".")); if (!(wv > 0)) return;
-      var pp = prof(); pp.weight = round1(wv); pp.weightUnit = U(); save();
-      var other = document.getElementById(el.id === "su-weight" ? "su-ruler" : "su-weight"); if (other) other.value = el.id === "su-ruler" ? fmtN(wv) : wv;
-      var nb = document.querySelector('[data-act="su-next"]'); if (nb) nb.disabled = false;
-      return;
-    }
     if (el.id === "in-w" || el.id === "in-r") {
       var L = workoutSet(); if (!L) return;
       var raw = el.value.replace(",", ".").trim(), n = raw === "" ? null : parseFloat(raw);

@@ -404,105 +404,6 @@ window.LiftArt = (function () {
     return _side(p);
   };
 
-  /* ---------------------------------------------------------------- body map */
-  // Front + back figure, each muscle its own region. levels: { chest: 0..1+, ... } (missing = untrained).
-  var BM_W = 120, BM_H = 96;
-  var RAMP = ["#3a3552", "#4e4577", "#665a9f", "#8170c8", "#a08ef0", "#d6ccff"];
-  var BM_BASE = "#2a2740", BM_SEAM = "#0d0c16";
-  function fillCap(a, b, ra, rb, plot) {
-    var x0 = Math.floor(Math.min(a[0] - ra, b[0] - rb)), x1 = Math.ceil(Math.max(a[0] + ra, b[0] + rb));
-    var y0 = Math.floor(Math.min(a[1] - ra, b[1] - rb)), y1 = Math.ceil(Math.max(a[1] + ra, b[1] + rb));
-    var dx = b[0] - a[0], dy = b[1] - a[1], L2 = dx * dx + dy * dy;
-    for (var y = y0; y <= y1; y++) for (var x = x0; x <= x1; x++) {
-      var px = x + 0.5 - a[0], py = y + 0.5 - a[1], t = L2 ? Math.max(0, Math.min(1, (px * dx + py * dy) / L2)) : 0;
-      var ex = px - t * dx, ey = py - t * dy, r = ra + (rb - ra) * t;
-      if (ex * ex + ey * ey <= r * r) plot(x, y);
-    }
-  }
-  function fillPoly(pts, plot) {
-    var xs = pts.map(function (p) { return p[0]; }), ys = pts.map(function (p) { return p[1]; });
-    for (var y = Math.floor(Math.min.apply(null, ys)); y <= Math.ceil(Math.max.apply(null, ys)); y++)
-      for (var x = Math.floor(Math.min.apply(null, xs)); x <= Math.ceil(Math.max.apply(null, xs)); x++) {
-        var px = x + 0.5, py = y + 0.5, inside = false;
-        for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
-          var A = pts[i], B = pts[j];
-          if ((A[1] > py) !== (B[1] > py) && px < (B[0] - A[0]) * (py - A[1]) / (B[1] - A[1]) + A[0]) inside = !inside;
-        }
-        if (inside) plot(x, y);
-      }
-  }
-  function bodyMapRegions() {
-    var reg = new Array(BM_W * BM_H).fill(null);
-    function P(name) { return function (x, y) { if (x >= 0 && y >= 0 && x < BM_W && y < BM_H) reg[y * BM_W + x] = name; }; }
-    function both(cx, f) { f(cx, 1); f(cx, -1); }
-    [[30, "front"], [90, "back"]].forEach(function (v) {
-      var cx = v[0], back = v[1] === "back", base = P("base");
-      // silhouette
-      fillCap([cx, 8.5], [cx, 8.5], 5, 5, base);
-      fillCap([cx, 13], [cx, 17], 2.6, 2.6, base);
-      fillPoly([[cx - 11, 17.5], [cx + 11, 17.5], [cx + 12.5, 21], [cx + 9.5, 32], [cx + 8.5, 46], [cx - 8.5, 46], [cx - 9.5, 32], [cx - 12.5, 21]], base);
-      fillPoly([[cx - 8.5, 45], [cx + 8.5, 45], [cx + 9.5, 51.5], [cx - 9.5, 51.5]], base);
-      both(cx, function (c, s) {
-        fillCap([c + s * 12.5, 20], [c + s * 14, 33], 3, 2.7, base);
-        fillCap([c + s * 14.3, 34], [c + s * 16, 46], 2.6, 2, base);
-        fillCap([c + s * 16.6, 48.8], [c + s * 16.6, 48.8], 2, 2, base);
-        fillCap([c + s * 5, 49], [c + s * 5, 67], 4.6, 3.6, base);
-        fillCap([c + s * 5, 69], [c + s * 5, 69], 3, 3, base);
-        fillCap([c + s * 5, 70.5], [c + s * 5, 87.5], 3.1, 2, base);
-        fillCap([c + s * 5, 90], [c + s * 7.2, 90.5], 1.8, 1.6, base);
-      });
-      if (!back) {
-        both(cx, function (c, s) {
-          var k = "." + s;
-          fillPoly([[c + s * 2.5, 16.4], [c + s * 9.5, 18.6], [c + s * 4, 19.8]], P("traps" + k));
-          fillCap([c + s * 11.6, 21], [c + s * 11.6, 21], 4.2, 4.2, P("shoulders" + k));
-          fillCap([c + s * 7.6, 23.4], [c + s * 2.2, 24.6], 3.9, 3.6, P("chest" + k));
-          fillCap([c + s * 7.3, 30.5], [c + s * 6.6, 42], 2, 1.7, P("abs~o" + k));
-          fillPoly([[c, 29.4], [c + s * 4.8, 29.4], [c + s * 4.1, 44], [c, 44]], P("abs" + k));
-          fillCap([c + s * 13.1, 23.6], [c + s * 14, 31.6], 2.4, 2.1, P("biceps" + k));
-          fillCap([c + s * 14.5, 35], [c + s * 15.8, 44.6], 2.2, 1.7, P("forearms" + k));
-          fillCap([c + s * 5.3, 51.5], [c + s * 5, 65.5], 3.9, 3, P("quads" + k));
-          fillCap([c + s * 7.3, 73], [c + s * 6.8, 81], 1.4, 1.1, P("calves" + k));
-        });
-      } else {
-        both(cx, function (c, s) {
-          var k = "." + s;
-          fillPoly([[c, 14.5], [c + s * 9.5, 19], [c + s * 3.2, 22.4], [c, 31]], P("traps" + k));
-          fillCap([c + s * 11.6, 21], [c + s * 11.6, 21], 4.2, 4.2, P("shoulders" + k));
-          fillPoly([[c + s * 3.4, 23], [c + s * 10.4, 23.4], [c + s * 9, 33.5], [c + s * 3.4, 38.5]], P("back" + k));
-          fillCap([c + s * 13.1, 23.6], [c + s * 14, 31.6], 2.4, 2.1, P("triceps" + k));
-          fillCap([c + s * 14.5, 35], [c + s * 15.8, 44.6], 2.2, 1.7, P("forearms" + k));
-          fillPoly([[c, 37.5], [c + s * 4.4, 37.5], [c + s * 5.8, 45.6], [c, 45.6]], P("lowback" + k));
-          fillCap([c + s * 4.4, 50], [c + s * 4.4, 50], 4.7, 4.7, P("glutes" + k));
-          fillCap([c + s * 5.2, 56.5], [c + s * 5, 66], 3.8, 3.1, P("hamstrings" + k));
-          fillCap([c + s * 5, 72.5], [c + s * 5, 81.5], 3.1, 2.2, P("calves" + k));
-        });
-      }
-    });
-    return reg;
-  }
-  var REG = null;
-  function rampIdx(v) { return v == null ? -1 : v <= 0 ? 0 : v < 0.25 ? 1 : v < 0.5 ? 2 : v < 0.75 ? 3 : v < 1 ? 4 : 5; }
-  function bodyMap(levels) {
-    REG = REG || bodyMapRegions();
-    var cv = document.createElement("canvas"); cv.width = BM_W; cv.height = BM_H;
-    var ctx = cv.getContext("2d");
-    ctx.fillStyle = COL.bg; ctx.fillRect(0, 0, BM_W, BM_H);
-    ctx.fillStyle = COL.star; STARS.forEach(function (st) { ctx.fillRect(st[0] * 1.5 % BM_W, st[1] * 1.6 % BM_H, 1, 1); });
-    for (var y = 0; y < BM_H; y++) for (var x = 0; x < BM_W; x++) {
-      var i = y * BM_W + x, r = REG[i]; if (!r) continue;
-      var lv = r === "base" ? null : levels[r.split(/[.~]/)[0]];
-      var c = r === "base" ? BM_BASE : RAMP[Math.max(0, rampIdx(lv))];
-      if (r !== "base") {
-        var nb = [x > 0 ? REG[i - 1] : null, x < BM_W - 1 ? REG[i + 1] : null, y > 0 ? REG[i - BM_W] : null, y < BM_H - 1 ? REG[i + BM_W] : null];
-        // outline each muscle: against the body, and a 1px seam against a neighbouring muscle
-        if (nb.some(function (n) { return n === "base" || (n && n !== r && n < r); })) c = BM_SEAM;
-      }
-      ctx.fillStyle = c; ctx.fillRect(x, y, 1, 1);
-    }
-    return cv.toDataURL("image/png");
-  }
-
   /* ---------------------------------------------------------------- public */
 
   var cache = {};
@@ -519,8 +420,7 @@ window.LiftArt = (function () {
     url: url,
     info: function (id) { var e = EX[id]; return e ? { cue: e.cue, muscles: e.m.map(function (k) { return LABEL[k]; }) } : null; },
     ids: function () { return Object.keys(EX); },
-    bodyMap: function (levels) { try { return bodyMap(levels || {}); } catch (e) { return null; } },
-    RAMP: RAMP,
+
     W: W, H: H
   };
 })();
