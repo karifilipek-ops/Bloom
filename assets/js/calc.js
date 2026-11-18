@@ -178,8 +178,12 @@ window.Bloom = (function () {
     function renderGuide(s) {
       var wrap = document.getElementById("bf-cards");
       wrap.innerHTML = BF_LEVELS[s].map(function (g, i) {
-        return '<button type="button" class="bf-card" data-val="' + g[0] + '" aria-label="' + g[1] + ' body fat">' +
-          torsoSVG(s, i) + '<span class="r">' + g[1] + "</span></button>";
+        // men: illustrated images (assets/img/bodyfat/m-<value>.webp); women: drawn figures until images are added
+        var art = s === "m"
+          ? '<img src="/assets/img/bodyfat/m-' + g[0] + '.webp" alt="" width="360" height="258" loading="lazy">'
+          : torsoSVG(s, i);
+        return '<button type="button" class="bf-card' + (s === "m" ? " photo" : "") + '" data-val="' + g[0] + '" aria-label="' + g[1] + ' body fat">' +
+          art + '<span class="r">' + g[1] + "</span></button>";
       }).join("");
       $$(".bf-card", wrap).forEach(function (c) {
         c.addEventListener("click", function () { bf.value = c.dataset.val; bfOut.textContent = bf.value; markGuide(); });

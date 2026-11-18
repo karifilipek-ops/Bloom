@@ -422,3 +422,12 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
   table.tbl th { font-size: 14px; letter-spacing: .08em; }
 }
 .big + .gauge { margin-top: 86px; }
+
+/* body fat guide: illustrated (image) tiles */
+.bf-cards:has(.bf-card.photo) { background: #141414; padding: 12px 12px 4px; border-radius: var(--r-md); }
+.bf-card.photo { background: #1e1e1e; border-color: #555; padding: 4px 4px 14px; }
+.bf-card.photo img { display: block; width: 100%; height: auto; border-radius: 8px; }
+.bf-card.photo .r { background: #1e1e1e; border-color: #555; color: #fff; }
+.bf-card.photo:hover { background: #262626; border-color: var(--lav-line); }
+.bf-card.photo[aria-pressed="true"] { background: #262626; border-color: var(--lav); box-shadow: 0 0 0 3px var(--lav); }
+.bf-card.photo[aria-pressed="true"] .r { background: var(--lav); border-color: var(--lav); }
