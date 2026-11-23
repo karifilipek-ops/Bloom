@@ -70,18 +70,17 @@
           </div>
           <input type="range" id="steps" min="1000" max="20000" step="500" value="7000">
           <div class="range-ends"><span>1,000</span><span>20,000+</span></div>
-          <p class="hint" id="steps-cal">Enter your weight to see what your steps burn.</p>
         </div>
       </div>
       <div class="actions"><button class="btn" type="submit">Calculate</button></div>
 
       <div class="results" id="results" hidden aria-live="polite">
         <div class="stats">
-          <div class="stat"><div class="k">LBM</div><div class="v" id="r-lbm"></div><div class="s">Lean body mass</div></div>
-          <div class="stat"><div class="k">BMR</div><div class="v" id="r-bmr"></div><div class="s">Calories burned at complete rest</div></div>
+          <div class="stat"><div class="k">LBM <button class="info" type="button" aria-expanded="false" aria-controls="i-lbm" aria-label="What is LBM?">?</button><div class="info-pop" id="i-lbm" role="note" hidden><b>Lean body mass.</b> Everything you weigh that isn&rsquo;t fat: muscle, bone, organs and water.</div></div><div class="v" id="r-lbm"></div><div class="s">Lean body mass</div></div>
+          <div class="stat"><div class="k">BMR <button class="info" type="button" aria-expanded="false" aria-controls="i-bmr" aria-label="What is BMR?">?</button><div class="info-pop" id="i-bmr" role="note" hidden><b>Basal metabolic rate.</b> The calories your body burns at complete rest, just keeping you alive. Roughly what you&rsquo;d burn lying in bed all day.</div></div><div class="v" id="r-bmr"></div><div class="s">Calories burned at complete rest</div></div>
         </div>
         <div class="big" style="background:var(--pink)">
-          <div class="k">Estimated TDEE</div>
+          <div class="k">Estimated TDEE <button class="info" type="button" aria-expanded="false" aria-controls="i-tdee" aria-label="What is TDEE?">?</button><div class="info-pop" id="i-tdee" role="note" hidden><b>Total daily energy expenditure.</b> Everything you burn in a day: your BMR plus walking, exercise and digesting food. Eat this much and your weight stays about the same.</div></div>
           <div class="v"><span id="r-tdee"></span> <small>cal</small></div>
           <div class="s">Your estimated maintenance calories per day</div>
         </div>
@@ -162,7 +161,6 @@
       var sex = B.seg("sex", bodyFat.render);
       var hours = B.seg("hours");
       var stepsEl = document.getElementById("steps");
-      function kg() { var w = B.num("weight"); return units() === "metric" ? w : w / B.LB_PER_KG; }
       // Calories from walking scale with body weight: ~0.0005 cal per kg per step
       // (about 0.04 cal/step at 175 lb, so ~400 cal for 10,000 steps).
       function stepCals(n, kgs) { return n * 0.0005 * kgs; }
@@ -211,11 +209,11 @@
       var printsEl = document.getElementById("trail-prints"), MIN = +stepsEl.min, MAX = +stepsEl.max;
       var prints = [], per = 0;
       function buildPrints() {
-        // a print every 2,000 steps on desktop (room for a real stride between them);
-        // phones get one per 2,500 steps and slightly smaller prints
-        var narrow = printsEl.clientWidth < 420, next = narrow ? 2500 : 2000;
+        // a print every 1,250 steps: 15 prints at 20,000 (phones get smaller prints so they fit)
+        var narrow = printsEl.clientWidth < 420, next = 1250;
         printsEl.classList.toggle("narrow", narrow);
-        if (next === per) return;
+        if (next === per && printsEl.dataset.narrow === String(narrow)) return;
+        printsEl.dataset.narrow = narrow;
         per = next; printsEl.innerHTML = ""; prints = [];
         for (var at = MIN + per; at <= MAX; at += per) {
           var el = document.createElement("i");
@@ -263,15 +261,10 @@
         var v = +stepsEl.value;
         document.getElementById("steps-out").textContent = B.fmt(v) + (v >= MAX ? "+" : "");
         prints.forEach(function (el) { el.classList.toggle("on", +el.dataset.at <= v); });
-        var kgs = kg();
-        document.getElementById("steps-cal").textContent = kgs > 0
-          ? "\u2248 " + B.fmt(stepCals(v, kgs)) + " cal/day from walking at your weight"
-          : "Enter your weight to see what your steps burn.";
       }
       stepsEl.addEventListener("input", function () { blip(+stepsEl.value); });
       window.addEventListener("resize", renderSteps);
       stepsEl.addEventListener("input", renderSteps);
-      document.getElementById("weight").addEventListener("input", renderSteps);
       renderSteps();
       var form = document.getElementById("form");
 

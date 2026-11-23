@@ -121,6 +121,27 @@ window.Bloom = (function () {
     countAnim = { finish: function () { cancelAnimationFrame(raf); paint(1); countAnim = null; } };
   }
 
+  // "What's this?" buttons: <button class="info" aria-controls="id"> opens the .info-pop with that id.
+  // One open at a time; clicking elsewhere or pressing Escape closes it.
+  function closeInfo(except) {
+    $$(".info[aria-expanded='true']").forEach(function (b) {
+      if (b === except) return;
+      b.setAttribute("aria-expanded", "false");
+      document.getElementById(b.getAttribute("aria-controls")).hidden = true;
+    });
+  }
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest(".info") : null;
+    if (btn) {
+      e.preventDefault();
+      var open = btn.getAttribute("aria-expanded") !== "true";
+      closeInfo(btn);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      document.getElementById(btn.getAttribute("aria-controls")).hidden = !open;
+    } else closeInfo(); // a tap anywhere else, including on the explanation, closes it
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeInfo(); });
+
   function show(el) {
     el.hidden = false;
     countUp(el);
