@@ -198,27 +198,39 @@
         ".XXXXXX.XXXXXXXXXX",
         ".XXXXXX..XXXXXXXX.",
         "..XXXX.....XXXXX.."];
-      function soleSvg(rows) {
-        return '<svg viewBox="0 0 18 6" shape-rendering="crispEdges">' + rows.map(function (row, y) {
+      function soleSvg(rows, w, h) {
+        return '<svg viewBox="0 0 ' + (w || 18) + " " + (h || 6) + '" shape-rendering="crispEdges">' + rows.map(function (row, y) {
           return row.split("").map(function (ch, x) {
             return ch === "X" ? '<rect x="' + x + '" y="' + y + '" width="1.02" height="1.02"/>' : "";
           }).join("");
         }).join("") + "</svg>";
       }
+      // Smaller sole for phones, so a narrow box still fits a proper trail.
+      var SOLE_SM = [
+        "..XX..XXXXX.",
+        ".XXXX.XXXXXX",
+        ".XXXX.XXXXXX",
+        "..XX...XXXX."];
       var PRINT_L = soleSvg(SOLE), PRINT_R = soleSvg(SOLE.slice().reverse());
+      var PRINT_SM_L = soleSvg(SOLE_SM, 12, 4), PRINT_SM_R = soleSvg(SOLE_SM.slice().reverse(), 12, 4);
       var printsEl = document.getElementById("trail-prints"), MIN = +stepsEl.min, MAX = +stepsEl.max;
       var prints = [], per = 0;
       // Prints sit one stride apart (about two foot-lengths, like a real walk), alternating left
       // and right with a small sideways gap. However many strides fit the box share 1,000-20,000.
-      var STRIDE = 38;
+      // Phones scale the whole scene down (smaller sneakers, prints and stride) so the trail
+      // keeps the same walking rhythm with more prints.
+      var trail = printsEl.parentNode, small = null;
       function buildPrints() {
-        var n = Math.max(4, Math.floor((printsEl.clientWidth - 18) / STRIDE) + 1);
+        var sm = trail.clientWidth < 420;
+        if (sm !== small) { small = sm; trail.classList.toggle("small", sm); per = 0; }
+        var foot = sm ? 12 : 18, stride = sm ? 20 : 38;
+        var n = Math.max(4, Math.floor((printsEl.clientWidth - foot) / stride) + 1);
         if (n === per) return;
         per = n; printsEl.innerHTML = ""; prints = [];
         for (var k = 1; k <= n; k++) {
           var el = document.createElement("i");
           el.className = k % 2 ? "up" : "down";
-          el.innerHTML = k % 2 ? PRINT_L : PRINT_R;
+          el.innerHTML = sm ? (k % 2 ? PRINT_SM_L : PRINT_SM_R) : (k % 2 ? PRINT_L : PRINT_R);
           el.dataset.at = MIN + (MAX - MIN) * k / n;
           printsEl.appendChild(el); prints.push(el);
         }
