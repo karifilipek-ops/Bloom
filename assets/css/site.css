@@ -296,6 +296,28 @@ input[type="range"] { width: 100%; accent-color: var(--lav-dark); height: 28px; 
 .range-ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
 #bf-out { color: var(--lav-dark); }
 
+/* step slider: pixel sneaker + footprint trail */
+#steps-out { color: var(--lav-dark); }
+.trail {
+  position: relative; height: 64px; margin: 2px 0 4px; overflow: hidden;
+  background: var(--paper); border: 2px solid var(--ink); border-radius: var(--r-sm);
+}
+.trail::after { /* ground line */
+  content: ""; position: absolute; left: 10px; right: 10px; bottom: 10px; height: 2px;
+  background: repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 10px);
+}
+.trail-prints { position: absolute; inset: 0 10px; }
+.trail-prints i {
+  position: absolute; width: 12px; height: 6px; background: var(--lav);
+  clip-path: polygon(3px 0, 9px 0, 12px 3px, 9px 6px, 3px 6px, 0 3px);
+  opacity: 0; transform: translateY(3px); transition: opacity .15s, transform .15s;
+}
+.trail-prints i.up { top: 30px; }
+.trail-prints i.down { top: 40px; }
+.trail-prints i.on { opacity: 1; transform: none; }
+.trail-shoe { position: absolute; left: 0; bottom: 12px; width: 60px; height: 33px; margin-left: 10px; z-index: 1; }
+@media (prefers-reduced-motion: reduce) { .trail-prints i { transition: none; } }
+
 /* ---------- Results ---------- */
 .results { margin-top: 26px; border-top: 2px dashed var(--lav-line); padding-top: 24px; }
 .results[hidden] { display: none; }
