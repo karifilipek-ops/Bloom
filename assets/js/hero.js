@@ -55,7 +55,7 @@
 
   // One cycle (ms): hold the current figure, then slide to the other one. During the slide the
   // numbers drift out to the left in the first part, and the new ones drift in over the second.
-  var FADE = 700, IN = 700, COUNT = 1500, HOLD = 4200, SLIDE = 1200, OUT_END = 0.4, IN_START = 0.5;
+  var FADE = 700, IN = 700, COUNT = 1500, HOLD = 4200, SLIDE = 1700, OUT_END = 0.4, IN_START = 0.5;
   var zeros = [0, 0, 0, 0, 0, 0];
   var cur = 0, t = 0, last = null, first = true, head = -250; // head: how far the numbers' entrance already got
   place(0, 0, 0); place(1, SHIFT, 0); show(zeros); shift(NUDGE, 0);
