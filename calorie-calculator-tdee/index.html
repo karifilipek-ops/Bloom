@@ -343,9 +343,6 @@
       renderSteps();
       var form = document.getElementById("form");
 
-      // Option values from the original calculator
-      var GENDER = { m: 5, f: -161 };
-
       // Goal picker. Lose weight: 0.5-1% of body weight a week (3,500 cal per lb).
       // Bulk and recomp: three stops, each a multiple of TDEE (from the original calculator).
       var GOALS = {
@@ -414,7 +411,8 @@
 
         var lbm = w - w * pct * 0.01;                                   // in the units entered
         var lbmCoef = u === "metric" ? 21.61 : 9.82;
-        var bmr = (370 + lbmCoef * lbm + GENDER[sex()]);
+        // Katch-McArdle: BMR from lean body mass alone (no sex term; lean mass already accounts for it)
+        var bmr = 370 + lbmCoef * lbm;
         var lbs = u === "metric" ? w * B.LB_PER_KG : w;
         var kgs = lbs / B.LB_PER_KG;
         var neat = stepCals(+stepsEl.value, kgs);                        // NEAT from steps
