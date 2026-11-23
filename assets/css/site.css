@@ -173,7 +173,7 @@ a { color: inherit; }
 }
 .hero-art p { font-size: 2.3cqw; margin-top: 1.8cqw; color: #d3cfe3; font-weight: 300; letter-spacing: .01em; }
 /* Phones: one figure with three stats either side (animated by hero.js). 640×480 canvas. */
-.hero-callouts-m .hm-fig { fill: var(--night); stroke: #fff; stroke-width: 1.25px; stroke-linejoin: round; }
+.hero-callouts-m .hm-fig { fill: var(--night); stroke: #d9d3f5; stroke-width: 1px; stroke-linejoin: round; }
 @media (max-width: 640px) {
   .hero-art { aspect-ratio: 640 / 480; }
   .hero-art::after { display: none; }
