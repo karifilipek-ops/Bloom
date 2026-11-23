@@ -365,6 +365,8 @@ table.tbl tr:last-child td { border-bottom: 0; }
 table.tbl td + td, table.tbl th + th { border-left: 1px solid var(--line); }
 table.tbl th { font-family: var(--pixel); font-weight: 400; font-size: 16px; letter-spacing: .16em; text-transform: uppercase; background: var(--ink); color: #fff; border-color: #3a3a3a; }
 table.tbl td:first-child { text-align: left; white-space: normal; min-width: 9em; }
+.lvl-sub { display: block; font-size: 16px; color: var(--muted); margin-top: 3px; }
+table.tbl tr.hl .lvl-sub { color: var(--lav-dark); }
 table.tbl tr.hl td, table.tbl td.hl { background: var(--lav-soft); color: var(--lav-dark); }
 
 .meter { margin: 12px 0 18px; }

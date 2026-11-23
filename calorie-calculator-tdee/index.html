@@ -117,10 +117,10 @@
         </div>
 
         <h2 style="margin-top:28px">TDEE if&hellip;</h2>
-        <p class="sec-p">This section is looking at different scenarios of what your TDEE <strong style="font-weight:600"><em>could be</em></strong>... based on different lifestyle changes. This can give you different ideas on how you approach your goal, like whether or not it's worth adding a short walk after each meal if it allowed you to have an extra nighttime snack while dieting.</p>
+        <p class="sec-p">Your TDEE at five different activity levels. The highlighted row is the closest match to what you entered.</p>
         <div class="tbl-wrap">
           <table class="tbl">
-            <thead><tr><th>TDEE if you&hellip;</th><th>Potential</th></tr></thead>
+            <thead><tr><th>Activity level</th><th>TDEE</th></tr></thead>
             <tbody id="r-ifs"></tbody>
           </table>
         </div>
@@ -444,15 +444,19 @@
         document.getElementById("r-tdee").textContent = B.fmt(tdee);
         goalState = { tdee: tdee, lbs: lbs, metric: u === "metric" };
         renderGoal(false);
-        var rows = function (list) {
-          return list.map(function (r) { return "<tr><td>" + r[0] + "</td><td>" + B.fmt(r[1]) + " cal</td></tr>"; }).join("");
-        };
-        document.getElementById("r-ifs").innerHTML = rows([
-          ["Added a 10-minute walk after each meal (~3,000 steps)...", tdee + stepCals(3000, kgs)],
-          ["Stood +3 hours a day instead of sitting...", tdee + 385],
-          ["MAXED out active lifestyle (15,000 steps + 8+ hrs training)...", bmr * 1.5 + stepCals(15000, kgs)],
-          ["Had the least active lifestyle (~3,000 steps, no training)...", bmr * 1 + stepCals(3000, kgs)]
-        ]);
+        // TDEE at five activity levels (steps a day + workout hours a week), same formula as above.
+        var LEVELS = [
+          ["No activity", 3000, 0, "&asymp;3,000 steps &middot; no workouts"],
+          ["A little activity", 6000, 2, "&asymp;6,000 steps &middot; 2 hrs a week"],
+          ["Some activity", 9000, 4, "&asymp;9,000 steps &middot; 4 hrs a week"],
+          ["A lot of activity", 12000, 6, "&asymp;12,000 steps &middot; 6 hrs a week"],
+          ["A TON of activity", 15000, 8, "15,000+ steps &middot; 8+ hrs a week"]
+        ].map(function (l) { return { name: l[0], sub: l[3], cal: bmr * (1 + 0.0625 * l[2]) + stepCals(l[1], kgs) }; });
+        var near = 0;
+        LEVELS.forEach(function (l, i) { if (Math.abs(l.cal - tdee) < Math.abs(LEVELS[near].cal - tdee)) near = i; });
+        document.getElementById("r-ifs").innerHTML = LEVELS.map(function (l, i) {
+          return '<tr' + (i === near ? ' class="hl"' : "") + '><td>' + l.name + '<small class="lvl-sub">' + l.sub + '</small></td><td>' + B.fmt(l.cal) + " cal</td></tr>";
+        }).join("");
 
         B.show(document.getElementById("results"));
       });
