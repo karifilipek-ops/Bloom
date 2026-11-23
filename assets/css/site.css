@@ -153,11 +153,15 @@ a { color: inherit; }
 .hero-callouts { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; }
 .hc-lines path { fill: none; stroke: #b9aef0; stroke-width: 2.6; stroke-dasharray: 7 7; opacity: .85; }
 .hc-dots circle { fill: #c2b6ff; filter: drop-shadow(0 0 6px #9d91be); }
-.hero-callouts a { cursor: pointer; }
 .hero-callouts text { font-family: var(--pixel); letter-spacing: 4px; }
 .hs-l { fill: #b9aef0; font-size: 38px; }
 .hs-v { fill: #fff; font-size: 48px; }
-.hero-callouts a:hover .hs-v, .hero-callouts a:focus .hs-v { fill: #d6ccff; }
+.hero-callouts-m { display: none; }
+.hero-callouts-m .hs-l { font-size: 24px; }
+.hero-callouts-m .hs-v { font-size: 34px; }
+.hero-callouts-m text { letter-spacing: 3px; }
+.hero-callouts-m .hc-lines path { stroke-width: 1.8; stroke-dasharray: 5 5; }
+.hero-callouts-m .hc-dots circle { r: 5px; }
 .hero-copy {
   position: absolute; inset: 0; z-index: 3; pointer-events: none;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -167,15 +171,18 @@ a { color: inherit; }
   text-shadow: .045em .045em 0 var(--lav-dark); margin-top: -4cqw;
 }
 .hero-art p { font-size: 2.3cqw; margin-top: 1.8cqw; color: #d3cfe3; font-weight: 300; letter-spacing: .01em; }
+/* Phones: portrait 640×820 canvas, title on top, stats stacked between the two figures. */
 @media (max-width: 640px) {
-  .hero-art { aspect-ratio: auto; min-height: 300px; }
-  .hero-callouts { display: none; }
-  .hero-art::after { background-size: 40px 26px; transform: perspective(160px) rotateX(60deg); }
-  .hero-fig { top: 14%; height: 74%; width: auto; opacity: .4; }
-  .hero-fig-l { left: auto; right: calc(100% - 22%); }
-  .hero-fig-r { left: 78%; }
-  .hero-art h1 { font-size: clamp(30px, 10.5vw, 54px); margin-top: -18px; }
-  .hero-art p { font-size: 15px; margin-top: 12px; padding: 0 16px; }
+  .hero-art { aspect-ratio: 640 / 820; }
+  .hero-callouts-d { display: none; }
+  .hero-callouts-m { display: block; }
+  .hero-art::after { height: 24%; background-size: 9cqw 6cqw; transform: perspective(48cqw) rotateX(60deg); }
+  .hero-fig { top: 29.16%; height: 62.6%; width: 30.48%; }
+  .hero-fig-l { left: 1.17%; }
+  .hero-fig-r { left: 68.36%; }
+  .hero-copy { justify-content: flex-start; padding-top: 9cqw; }
+  .hero-art h1 { font-size: 12.4cqw; margin-top: 0; }
+  .hero-art p { font-size: 4.1cqw; margin-top: 3.4cqw; }
 }
 .hero.sm { padding: 30px 16px 84px; }
 .hero.sm h1 { font-size: clamp(26px, 6vw, 44px); }
