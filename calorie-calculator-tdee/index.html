@@ -72,13 +72,6 @@
           <div class="range-ends"><span>1,000</span><span>20,000+</span></div>
           <p class="hint" id="steps-cal">Enter your weight to see what your steps burn.</p>
         </div>
-        <div class="field full">
-          <span class="label">Age range</span>
-          <div class="seg" data-name="age">
-            <button data-value="1" aria-pressed="true">Under 60</button>
-            <button data-value="0.9">61+</button>
-          </div>
-        </div>
       </div>
       <div class="actions"><button class="btn" type="submit">Calculate</button></div>
 
@@ -228,7 +221,6 @@
       stepsEl.addEventListener("input", renderSteps);
       document.getElementById("weight").addEventListener("input", renderSteps);
       renderSteps();
-      var age = B.seg("age");
       var form = document.getElementById("form");
 
       // Option values from the original calculator
@@ -242,7 +234,7 @@
 
         var lbm = w - w * pct * 0.01;                                   // in the units entered
         var lbmCoef = u === "metric" ? 21.61 : 9.82;
-        var bmr = (370 + lbmCoef * lbm + GENDER[sex()]) * parseFloat(age());
+        var bmr = (370 + lbmCoef * lbm + GENDER[sex()]);
         var lbs = u === "metric" ? w * B.LB_PER_KG : w;
         var kgs = lbs / B.LB_PER_KG;
         var neat = stepCals(+stepsEl.value, kgs);                        // NEAT from steps
