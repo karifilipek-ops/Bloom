@@ -344,6 +344,36 @@ table.tbl tr.hl td, table.tbl td.hl { background: var(--lav-soft); font-weight: 
 .legend i { display: inline-block; width: 12px; height: 12px; border: 1.5px solid var(--ink); border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
 
 .note { font-size: 13px; color: var(--muted); margin: 12px 0 0; }
+/* TDEE goal picker: goal buttons, pace slider on the left, daily target card on the right */
+.goal-tabs { margin-bottom: 18px; }
+.goal { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 22px; align-items: center; }
+.goal-k {
+  font-family: var(--pixel); font-size: 18px; letter-spacing: .2em; text-transform: uppercase;
+  text-shadow: var(--px-shadow); line-height: 1.2;
+}
+.goal-hint { margin: 2px 0 10px; font-size: 13px; color: var(--muted); }
+.goal-rate { font-family: var(--pixel); font-size: clamp(34px, 7vw, 46px); line-height: 1; letter-spacing: .04em; text-shadow: 2px 2px 0 var(--lav-line); }
+.goal-sub { font-size: 13px; color: var(--ink-soft); margin: 6px 0 8px; min-height: 1.4em; }
+.goal-ticks { display: flex; justify-content: space-between; margin-top: 2px; }
+.goal-ticks span { flex: 1; display: flex; flex-direction: column; font-size: 12px; color: var(--muted); }
+.goal-ticks span:nth-child(2) { text-align: center; }
+.goal-ticks span:last-child { text-align: right; }
+.goal-ticks b { font-weight: 600; font-size: 13px; color: var(--text); }
+.goal-target {
+  background: var(--lav-soft); border: 2px solid var(--ink); border-radius: var(--r-md);
+  padding: 18px 16px; text-align: center; box-shadow: 4px 4px 0 var(--lav);
+}
+.goal-target .k { font-family: var(--pixel); font-size: 17px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); text-shadow: var(--px-shadow); }
+.goal-target .v { font-family: var(--pixel); font-size: clamp(52px, 12vw, 70px); line-height: 1; letter-spacing: .05em; margin-top: 6px; text-shadow: 3px 3px 0 var(--lav-line); }
+.goal-target .u { font-family: var(--pixel); font-size: 16px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); margin-top: 2px; }
+.goal-diff { border-top: 1px solid var(--lav-line); margin-top: 12px; padding-top: 10px; font-size: 14px; color: var(--ink-soft); }
+.goal-target.low .v { color: #a8364b; }
+.goal-target.low .goal-diff::after { content: " · under 1,200 cal, see note below"; color: #a8364b; }
+.goal-foot { font-size: 12px; color: var(--muted); margin: 12px 0 0; }
+@media (max-width: 560px) {
+  .goal { grid-template-columns: 1fr; gap: 18px; }
+  .goal-tabs button { font-size: 15px; letter-spacing: .08em; padding: 9px 4px; }
+}
 .callout { border: 2px solid var(--lav-line); border-left: 8px solid var(--lav); border-radius: var(--r-sm); background: var(--paper); padding: 12px 14px; font-size: 14px; margin: 12px 0; }
 .chart { width: 100%; height: auto; border: 2px solid var(--ink); border-radius: var(--r-md); background: var(--paper); }
 
