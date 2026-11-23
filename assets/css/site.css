@@ -27,6 +27,7 @@
   --r-md: 14px;
   --r-sm: 10px;
   --pixel: "Jersey 10", "VT323", "Courier New", monospace;
+  --mono: "VT323", "Courier New", monospace; /* thin pixel type for small accessory text */
   --sans: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
   --track: .32em;
   --px-shadow: 1px 1px 0 var(--lav-line);
@@ -351,14 +352,15 @@ table.tbl tr.hl td, table.tbl td.hl { background: var(--lav-soft); font-weight: 
   font-family: var(--pixel); font-size: 18px; letter-spacing: .2em; text-transform: uppercase;
   text-shadow: var(--px-shadow); line-height: 1.2;
 }
-.goal-hint { margin: 2px 0 10px; font-size: 13px; color: var(--muted); }
+.goal-hint { margin: 2px 0 10px; font-family: var(--mono); font-size: 18px; line-height: 1.1; color: var(--muted); }
 .goal-rate { font-family: var(--pixel); font-size: clamp(34px, 7vw, 46px); line-height: 1; letter-spacing: .04em; text-shadow: 2px 2px 0 var(--lav-line); }
-.goal-sub { font-size: 13px; color: var(--ink-soft); margin: 6px 0 8px; min-height: 1.4em; }
+.goal-sub { font-family: var(--mono); font-size: 19px; line-height: 1.1; color: var(--ink-soft); margin: 8px 0 8px; min-height: 1.1em; }
 .goal-ticks { display: flex; justify-content: space-between; margin-top: 2px; }
-.goal-ticks span { flex: 1; display: flex; flex-direction: column; font-size: 12px; color: var(--muted); }
+.goal-ticks span { flex: 1; display: flex; flex-direction: column; font-family: var(--mono); font-size: 16px; line-height: 1.1; color: var(--muted); letter-spacing: .04em; }
 .goal-ticks span:nth-child(2) { text-align: center; }
 .goal-ticks span:last-child { text-align: right; }
-.goal-ticks b { font-weight: 600; font-size: 13px; color: var(--text); }
+.goal-ticks b { font-weight: 400; font-size: 19px; color: var(--text); text-transform: uppercase; letter-spacing: .08em; }
+.goal-ticks i { font-style: normal; }
 .goal-target {
   background: var(--lav-soft); border: 2px solid var(--ink); border-radius: var(--r-md);
   padding: 18px 16px; text-align: center; box-shadow: 4px 4px 0 var(--lav);
@@ -366,10 +368,10 @@ table.tbl tr.hl td, table.tbl td.hl { background: var(--lav-soft); font-weight: 
 .goal-target .k { font-family: var(--pixel); font-size: 17px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); text-shadow: var(--px-shadow); }
 .goal-target .v { font-family: var(--pixel); font-size: clamp(52px, 12vw, 70px); line-height: 1; letter-spacing: .05em; margin-top: 6px; text-shadow: 3px 3px 0 var(--lav-line); }
 .goal-target .u { font-family: var(--pixel); font-size: 16px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); margin-top: 2px; }
-.goal-diff { border-top: 1px solid var(--lav-line); margin-top: 12px; padding-top: 10px; font-size: 14px; color: var(--ink-soft); }
+.goal-diff { border-top: 1px solid var(--lav-line); margin-top: 12px; padding-top: 10px; font-family: var(--mono); font-size: 20px; line-height: 1.1; color: var(--ink-soft); }
 .goal-target.low .v { color: #a8364b; }
 .goal-target.low .goal-diff::after { content: " · under 1,200 cal, see note below"; color: #a8364b; }
-.goal-foot { font-size: 12px; color: var(--muted); margin: 12px 0 0; }
+.goal-foot { font-family: var(--mono); font-size: 17px; color: var(--muted); margin: 12px 0 0; }
 @media (max-width: 560px) {
   .goal { grid-template-columns: 1fr; gap: 18px; }
   .goal-tabs button { font-size: 15px; letter-spacing: .08em; padding: 9px 4px; }
