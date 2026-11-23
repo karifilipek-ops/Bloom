@@ -70,8 +70,60 @@ window.Bloom = (function () {
     return (ft * 12 + (isFinite(inch) ? inch : 0)) * 2.54;
   }
 
+  // Result numbers count up to their value instead of appearing: every number in the matched
+  // elements eases from where it was (or from 0) to what the calculator just wrote, keeping its
+  // format (commas, decimals, units and surrounding words). Runs whenever results are shown.
+  var COUNT_SEL = ".v, .tl-v, .note, .gauge-pin, .gauge-tick, .legend strong, .stack > div, .tbl tbody td:not(:first-child)";
+  var NUM_RE = /\d[\d,]*(?:\.\d+)?/g, countAnim = null;
+  function countUp(root) {
+    if (countAnim) countAnim.finish();
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var jobs = [];
+    $$(COUNT_SEL, root).forEach(function (el) {
+      if (el.closest(".goal")) return; // the TDEE goal picker animates itself
+      var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), node, i = 0;
+      var prev = el.__counted || {};
+      el.__counted = {};
+      while ((node = walker.nextNode())) {
+        var text = node.nodeValue, nums = text.match(NUM_RE);
+        if (!nums) continue;
+        var tpl = text.replace(NUM_RE, "#"), key = i++;
+        var to = nums.map(function (n) {
+          return { v: parseFloat(n.replace(/,/g, "")), dec: (n.split(".")[1] || "").length, comma: n.indexOf(",") > -1 };
+        });
+        var p = prev[key], from = p && p.tpl === tpl ? p.vals : to.map(function () { return 0; });
+        el.__counted[key] = { tpl: tpl, vals: to.map(function (n) { return n.v; }) };
+        jobs.push({ node: node, tpl: tpl, to: to, from: from, text: text });
+      }
+    });
+    if (!jobs.length) return;
+    // Recalculating with the same inputs: nothing would move, so count up from zero again.
+    var same = jobs.every(function (j) { return j.from.every(function (v, n) { return v === j.to[n].v; }); });
+    if (same) jobs.forEach(function (j) { j.from = j.to.map(function () { return 0; }); });
+    function paint(k) {
+      jobs.forEach(function (j) {
+        var n = 0;
+        j.node.nodeValue = k >= 1 ? j.text : j.tpl.replace(/#/g, function () {
+          var t = j.to[n], v = j.from[n] + (t.v - j.from[n]) * k; n++;
+          return t.comma ? v.toLocaleString("en-US", { minimumFractionDigits: t.dec, maximumFractionDigits: t.dec }) : v.toFixed(t.dec);
+        });
+      });
+    }
+    var t0 = null, raf, DUR = 900;
+    function step(now) {
+      if (t0 == null) t0 = now;
+      var k = Math.min(1, (now - t0) / DUR);
+      paint(1 - Math.pow(1 - k, 3));
+      if (k < 1) raf = requestAnimationFrame(step); else countAnim = null;
+    }
+    paint(0);
+    raf = requestAnimationFrame(step);
+    countAnim = { finish: function () { cancelAnimationFrame(raf); paint(1); countAnim = null; } };
+  }
+
   function show(el) {
     el.hidden = false;
+    countUp(el);
     if (el.getBoundingClientRect().top > window.innerHeight * 0.75) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
     }
