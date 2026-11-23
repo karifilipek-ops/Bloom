@@ -208,24 +208,24 @@
       var PRINT_L = soleSvg(SOLE), PRINT_R = soleSvg(SOLE.slice().reverse());
       var printsEl = document.getElementById("trail-prints"), MIN = +stepsEl.min, MAX = +stepsEl.max;
       var prints = [], per = 0;
+      // Prints sit one stride apart (about two foot-lengths, like a real walk), alternating left
+      // and right with a small sideways gap. However many strides fit the box share 1,000-20,000.
+      var STRIDE = 38;
       function buildPrints() {
-        // a print every 2,000 steps on desktop (room for a real stride between them);
-        // phones get one per 2,500 steps and slightly smaller prints
-        var narrow = printsEl.clientWidth < 420, next = narrow ? 2500 : 2000;
-        printsEl.classList.toggle("narrow", narrow);
-        if (next === per) return;
-        per = next; printsEl.innerHTML = ""; prints = [];
-        for (var at = MIN + per; at <= MAX; at += per) {
+        var n = Math.max(4, Math.floor((printsEl.clientWidth - 18) / STRIDE) + 1);
+        if (n === per) return;
+        per = n; printsEl.innerHTML = ""; prints = [];
+        for (var k = 1; k <= n; k++) {
           var el = document.createElement("i");
-          el.className = prints.length % 2 ? "down" : "up";
-          el.innerHTML = prints.length % 2 ? PRINT_R : PRINT_L;
-          el.dataset.at = at;
+          el.className = k % 2 ? "up" : "down";
+          el.innerHTML = k % 2 ? PRINT_L : PRINT_R;
+          el.dataset.at = MIN + (MAX - MIN) * k / n;
           printsEl.appendChild(el); prints.push(el);
         }
       }
       function layoutPrints() {
-        var room = printsEl.clientWidth - (prints[0] ? prints[0].offsetWidth : 36);
-        prints.forEach(function (el, n) { el.style.left = (n + 0.5) / prints.length * room + "px"; });
+        var room = printsEl.clientWidth - (prints[0] ? prints[0].offsetWidth : 18);
+        prints.forEach(function (el, n) { el.style.left = n / Math.max(1, prints.length - 1) * room + "px"; });
       }
 
       // 8-bit blip on every change (follows the device volume/mute): square wave,
