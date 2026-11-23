@@ -157,11 +157,12 @@ a { color: inherit; }
 .hs-l { fill: #b9aef0; font-size: 38px; }
 .hs-v { fill: #fff; font-size: 48px; }
 .hero-callouts-m { display: none; }
-.hero-callouts-m .hs-l { font-size: 22px; }
-.hero-callouts-m .hs-v { font-size: 30px; }
 .hero-callouts-m text { letter-spacing: 3px; }
-.hero-callouts-m .hc-lines path { stroke-width: 1.8; stroke-dasharray: 5 5; }
-.hero-callouts-m .hc-dots circle { r: 5px; }
+.hero-callouts-m .hs-l { font-size: 21px; }
+.hero-callouts-m .hs-v { font-size: 38px; }
+.hero-callouts-m .hs-u { font-size: 22px; fill: #cfccdb; }
+.hp-track { fill: #2a2838; }
+.hp-fill { fill: #9d91be; }
 .hero-copy {
   position: absolute; inset: 0; z-index: 3; pointer-events: none;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -171,18 +172,17 @@ a { color: inherit; }
   text-shadow: .045em .045em 0 var(--lav-dark); margin-top: -4cqw;
 }
 .hero-art p { font-size: 2.3cqw; margin-top: 1.8cqw; color: #d3cfe3; font-weight: 300; letter-spacing: .01em; }
-/* Phones: one figure with the stats either side (animated by hero.js). 640×540 canvas. */
-.hero-callouts-m .hm { fill: none; stroke: #fff; stroke-width: 10; }
-.hero-callouts-m .hm-fig { fill: var(--night); stroke: #f4f1ff; stroke-width: 1.4px; stroke-linejoin: round; }
+/* Phones: one figure with three stats either side (animated by hero.js). 640×480 canvas. */
+.hero-callouts-m .hm-fig { fill: var(--night); stroke: #fff; stroke-width: 1.25px; stroke-linejoin: round; }
 @media (max-width: 640px) {
-  .hero-art { aspect-ratio: 640 / 540; }
+  .hero-art { aspect-ratio: 640 / 480; }
+  .hero-art::after { display: none; }
   .hero-callouts-d { display: none; }
   .hero-callouts-m { display: block; }
   .hero-fig { visibility: hidden; } /* kept in the page: the phone figure reuses its drawing */
-  .hero-art::after { height: 24%; background-size: 9cqw 6cqw; transform: perspective(48cqw) rotateX(60deg); }
-  .hero-copy { justify-content: flex-start; padding-top: 7.2cqw; }
-  .hero-art h1 { font-size: 10cqw; margin-top: 0; }
-  .hero-art p { font-size: 3.9cqw; margin-top: 2.6cqw; }
+  .hero-copy { justify-content: flex-start; padding-top: 4.2cqw; }
+  .hero-art h1 { font-size: 11cqw; margin-top: 0; text-shadow: none; }
+  .hero-art p { font-size: 3.4cqw; margin-top: 1.4cqw; }
 }
 .hero.sm { padding: 30px 16px 84px; }
 .hero.sm h1 { font-size: clamp(26px, 6vw, 44px); }
