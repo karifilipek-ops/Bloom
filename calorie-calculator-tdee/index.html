@@ -209,11 +209,11 @@
       var printsEl = document.getElementById("trail-prints"), MIN = +stepsEl.min, MAX = +stepsEl.max;
       var prints = [], per = 0;
       function buildPrints() {
-        // a print every 1,250 steps: 15 prints at 20,000 (phones get smaller prints so they fit)
-        var narrow = printsEl.clientWidth < 420, next = 1250;
+        // a print every 2,000 steps on desktop (room for a real stride between them);
+        // phones get one per 2,500 steps and slightly smaller prints
+        var narrow = printsEl.clientWidth < 420, next = narrow ? 2500 : 2000;
         printsEl.classList.toggle("narrow", narrow);
-        if (next === per && printsEl.dataset.narrow === String(narrow)) return;
-        printsEl.dataset.narrow = narrow;
+        if (next === per) return;
         per = next; printsEl.innerHTML = ""; prints = [];
         for (var at = MIN + per; at <= MAX; at += per) {
           var el = document.createElement("i");

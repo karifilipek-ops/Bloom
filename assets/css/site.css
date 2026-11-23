@@ -296,9 +296,9 @@ input[type="range"] { width: 100%; accent-color: var(--lav-dark); height: 28px; 
 }
 .trail-prints i.up { top: 30px; }
 .trail-prints i.down { top: 44px; }
-.trail-prints.narrow i { width: 21px; height: 7px; }
-.trail-prints.narrow i.up { top: 35px; }
-.trail-prints.narrow i.down { top: 47px; }
+.trail-prints.narrow i { width: 27px; height: 9px; }
+.trail-prints.narrow i.up { top: 33px; }
+.trail-prints.narrow i.down { top: 46px; }
 .trail-prints svg { display: block; width: 100%; height: 100%; fill: currentColor; }
 .trail-prints i.on { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .trail-prints i { transition: none; } }
