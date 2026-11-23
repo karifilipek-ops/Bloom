@@ -325,9 +325,10 @@ input[type="range"] { width: 100%; accent-color: var(--lav-dark); height: 28px; 
 @media (prefers-reduced-motion: reduce) { .trail-prints i { transition: none; } }
 
 /* ---------- Results ---------- */
-.results { margin-top: 26px; border-top: 2px dashed var(--lav-line); padding-top: 24px; }
+.results { margin-top: 26px; border-top: 2px dashed var(--lav-line); padding-top: 24px; scroll-margin-top: 72px; /* clear the sticky header */ }
 .results[hidden] { display: none; }
 .results h2 { margin-top: 26px; }
+.results > h2:first-child { margin-top: 0; }
 .big { background: var(--paper); border: 2px solid var(--ink); border-radius: var(--r-md); padding: 18px; text-align: center; margin-bottom: 16px; }
 .big .k, .stat .k { font-family: var(--pixel); font-size: 17px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); text-shadow: var(--px-shadow); }
 .big .v { font-family: var(--pixel); font-size: clamp(48px, 11vw, 66px); line-height: 1.05; letter-spacing: .06em; text-shadow: 3px 3px 0 var(--lav-line); }
