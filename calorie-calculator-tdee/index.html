@@ -63,15 +63,14 @@
           </div>
         </div>
         <div class="field full">
-          <span class="label">How many steps do you average each day?</span>
-          <div class="seg multi" data-name="steps">
-            <button data-value="150" aria-pressed="true">3,000–5,000</button>
-            <button data-value="240">5,000–7,000</button>
-            <button data-value="330">7,000–9,000</button>
-            <button data-value="420">9,000–11,000</button>
-            <button data-value="510">11,000–13,000</button>
-            <button data-value="600">13,000+</button>
+          <label for="steps">Average daily steps: <span id="steps-out">7,000</span></label>
+          <div class="trail" aria-hidden="true">
+            <div class="trail-prints" id="trail-prints"></div>
+            <svg class="trail-shoe" id="trail-shoe" viewBox="0 0 20 11" shape-rendering="crispEdges"></svg>
           </div>
+          <input type="range" id="steps" min="1000" max="20000" step="500" value="7000">
+          <div class="range-ends"><span>1,000</span><span>20,000+</span></div>
+          <p class="hint" id="steps-cal">Enter your weight to see what your steps burn.</p>
         </div>
         <div class="field full">
           <span class="label">Age range</span>
@@ -166,10 +165,69 @@
     (function () {
       var B = Bloom;
       var bodyFat = B.bodyFat();
-      var units = B.unitSystem();
+      var units = B.unitSystem(function () { if (shoe) renderSteps(); });
       var sex = B.seg("sex", bodyFat.render);
       var hours = B.seg("hours");
-      var steps = B.seg("steps");
+      var stepsEl = document.getElementById("steps");
+      function kg() { var w = B.num("weight"); return units() === "metric" ? w : w / B.LB_PER_KG; }
+      // Calories from walking scale with body weight: ~0.0005 cal per kg per step
+      // (about 0.04 cal/step at 175 lb, so ~400 cal for 10,000 steps).
+      function stepCals(n, kgs) { return n * 0.0005 * kgs; }
+
+      // Sneaker trail: a pixel sneaker rides with the slider thumb and leaves
+      // footprints behind it (one per 1,000 steps; per 2,000 on narrow screens).
+      var SHOE = [
+        "....OOOOO...........",
+        "...OWWWWWO..........",
+        "...OWWOWWWO.........",
+        "...OWWWWOWWO........",
+        "..OWWWWWWWOWOOO.....",
+        ".OWWWWWWWWWWWWWOO...",
+        "OWLLLWWWWWWWWWWWWOO.",
+        "OWLLLWWWWWWWWWWWWWWO",
+        "OWWWWWWWWWWWWWWWWWWO",
+        "OLLLLLLLLLLLLLLLLLLO",
+        ".OOOOOOOOOOOOOOOOOO."];
+      var FILL = { O: "#242424", W: "#fff", L: "#9d91be" };
+      var shoe = document.getElementById("trail-shoe");
+      shoe.innerHTML = SHOE.map(function (row, y) {
+        return row.split("").map(function (ch, x) {
+          return FILL[ch] ? '<rect x="' + x + '" y="' + y + '" width="1.02" height="1.02" fill="' + FILL[ch] + '"/>' : "";
+        }).join("");
+      }).join("");
+      var printsEl = document.getElementById("trail-prints"), MIN = +stepsEl.min, MAX = +stepsEl.max, SHOE_W = 60, PRINT_W = 12;
+      var prints = [], per = 0;
+      function buildPrints() {
+        var next = printsEl.clientWidth < 420 ? 2000 : 1000;
+        if (next === per) return;
+        per = next; printsEl.innerHTML = "";
+        prints = [];
+        for (var k = Math.ceil(MIN / per) + 1; k * per <= MAX; k++) {
+          var el = document.createElement("i");
+          el.className = k % 2 ? "up" : "down";
+          el.dataset.at = k * per - per / 2;            // centred in its 1k/2k slot
+          printsEl.appendChild(el); prints.push(el);
+        }
+      }
+      function renderSteps() {
+        buildPrints();
+        var v = +stepsEl.value, frac = (v - MIN) / (MAX - MIN), room = printsEl.clientWidth - SHOE_W;
+        document.getElementById("steps-out").textContent = B.fmt(v) + (v >= MAX ? "+" : "");
+        shoe.style.left = frac * room + "px";
+        prints.forEach(function (el) {
+          var x = (el.dataset.at - MIN) / (MAX - MIN) * room;
+          el.style.left = x + "px";
+          el.classList.toggle("on", x + PRINT_W + 4 <= frac * room);
+        });
+        var kgs = kg();
+        document.getElementById("steps-cal").textContent = kgs > 0
+          ? "\u2248 " + B.fmt(stepCals(v, kgs)) + " cal/day from walking at your weight"
+          : "Enter your weight to see what your steps burn.";
+      }
+      window.addEventListener("resize", renderSteps);
+      stepsEl.addEventListener("input", renderSteps);
+      document.getElementById("weight").addEventListener("input", renderSteps);
+      renderSteps();
       var age = B.seg("age");
       var form = document.getElementById("form");
 
@@ -185,13 +243,15 @@
         var lbm = w - w * pct * 0.01;                                   // in the units entered
         var lbmCoef = u === "metric" ? 21.61 : 9.82;
         var bmr = (370 + lbmCoef * lbm + GENDER[sex()]) * parseFloat(age());
-        var tdee = bmr * parseFloat(hours()) + parseFloat(steps());
         var lbs = u === "metric" ? w * B.LB_PER_KG : w;
+        var kgs = lbs / B.LB_PER_KG;
+        var neat = stepCals(+stepsEl.value, kgs);                        // NEAT from steps
+        var tdee = bmr * parseFloat(hours()) + neat;
 
         // Breakdown: BMR, NEAT (steps), EAT (exercise multiplier), TEF.
         // The formula has no separate TEF term, so TEF is set at 10% of TDEE
         // and the other three share the remaining 90% in proportion.
-        var neat = parseFloat(steps()), eat = bmr * (parseFloat(hours()) - 1);
+        var eat = bmr * (parseFloat(hours()) - 1);
         var parts = [["BMR", bmr, "#9d91be", "#242424"], ["NEAT", neat, "#e9e6f3", "#242424"], ["EAT", eat, "#242424", "#e9e6f3"]];
         var base = bmr + neat + eat;
         parts = parts.map(function (p) { return [p[0], p[1] / base * 90, p[2], p[3]]; });
@@ -230,10 +290,10 @@
           ["Muscle Gain Focus", tdee * 1.08]
         ]);
         document.getElementById("r-ifs").innerHTML = rows([
-          ["Added a 10-minute walk after each meal...", tdee + 210],
+          ["Added a 10-minute walk after each meal (~3,000 steps)...", tdee + stepCals(3000, kgs)],
           ["Stood +3 hours a day instead of sitting...", tdee + 385],
-          ["MAXED out active lifestyle (steps+exercise)...", bmr * 1.5 + 600],
-          ["Had the least active lifestyle...", bmr * 1 + 150]
+          ["MAXED out active lifestyle (15,000 steps + 8+ hrs training)...", bmr * 1.5 + stepCals(15000, kgs)],
+          ["Had the least active lifestyle (~3,000 steps, no training)...", bmr * 1 + stepCals(3000, kgs)]
         ]);
 
         B.show(document.getElementById("results"));
