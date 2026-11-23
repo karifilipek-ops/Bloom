@@ -1,9 +1,9 @@
-// Home hero, phone layout: the male figure fades in and his numbers count up; after a few seconds
+// Home hero: the male figure fades in and his numbers count up; after a few seconds
 // he eases out to the left while the female figure eases in from the right, and the numbers
 // recount to hers. Then back again, forever.
 // Stats, in order: TDEE, body fat, 1RM squat, VO2 max, protein, potential.
 (function () {
-  var svg = document.querySelector(".hero-callouts-m");
+  var svg = document.querySelector(".hero-stage");
   if (!svg || !window.requestAnimationFrame) return;
   if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return; // markup shows the male frame
 
@@ -60,10 +60,8 @@
   var cur = 0, t = 0, last = null, first = true, head = -250; // head: how far the numbers' entrance already got
   place(0, 0, 0); place(1, SHIFT, 0); show(zeros); shift(NUDGE, 0);
 
-  var phone = window.matchMedia ? matchMedia("(max-width: 640px)") : { matches: true };
   function tick(now) {
     requestAnimationFrame(tick);
-    if (!phone.matches) { last = null; return; } // the desktop layout is showing
     var dt = last == null ? 0 : Math.min(now - last, 50); // capped so a background tab doesn't jump ahead
     last = now; t += dt;
     var next = 1 - cur, prev = first ? zeros : FRAMES[next].vals;
