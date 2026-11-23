@@ -418,6 +418,10 @@ table.tbl tr.hl td, table.tbl td.hl { background: var(--lav-soft); color: var(--
   .goal-tabs button { font-size: 15px; letter-spacing: .08em; padding: 9px 4px; }
 }
 .callout { border: 2px solid var(--lav-line); border-left: 8px solid var(--lav); border-radius: var(--r-sm); background: var(--paper); padding: 12px 14px; font-family: var(--mono); font-size: 19px; line-height: 1.2; margin: 12px 0; }
+.callout-tip { border-color: var(--lav-line); border-left-color: var(--lav-dark); background: var(--lav-soft); }
+.pop-in { animation: pop-in .25s ease-out; }
+@keyframes pop-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .pop-in { animation: none; } }
 .chart { width: 100%; height: auto; border: 2px solid var(--ink); border-radius: var(--r-md); background: var(--paper); }
 
 /* body fat guide */

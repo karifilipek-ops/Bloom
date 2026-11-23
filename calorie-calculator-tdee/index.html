@@ -112,7 +112,8 @@
           </div>
         </div>
         <p class="goal-foot">Estimates based on your TDEE.</p>
-        <div class="callout" id="g-note">
+        <div class="callout callout-tip" id="g-tip" hidden></div>
+        <div class="callout" id="g-note" hidden>
           <strong style="font-weight:600">Important note:</strong> Our calculator offers an estimate based off standard formula, please remember extreme calorie restriction can do much more harm than good. For some smaller, less active individuals the suggested intake may calculate to below 1,200 calories. Intake lower than this likely won't provide essential nutrients your body needs, risk of muscle loss, other health concerns, and is not recommended. Always consult a registered dietitian before making major dietary adjustments.
         </div>
 
@@ -353,6 +354,11 @@
           ticks: [["Fat loss", "Lean out"], ["Standard", ""], ["Muscle", "Build"]] }
       };
       var goalState = null, shown = null, anim = null;
+      // Show/hide with a short slide-in when something newly appears.
+      function reveal(el, on) {
+        if (on && el.hidden) { el.hidden = false; el.classList.remove("pop-in"); void el.offsetWidth; el.classList.add("pop-in"); }
+        else if (!on) el.hidden = true;
+      }
       var slider = document.getElementById("g-slider");
       var goal = B.seg("goal", function () { if (goal) setupGoal(); }); // fires once during setup, before goal exists
       function setupGoal() {
@@ -363,7 +369,6 @@
         document.getElementById("g-ticks").innerHTML = g.ticks.map(function (t) {
           return "<span><b>" + t[0] + "</b>" + (t[1] ? "<i>" + t[1] + "</i>" : "") + "</span>";
         }).join("");
-        document.getElementById("g-note").hidden = goal() !== "cut";
         renderGoal(true);
       }
       function renderGoal(animate) {
@@ -385,6 +390,14 @@
         var d = Math.round(cals - T);
         document.getElementById("g-diff").textContent = d === 0 ? "At maintenance" : B.fmt(Math.abs(d)) + (d < 0 ? " below" : " above") + " maintenance";
         document.querySelector(".goal-target").classList.toggle("low", cals < 1200);
+        // Low targets: under 1,500 (while eating below maintenance) suggest moving more first;
+        // under 1,200 also show the full warning.
+        var tip = document.getElementById("g-tip"), more = stepCals(3000, goalState.kgs) + goalState.bmr * 0.125; // +3,000 steps/day and +2 workout hrs/week
+        var tipOn = cals < 1500 && cals < T;                      // only when eating below maintenance
+        reveal(tip, tipOn);
+        reveal(document.getElementById("g-note"), cals < 1200);
+        if (tipOn) tip.innerHTML = "<strong>Try moving more first.</strong> Your target is on the low side. If you can, add movement before cutting more food. An extra 3,000 steps a day (about a 30-minute walk) plus 2 more hours of workouts a week burns roughly " +
+          B.fmt(Math.round(more / 10) * 10) + " more calories a day for you, so you could eat that much more and still lose at the same pace.";
         countTo(cals, animate);
       }
       // Ease the big number to its new value rather than jumping.
@@ -440,7 +453,7 @@
         document.getElementById("r-lbm").textContent = B.fmt(lbm) + (u === "metric" ? " kg" : " lbs");
         document.getElementById("r-bmr").textContent = B.fmt(bmr) + " cal";
         document.getElementById("r-tdee").textContent = B.fmt(tdee);
-        goalState = { tdee: tdee, lbs: lbs, metric: u === "metric" };
+        goalState = { tdee: tdee, bmr: bmr, lbs: lbs, kgs: kgs, metric: u === "metric" };
         renderGoal(false);
         // TDEE at five activity levels (steps a day + workout hours a week), same formula as above.
         var LEVELS = [
