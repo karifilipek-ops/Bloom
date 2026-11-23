@@ -67,7 +67,6 @@
           <div class="trail">
             <svg class="trail-shoe" id="trail-shoe" viewBox="0 0 28 15" shape-rendering="crispEdges" aria-hidden="true"></svg>
             <div class="trail-prints" id="trail-prints" aria-hidden="true"></div>
-            <button type="button" class="trail-sound" id="trail-sound" aria-pressed="true">&#9835; On</button>
           </div>
           <input type="range" id="steps" min="1000" max="20000" step="500" value="7000">
           <div class="range-ends"><span>1,000</span><span>20,000+</span></div>
@@ -199,42 +198,50 @@
       var shoe = document.getElementById("trail-shoe");
       shoe.innerHTML = drawShoe(0, 0, { O: "#6f6496", W: "#9d91be", L: "#6f6496" }) +     // back shoe
                        drawShoe(8, 4, { O: "#242424", W: "#fff", L: "#9d91be" });         // front shoe
+      // Pixel sneaker sole print (heel + forefoot), toes pointing right. Left foot has
+      // its arch cut-out on the bottom; the right foot is the mirror image.
+      var SOLE = [
+        "..XXXX...XXXXXX...",
+        ".XXXXXX.XXXXXXXXX.",
+        ".XXXXXX.XXXXXXXXXX",
+        ".XXXXXX.XXXXXXXXXX",
+        ".XXXXXX..XXXXXXXX.",
+        "..XXXX.....XXXXX.."];
+      function soleSvg(rows) {
+        return '<svg viewBox="0 0 18 6" shape-rendering="crispEdges">' + rows.map(function (row, y) {
+          return row.split("").map(function (ch, x) {
+            return ch === "X" ? '<rect x="' + x + '" y="' + y + '" width="1.02" height="1.02"/>' : "";
+          }).join("");
+        }).join("") + "</svg>";
+      }
+      var PRINT_L = soleSvg(SOLE), PRINT_R = soleSvg(SOLE.slice().reverse());
       var printsEl = document.getElementById("trail-prints"), MIN = +stepsEl.min, MAX = +stepsEl.max;
       var prints = [], per = 0;
       function buildPrints() {
-        // widest spacing that still fits: 1,000 steps per print on desktop, fewer on phones
-        var room = printsEl.clientWidth, next = [1000, 2000, 2500, 5000].filter(function (n) {
-          return room / ((MAX - MIN) / n) >= 18;
-        })[0] || 5000;
+        // a print every 2,000 steps on desktop (room for a real stride between them);
+        // phones get one per 2,500 steps and slightly smaller prints
+        var narrow = printsEl.clientWidth < 420, next = narrow ? 2500 : 2000;
+        printsEl.classList.toggle("narrow", narrow);
         if (next === per) return;
         per = next; printsEl.innerHTML = ""; prints = [];
         for (var at = MIN + per; at <= MAX; at += per) {
           var el = document.createElement("i");
           el.className = prints.length % 2 ? "down" : "up";
+          el.innerHTML = prints.length % 2 ? PRINT_R : PRINT_L;
           el.dataset.at = at;
           printsEl.appendChild(el); prints.push(el);
         }
       }
       function layoutPrints() {
-        var room = printsEl.clientWidth - 12;
+        var room = printsEl.clientWidth - (prints[0] ? prints[0].offsetWidth : 36);
         prints.forEach(function (el, n) { el.style.left = (n + 0.5) / prints.length * room + "px"; });
       }
 
-      // 8-bit blip on every change: square wave, pitch climbs a major scale as steps go up.
-      var soundBtn = document.getElementById("trail-sound"), ctx = null, lastBlip = 0;
-      var soundOn = B.store("tdee.sound") !== "off";
-      function paintSound() {
-        soundBtn.setAttribute("aria-pressed", soundOn ? "true" : "false");
-        soundBtn.innerHTML = "&#9835; " + (soundOn ? "On" : "Off");
-        soundBtn.setAttribute("aria-label", "Step sounds " + (soundOn ? "on" : "off"));
-      }
-      soundBtn.addEventListener("click", function () {
-        soundOn = !soundOn; B.store("tdee.sound", soundOn ? "on" : "off"); paintSound();
-      });
-      paintSound();
+      // 8-bit blip on every change (follows the device volume/mute): square wave,
+      // pitch climbs a major scale as steps go up.
+      var ctx = null, lastBlip = 0;
       var SCALE = [0, 2, 4, 5, 7, 9, 11];
       function blip(v) {
-        if (!soundOn) return;
         var AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return;
         var now = performance.now();
