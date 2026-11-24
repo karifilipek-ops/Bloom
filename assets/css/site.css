@@ -214,7 +214,7 @@ a { color: inherit; }
 .section-title { text-align: center; font-family: var(--pixel); font-weight: 400; font-size: 24px; letter-spacing: var(--track); text-transform: uppercase; text-shadow: var(--px-shadow); margin: 6px 0 16px; }
 
 /* ---------- Home cards (replicas of the hoo.be calculator cards) ---------- */
-.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 0 auto 40px; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 0 auto 30px; }
 .card-link {
   position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px;
   min-height: 150px; padding: 18px 44px 16px 34px; text-decoration: none; color: var(--text);
@@ -607,7 +607,7 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .faq .body a { color: var(--lav-dark); text-decoration-thickness: 1px; text-underline-offset: 2px; }
 
 /* ---------- Footer ---------- */
-.site-footer { text-align: center; padding: 58px 16px 40px; color: var(--muted); font-size: 13px; }
+.site-footer { text-align: center; padding: 46px 16px 30px; color: var(--muted); font-size: 13px; }
 .site-footer p { margin: 2px 0; }
 .site-footer p { font-family: var(--mono); font-size: 17px; letter-spacing: .03em; }
 .site-footer .by-wrap { position: relative; display: inline-block; }

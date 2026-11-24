@@ -125,7 +125,7 @@
       // while y > 0 the clip hides whatever is still below that line (behind the word).
       // The pop out is fast (2 frames), then one gravity arc over and down to the baseline beside the word.
       var path = [[x1, 30], [x1, 4]];
-      var N = 9, TOP = -16;                               // arc frames, apex height above the letters
+      var N = 9, TOP = -6;                               // arc frames, apex height above the letters
       for (var i = 1; i <= N; i++) {
         var p = i / N, xa = x1 + (x2 - x1) * p;
         var ya = p < 0.4 ? TOP * Math.sin((p / 0.4) * Math.PI / 2)        // rise to the apex...
