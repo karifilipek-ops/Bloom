@@ -53,10 +53,10 @@
 
   var footer = document.createElement("footer");
   footer.className = "site-footer";
-  footer.innerHTML = '<div class="by-wrap"><div class="peek" aria-hidden="true"></div><p class="by">By Trainbloom</p></div>';
+  footer.innerHTML = '<div class="by-wrap"><div class="peek" aria-hidden="true"></div><i class="peek-shadow" aria-hidden="true"></i><p class="by">By Trainbloom</p></div>';
   document.body.appendChild(footer);
 
-  // Pixel me behind "By Trainbloom": he pops up to the waist with a bounce, then stays, looking at you and blinking.
+  // Pixel me next to "By Trainbloom": he hops up onto the baseline once, then stays there blinking.
   (function () {
     var peek = footer.querySelector(".peek"), wrap = footer.querySelector(".by-wrap");
     peek.innerHTML = '<div class="peek-guy"></div>';
