@@ -21,7 +21,7 @@
   ];
   var nums = svg.querySelectorAll(".hs-n"), bar = svg.querySelector(".hp-fill");
   var BAR_W = +svg.querySelector(".hp-track").getAttribute("width");
-  // All the numbers, units and the potential bar fill live in one group that moves as a single
+  // All the numbers and units live in one group that moves as a single
   // composited layer (smooth sub-pixel motion); the labels above them stay put.
   var vals = svg.querySelector(".hm-vals");
 
@@ -48,8 +48,9 @@
 
   function show(v) {
     for (var i = 0; i < nums.length; i++) nums[i].textContent = FMT[i](v[i]);
-    bar.setAttribute("width", (BAR_W * v[5] / 100).toFixed(1));
   }
+  // The potential bar never fades: it stays on its track and just grows or shrinks.
+  function setBar(pct) { bar.setAttribute("width", (BAR_W * pct / 100).toFixed(1)); }
   function shift(x, o) {
     vals.style.transform = "translateX(" + x.toFixed(2) + "px)";
     vals.style.opacity = o.toFixed(3);
@@ -69,7 +70,9 @@
   function enter(ms, from, to) {
     var e = easeOut(clamp(ms / IN));
     shift(NUDGE * (1 - e), e);
-    show(lerp(from, to, easeSine(clamp(ms / COUNT))));
+    var v = lerp(from, to, easeSine(clamp(ms / COUNT)));
+    show(v);
+    if (first && t < HOLD) setBar(v[5]);                             // first load only: bar fills with the count
   }
 
   // One cycle (ms): hold the current figure, then slide to the other one. During the slide the
@@ -77,7 +80,7 @@
   var FADE = 700, IN = 750, COUNT = 1400, HOLD = 4200, SLIDE = 1700, OUT_END = 0.4, IN_START = 0.5;
   var zeros = [0, 0, 0, 0, 0, 0];
   var cur = 0, t = 0, last = null, first = true, head = -250; // head: how far the numbers' entrance already got
-  place(0, 0, 0); place(1, SHIFT, 0); show(zeros); shift(NUDGE, 0);
+  place(0, 0, 0); place(1, SHIFT, 0); show(zeros); setBar(0); shift(NUDGE, 0);
 
   function tick(now) {
     requestAnimationFrame(tick);
@@ -91,11 +94,13 @@
       var s = (t - HOLD) / SLIDE, e = easeInOut(s);
       place(cur, -SHIFT * e, 1 - e);
       place(next, SHIFT * (1 - e), e);
+      setBar(FRAMES[cur].vals[5] + (FRAMES[next].vals[5] - FRAMES[cur].vals[5]) * e);   // bar glides to the new value
       if (s < OUT_END) { var o = easeIn(s / OUT_END); show(FRAMES[cur].vals); shift(-NUDGE * o, 1 - o); }
       else if (s < IN_START) shift(NUDGE, 0);
       else enter((s - IN_START) * SLIDE, FRAMES[cur].vals, FRAMES[next].vals);
     } else {
       place(cur, SHIFT, 0); place(next, 0, 1); // parked on the right, ready to come back in
+      setBar(FRAMES[next].vals[5]);
       head = (1 - IN_START) * SLIDE; // the new numbers' entrance carries on from here
       cur = next; t = 0; first = false;
     }
