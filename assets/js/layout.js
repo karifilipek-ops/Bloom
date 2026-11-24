@@ -8,8 +8,7 @@
     ["/strength-standards-calculator/", "Strength Standards"],
     ["/muscle-gain-potential-calculator/", "Muscle Gain Calculator"],
     ["/creatine-calculator/", "Creatine Calculator"],
-    ["/how-long-should-i-diet-calculator/", "How Long to Diet"],
-    ["/workout-tracker/", "Workout Tracker"]
+    ["/how-long-should-i-diet-calculator/", "How Long to Diet"]
   ];
 
   var here = location.pathname.replace(/index\.html$/, "");
