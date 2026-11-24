@@ -62,39 +62,41 @@
   function easeInOut(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
   function easeOut(x) { return 1 - Math.pow(1 - x, 3); }
   function easeIn(x) { return x * x * x; }
+  function easeSine(x) { return -(Math.cos(Math.PI * x) - 1) / 2; }   // gentle speed-up and slow-down, for counting
   function lerp(a, b, t) { return a.map(function (v, i) { return v + (b[i] - v) * t; }); }
 
   // Numbers `ms` into their entrance: drift in from the right, fade up, and count from -> to.
   function enter(ms, from, to) {
     var e = easeOut(clamp(ms / IN));
     shift(NUDGE * (1 - e), e);
-    show(lerp(from, to, easeOut(clamp(ms / COUNT))));
+    show(lerp(from, to, easeSine(clamp(ms / COUNT))));
   }
 
-  // One cycle (ms): hold the current figure, then slide to the other one. On the very first load
-  // the numbers fade in and count up from zero; on every swap after that they stay put and simply
-  // count from one person's values to the other's, in step with the slide.
-  var FADE = 700, IN = 750, COUNT = 950, HOLD = 4200, SLIDE = 1700;
+  // One cycle (ms): hold the current figure, then slide to the other one. During the slide the
+  // numbers drift out to the left with the outgoing person, and the new ones drift in over the second half.
+  var FADE = 700, IN = 750, COUNT = 1400, HOLD = 4200, SLIDE = 1700, OUT_END = 0.4, IN_START = 0.5;
   var zeros = [0, 0, 0, 0, 0, 0];
-  var cur = 0, t = 0, last = null, first = true;
+  var cur = 0, t = 0, last = null, first = true, head = -250; // head: how far the numbers' entrance already got
   place(0, 0, 0); place(1, SHIFT, 0); show(zeros); shift(NUDGE, 0);
 
   function tick(now) {
     requestAnimationFrame(tick);
     var dt = last == null ? 0 : Math.min(now - last, 50); // capped so a background tab doesn't jump ahead
     last = now; t += dt;
-    var next = 1 - cur;
+    var next = 1 - cur, prev = first ? zeros : FRAMES[next].vals;
+    if (first) place(cur, 0, easeOut(clamp(t / FADE)));
     if (t < HOLD) {
-      if (first) { place(cur, 0, easeOut(clamp(t / FADE))); enter(t - 250, zeros, FRAMES[cur].vals); }
+      enter(t + head, prev, FRAMES[cur].vals);
     } else if (t < HOLD + SLIDE) {
-      var e = easeInOut((t - HOLD) / SLIDE);
+      var s = (t - HOLD) / SLIDE, e = easeInOut(s);
       place(cur, -SHIFT * e, 1 - e);
       place(next, SHIFT * (1 - e), e);
-      shift(0, 1);
-      show(lerp(FRAMES[cur].vals, FRAMES[next].vals, e));   // numbers glide to the new values
+      if (s < OUT_END) { var o = easeIn(s / OUT_END); show(FRAMES[cur].vals); shift(-NUDGE * o, 1 - o); }
+      else if (s < IN_START) shift(NUDGE, 0);
+      else enter((s - IN_START) * SLIDE, FRAMES[cur].vals, FRAMES[next].vals);
     } else {
-      place(cur, SHIFT, 0); place(next, 0, 1);             // parked on the right, ready to come back in
-      show(FRAMES[next].vals);
+      place(cur, SHIFT, 0); place(next, 0, 1); // parked on the right, ready to come back in
+      head = (1 - IN_START) * SLIDE; // the new numbers' entrance carries on from here
       cur = next; t = 0; first = false;
     }
   }
