@@ -53,8 +53,44 @@
 
   var footer = document.createElement("footer");
   footer.className = "site-footer";
-  footer.innerHTML = '<p class="by">By Trainbloom</p>';
+  footer.innerHTML = '<div class="by-wrap"><div class="peek" aria-hidden="true"></div><p class="by">By Trainbloom</p></div>';
   document.body.appendChild(footer);
+
+  // Pixel me behind "By Trainbloom": he sneaks his eyes up over the letters, then pops up to the waist
+  // with a bounce, glances around, blinks, and ducks back down. Then again somewhere else.
+  (function () {
+    var peek = footer.querySelector(".peek"), wrap = footer.querySelector(".by-wrap");
+    peek.innerHTML = '<div class="peek-guy"></div>';
+    var guy = peek.querySelector(".peek-guy");
+    function face(n) { guy.style.backgroundPosition = (n * 50) + "% 0"; }   // 0 normal, 1 glancing, 2 blink
+    function state(s) { peek.className = "peek" + (s ? " " + s : ""); }
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { state("up"); return; }
+
+    var timers = [], visible = false;
+    function at(ms, fn) { timers.push(setTimeout(fn, ms)); }
+    function stop() { timers.forEach(clearTimeout); timers = []; state(""); face(0); }
+    function pop() {
+      if (!visible) return;
+      var room = wrap.offsetWidth - peek.offsetWidth;            // a new spot along the text each time
+      peek.style.left = Math.round(Math.random() * Math.max(room, 0)) + "px";
+      face(0);
+      at(0, function () { state("sneak"); });                      // eyes creep up over the letters
+      at(1150, function () { face(1); });                         // glance
+      at(1600, function () { face(0); });
+      at(1850, function () { state("up"); });                     // boing
+      at(2650, function () { face(2); });                         // blink
+      at(2790, function () { face(0); });
+      at(3300, function () { state(""); });                       // duck
+      at(3300 + 4000 + Math.random() * 4000, pop);
+    }
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) {
+        var was = visible; visible = en[0].isIntersecting;
+        if (visible && !was) { stop(); at(700, pop); }
+        if (!visible && was) stop();
+      }).observe(footer);
+    } else { visible = true; at(1500, pop); }
+  })();
 
   // Header banners (calculator pages and the home page): star dots that each drift on their own
   // small loop, a few of them sparkling.
