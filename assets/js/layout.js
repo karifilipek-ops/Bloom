@@ -56,28 +56,73 @@
   footer.innerHTML = '<div class="by-wrap"><div class="peek" aria-hidden="true"></div><i class="peek-shadow" aria-hidden="true"></i><p class="by">By Trainbloom</p></div>';
   document.body.appendChild(footer);
 
-  // Pixel me next to "By Trainbloom": he hops up onto the baseline once, then stays there blinking.
+  // Pixel me in the footer: pops up on top of "By Trainbloom", walks to the end of the word,
+  // does a little jump down beside it, turns to face the text, and stays there blinking.
   (function () {
     var peek = footer.querySelector(".peek"), wrap = footer.querySelector(".by-wrap");
+    var shadow = footer.querySelector(".peek-shadow");
     peek.innerHTML = '<div class="peek-guy"></div>';
-    var guy = peek.querySelector(".peek-guy");
-    function face(n) { guy.style.backgroundPosition = (n * 100) + "% 0"; }   // 0 normal, 1 blink
-    function state(s) { peek.className = "peek" + (s ? " " + s : ""); }
-    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { state("up"); return; }
-
-    // Once the footer comes into view he pops up (once), then just stays there and blinks now and then.
-    function blink() {
-      face(1);
-      setTimeout(function () { face(0); }, 140);
-      setTimeout(blink, 2500 + Math.random() * 2500);
+    var guy = peek.firstChild;
+    var STAND = 0, BLINK = 1, STEP = 2, PAD = 50, HALF = 22, DROP = 11;   // DROP: letter tops -> baseline
+    function frame(n) { guy.style.backgroundPosition = (n * 50) + "% 0"; }
+    function pose(x, y, sx, sy, flip) {
+      peek.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
+      guy.style.transform = "scale(" + ((flip ? -1 : 1) * sx).toFixed(3) + "," + sy.toFixed(3) + ")";
     }
-    function pop() { state("up"); setTimeout(blink, 1400); }
+    function blinkLoop() {
+      frame(BLINK);
+      setTimeout(function () { frame(STAND); }, 140);
+      setTimeout(blinkLoop, 2500 + Math.random() * 2500);
+    }
+    function settle() { shadow.classList.add("on"); setTimeout(blinkLoop, 900); }
+    var textW = function () { return wrap.offsetWidth - PAD; };
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      peek.style.opacity = 1; frame(STAND); pose(textW() + 4, DROP, 1, 1, true); settle(); return;
+    }
+
+    function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+    function easeOutBack(x) { var c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); }
+    function run() {
+      var W = textW(), x0 = W * 0.3 - HALF, x1 = W - HALF - 4, x2 = W + 4;
+      var POP = 450, WAIT = 450, WALK = Math.max(900, (x1 - x0) / 0.045), CROUCH = 110, JUMP = 520, LAND = 140, PAUSE = 380;
+      var tWalk = POP + WAIT, tCrouch = tWalk + WALK, tJump = tCrouch + CROUCH, tLand = tJump + JUMP, tTurn = tLand + LAND + PAUSE;
+      var start = null;
+      peek.style.opacity = 1;
+      (function tick(now) {
+        if (start == null) start = now;
+        var t = now - start;
+        if (t < POP) {                                   // pop up out of nowhere, a little springy
+          var s = easeOutBack(clamp(t / POP));
+          frame(STAND); pose(x0, 0, s, s, false);
+        } else if (t < tWalk) {
+          frame(STAND); pose(x0, 0, 1, 1, false);
+        } else if (t < tCrouch) {                        // walk along the letter tops
+          var w = (t - tWalk) / WALK, stepOn = Math.floor((t - tWalk) / 170) % 2 === 1;
+          frame(stepOn ? STEP : STAND);
+          pose(x0 + (x1 - x0) * w, stepOn ? -1 : 0, 1, 1, false);
+        } else if (t < tJump) {                          // crouch at the edge
+          frame(STAND); pose(x1, 0, 1.08, 0.86, false);
+        } else if (t < tLand) {                          // the jump: an arc down to the baseline
+          var j = (t - tJump) / JUMP;
+          frame(STEP); pose(x1 + (x2 - x1) * j, DROP * j * j - 20 * Math.sin(Math.PI * j), 1, 1.04, false);
+        } else if (t < tLand + LAND) {                   // squish on landing
+          var l = (t - tLand) / LAND;
+          frame(STAND); pose(x2, DROP, 1 + 0.1 * (1 - l), 1 - 0.14 * (1 - l), false);
+          shadow.classList.add("on");
+        } else if (t < tTurn) {
+          frame(STAND); pose(x2, DROP, 1, 1, false);
+        } else {                                         // turn to face the text, and stay
+          frame(STAND); pose(x2, DROP, 1, 1, true); settle(); return;
+        }
+        requestAnimationFrame(tick);
+      })(performance.now());
+    }
     if ("IntersectionObserver" in window) {
       var io = new IntersectionObserver(function (en) {
-        if (en[0].isIntersecting) { io.disconnect(); setTimeout(pop, 400); }
+        if (en[0].isIntersecting) { io.disconnect(); setTimeout(run, 400); }
       });
       io.observe(footer);
-    } else setTimeout(pop, 1000);
+    } else setTimeout(run, 1000);
   })();
 
   // Header banners (calculator pages and the home page): star dots that each drift on their own

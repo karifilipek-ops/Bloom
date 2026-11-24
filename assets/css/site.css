@@ -613,22 +613,20 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .site-footer .by-wrap { position: relative; display: inline-block; }
 /* Footer: pixel me popping up behind "By Trainbloom". The letter tops are 12px below .by-wrap's top;
    the box is clipped at that line, so from the waist down he's hidden behind the text. */
-/* He stands just after the word, feet on the text's baseline (23px below .by-wrap's top), facing in.
-   He hops up from below the baseline once, then stays and blinks. Drawn at exactly 2x, the same
-   pixel size as the footer font, so the two read as one piece. */
-.site-footer .by-wrap { padding-right: 44px; }   /* room for him, so text + him stay centred together */
-.site-footer .peek { position: absolute; right: 0; bottom: calc(100% - 23px); width: 30px; height: 70px; overflow: hidden; pointer-events: none; }
+/* Pixel me in the footer (driven by layout.js): he pops up standing on the letter tops (12px below
+   .by-wrap's top), walks to the end of the word, hops down, and ends up standing on the baseline
+   (23px down) just after it. Drawn at exactly 2x, the same pixel size as the footer font. */
+.site-footer .by-wrap { padding-right: 50px; }   /* his final spot, so text + him stay centred together */
+.site-footer .peek { position: absolute; left: 0; bottom: calc(100% - 12px); width: 44px; height: 54px; pointer-events: none; opacity: 0; will-change: transform; }
 .site-footer .peek-guy {
-  position: absolute; left: 0; bottom: 0; width: 30px; height: 54px;
-  background: url(/assets/img/peek-me.png) 0 0 / 200% 100% no-repeat; image-rendering: pixelated;
-  transform: scaleX(-1) translateY(100%);
+  width: 44px; height: 54px; transform-origin: 50% 100%;
+  background: url(/assets/img/peek-me.png) 0 0 / 300% 100% no-repeat; image-rendering: pixelated;
 }
-.site-footer .peek.up .peek-guy { transform: scaleX(-1) translateY(0); transition: transform .5s cubic-bezier(.34,1.56,.64,1); }
 .site-footer .peek-shadow {
-  position: absolute; right: 3px; bottom: calc(100% - 25px); width: 24px; height: 3px; border-radius: 50%;
-  background: rgba(30,26,40,.16); transform: scaleX(0); transition: transform .35s ease-out .2s;
+  position: absolute; right: 14px; bottom: calc(100% - 25px); width: 24px; height: 3px; border-radius: 50%;
+  background: rgba(30,26,40,.16); transform: scaleX(0); transition: transform .25s ease-out;
 }
-.site-footer .peek.up + .peek-shadow { transform: scaleX(1); }
+.site-footer .peek-shadow.on { transform: scaleX(1); }
 .site-footer .by { position: relative; z-index: 1; font-family: var(--pixel); font-size: 21px; letter-spacing: .26em; text-transform: uppercase; color: var(--ink-soft); margin: 0 -.26em 0 0; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
