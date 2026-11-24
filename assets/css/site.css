@@ -197,6 +197,10 @@ a { color: inherit; }
 
 .lede { text-align: center; font-family: var(--mono); font-size: 23px; line-height: 1.2; letter-spacing: .02em; margin: 0 auto 6px; max-width: 640px; }
 .lede-sub { text-align: center; color: var(--muted); font-family: var(--mono); font-size: 20px; line-height: 1.15; margin: 0 auto 26px; }
+/* 1RM page: faint pixel bench / squat / deadlift icons under the intro */
+.lift-icons { display: flex; justify-content: center; align-items: flex-end; gap: 34px; margin: -8px 0 22px; opacity: .3; }
+.lift-icons img { height: 34px; width: auto; }
+@media (max-width: 560px) { .lift-icons { gap: 26px; } .lift-icons img { height: 28px; } }
 .lede + .calc { margin-top: 22px; }
 
 /* ---------- Section heading (hoo.be style) ---------- */
