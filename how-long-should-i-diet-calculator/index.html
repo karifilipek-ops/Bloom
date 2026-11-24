@@ -150,7 +150,9 @@
       });
 
       function drawChart(w, goalW, fastRate, slowRate, weeks, u) {
-        var W = 600, H = 240, L = 52, R = 16, T = 16, Bm = 34;
+        var el = document.getElementById("r-chart"), narrow = window.innerWidth < 560;    // phones get their own proportions
+        var W = narrow ? 360 : 600, H = narrow ? 280 : 240, L = narrow ? 40 : 52, R = 16, T = 16, Bm = 34;
+        el.setAttribute("viewBox", "0 0 " + W + " " + H);
         var top = w + (w - goalW) * 0.08, bot = goalW - (w - goalW) * 0.15, span = Math.max(1, Math.ceil(weeks));
         var x = function (wk) { return L + (W - L - R) * wk / span; };
         var y = function (v) { return T + (H - T - Bm) * (top - v) / (top - bot); };
@@ -178,7 +180,7 @@
         svg += '<polyline fill="none" stroke="#6f6496" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 6" points="' + x(0) + "," + y(w) + " " + x(weeks) + "," + y(goalW) + '"/>';   // slow: dashed, lavender
         svg += '<polyline fill="none" stroke="#242424" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 6" points="' + x(0) + "," + y(w) + " " + x(fastWk) + "," + y(goalW) + '"/>';   // fast: dashed
         svg += '</g><circle cx="' + x(0) + '" cy="' + y(w) + '" r="4.5" fill="#242424"/>';
-        var ticks = Math.min(6, span);
+        var ticks = Math.min(narrow ? 4 : 6, span);
         for (var t = 0; t <= ticks; t++) {
           var wk = Math.round(span * t / ticks);
           svg += '<text x="' + x(wk) + '" y="' + (H - 12) + '" text-anchor="middle"' + MONO + ' fill="#8a8a93">wk ' + wk + "</text>";

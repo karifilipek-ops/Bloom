@@ -699,3 +699,22 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 @media (max-width: 560px) { .bf-card .r { font-size: 16px; letter-spacing: .08em; padding: 0 6px 0 8px; } }
 .bf-card.photo.round { padding: 6px 6px 16px; }
 .bf-card.photo.round img { border-radius: 50%; }
+
+/* ---------- Phone polish: tighter tracking so headings, buttons and tables fit cleanly ---------- */
+.tbl .abbr { display: none; }
+@media (max-width: 560px) {
+  .calc h2, .section-title { font-size: 20px; letter-spacing: .16em; }
+  .learn-h { font-size: 22px; letter-spacing: .16em; }
+  .seg button { font-size: 15px; letter-spacing: .08em; padding: 9px 4px; }
+  .card-link .t { font-size: 16px; letter-spacing: .1em; }
+  table.tbl td:first-child { min-width: 0; }
+  table.tbl th, table.tbl td { padding: 8px 6px; }
+  .tbl .full { display: none; } .tbl .abbr { display: inline; }
+  .tbl .oa { display: none; }                      /* VO2 table: only your age group's column */
+  .next-h { font-size: 19px; letter-spacing: .1em; }
+  .next-btn { font-size: 14px; letter-spacing: .08em; padding: 8px 14px; }
+  .lift-head .k { font-size: 17px; letter-spacing: .1em; }
+  .lift-head .lvl { font-size: 21px; }
+  .gauge-track em { font-size: 11px; letter-spacing: .04em; }
+  .stats.pair .k { font-size: 13px; letter-spacing: .1em; }
+}

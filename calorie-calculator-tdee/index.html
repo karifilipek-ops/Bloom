@@ -425,7 +425,7 @@
         var NAMES = { BMR: "Basal metabolic rate", NEAT: "Non-exercise activity (steps)", TEF: "Digesting food", EAT: "Exercise" };
         document.getElementById("r-stack").innerHTML = parts.filter(function (p) { return p[1] > 0.05; }).map(function (p) {
           return '<div style="flex:' + p[1] + ';background:' + p[2] + ';color:' + p[3] + '" title="' + p[0] + ': ' + Math.round(p[1]) + '%">' +
-            (p[1] >= 7 ? Math.round(p[1]) + "%" : "") + "</div>";
+            (p[1] >= (window.innerWidth < 560 ? 13 : 7) ? Math.round(p[1]) + "%" : "") + "</div>";
         }).join("");
         document.getElementById("r-legend").innerHTML = parts.map(function (p) {
           return '<span><i style="background:' + p[2] + '"></i><strong style="font-weight:600">' + p[0] + " " + Math.round(p[1]) + "%</strong> · " + NAMES[p[0]] + "</span>";

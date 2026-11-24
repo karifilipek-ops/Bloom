@@ -281,9 +281,11 @@
         document.getElementById("r-method").textContent = TESTS[m].cite;
         document.getElementById("r-norms").innerHTML = [0, 1, 2, 3].map(function (k) {
           return "<tr><td>" + RATINGS[4 - k] + "</td>" + NORMS[s].map(function (b, a) {
-            return "<td" + (a === bi && 4 - k === idx ? ' class="hl"' : "") + ">" + b[k].toFixed(1) + "</td>";
+            return "<td" + (a === bi && 4 - k === idx ? ' class="hl"' : a !== bi ? ' class="oa"' : "") + ">" + b[k].toFixed(1) + "</td>";
           }).join("") + "</tr>";
-        }).join("") + "<tr><td>Poor</td>" + NORMS[s].map(function (b, a) { return "<td" + (a === bi && idx === 0 ? ' class="hl"' : "") + ">&lt; " + b[3].toFixed(1) + "</td>"; }).join("") + "</tr>";
+        }).join("") + "<tr><td>Poor</td>" + NORMS[s].map(function (b, a) { return "<td" + (a === bi && idx === 0 ? ' class="hl"' : a !== bi ? ' class="oa"' : "") + ">&lt; " + b[3].toFixed(1) + "</td>"; }).join("") + "</tr>";
+        // header: hide the other age groups on phones too
+        Array.prototype.forEach.call(document.getElementById("r-norms").parentNode.querySelectorAll("thead th"), function (th, i) { th.classList.toggle("oa", i > 0 && i - 1 !== bi); });
 
         B.show(document.getElementById("results"));
       });
