@@ -320,7 +320,10 @@ input[type="range"] { width: 100%; accent-color: var(--lav-dark); height: 28px; 
 .gym-bar { flex: 1; display: flex; height: 30px; border: 2px solid var(--ink); border-radius: 3px; overflow: hidden; background: var(--paper); }
 .gym-bar i { flex: 1; border-left: 2px solid var(--line); transition: background .15s; }
 .gym-bar i:first-child { border-left: 0; }
-.gym-bar i.on { background: var(--lav); border-left-color: var(--paper); }
+.gym-bar i.on {   /* lavender with fine scanlines */
+  background: repeating-linear-gradient(to bottom, var(--lav) 0 2px, #8f83b3 2px 3px);
+  border-left-color: var(--paper);
+}
 .gym-bar i.on:first-child { border-left: 0; }
 @media (max-width: 560px) { .gym { height: 54px; gap: 14px; padding: 0 12px; } .gym-icon { width: 44px; height: 22px; } .gym-bar { height: 24px; } }
 /* step slider: pixel sneakers + footprint trail */
