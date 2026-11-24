@@ -166,7 +166,7 @@ a { color: inherit; }
   .hero-art h1 { font-size: 11cqw; }
   .hero-art p { font-size: 3.4cqw; margin-top: 1.4cqw; }
 }
-.hero.sm { padding: 30px 16px 84px; }
+.hero.sm { padding: 57px 16px 57px; } /* even top/bottom so the icon + title sit in the vertical middle */
 .hero.sm h1 { font-size: clamp(26px, 6vw, 44px); }
 /* Calculator headers: the icon and title float gently while the box stays put.
    Distance and speed are the two variables below, so the motion can be tuned in one place. */
