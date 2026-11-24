@@ -173,17 +173,26 @@ a { color: inherit; }
    layout.js adds the star dots (.stars); without it the static stars in ::before show instead. */
 .hero.has-stars::before { display: none; }
 .hero .stars { position: absolute; inset: 0; z-index: -2; pointer-events: none; }
-.hero .stars i {
-  position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%;
+.hero .stars i {                       /* the star drifts... */
+  position: absolute; width: 2px; height: 2px;
   animation: star-drift var(--t) ease-in-out var(--d) infinite;
 }
-.hero .stars i.s-lav { background: #cfc8ff; }
+.hero .stars i::after {                /* ...and its dot sparkles: grows, glows and fades on a faster beat */
+  content: ""; position: absolute; inset: 0; background: #fff; border-radius: 50%;
+  box-shadow: 0 0 4px 1px rgba(255, 255, 255, .55);
+  animation: star-sparkle var(--s) ease-in-out var(--d) infinite;
+}
+.hero .stars i.s-lav::after { background: #cfc8ff; box-shadow: 0 0 4px 1px rgba(207, 200, 255, .6); }
 .hero .stars i.s-big { width: 3px; height: 3px; }
 @keyframes star-drift {
-  0%, 100% { transform: translate(0, 0); opacity: var(--o); }
-  50% { transform: translate(var(--dx), var(--dy)); opacity: 1; }
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(var(--dx), var(--dy)); }
 }
-@media (prefers-reduced-motion: reduce) { .hero .stars i { animation: none; } }
+@keyframes star-sparkle {
+  0%, 100% { transform: scale(.55); opacity: var(--o); }
+  50% { transform: scale(1.7); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .hero .stars i, .hero .stars i::after { animation: none; } }
 
 .lede { text-align: center; font-family: var(--mono); font-size: 23px; line-height: 1.2; letter-spacing: .02em; margin: 0 auto 6px; max-width: 640px; }
 .lede-sub { text-align: center; color: var(--muted); font-family: var(--mono); font-size: 20px; line-height: 1.15; margin: 0 auto 26px; }
