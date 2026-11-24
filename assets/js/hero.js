@@ -2,6 +2,44 @@
 // he eases out to the left while the female figure eases in from the right, and the numbers
 // recount to hers. Then back again, forever.
 // Stats, in order: TDEE, body fat, 1RM squat, VO2 max, protein, potential.
+// Title: "number glitch" reveal. Each letter starts as a flickering random digit and locks into place
+// left to right. Letters keep their final width while scrambling so the title doesn't jump around.
+(function () {
+  var h1 = document.querySelector(".hero-art h1");
+  if (!h1 || !window.requestAnimationFrame) return;
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var text = h1.textContent;
+  h1.setAttribute("aria-label", text);
+  h1.style.opacity = "0";                                          // hidden until the scramble starts (no flash)
+  setTimeout(function () { h1.style.opacity = ""; }, 2500);        // safety net if anything goes wrong
+  function start() {
+    h1.innerHTML = "";
+    var spans = text.split("").map(function (ch) {
+      var sp = document.createElement("span");
+      sp.className = "gl-ch"; sp.setAttribute("aria-hidden", "true"); sp.textContent = ch;
+      h1.appendChild(sp); return sp;
+    });
+    spans.forEach(function (sp) { sp.style.width = sp.getBoundingClientRect().width + "px"; });   // lock each width
+    h1.classList.add("glitching");
+    h1.style.opacity = "";
+    var t0 = null, STEP = 70, LEAD = 220, lastSwap = 0;
+    function frame(now) {
+      if (t0 == null) t0 = now;
+      var t = now - t0, done = true, swap = now - lastSwap > 55;
+      if (swap) lastSwap = now;
+      spans.forEach(function (sp, i) {
+        if (t >= LEAD + i * STEP) { sp.textContent = text[i]; sp.classList.remove("gl-on"); }
+        else { done = false; if (swap) { sp.textContent = String(Math.floor(Math.random() * 10)); sp.classList.add("gl-on"); } }
+      });
+      if (!done) requestAnimationFrame(frame);
+      else { h1.classList.remove("glitching"); setTimeout(function () { h1.textContent = text; }, 150); }   // back to plain text
+    }
+    requestAnimationFrame(frame);
+  }
+  // wait for the pixel font so the locked widths are right
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(start); else start();
+})();
+
 (function () {
   var svg = document.querySelector(".hero-stage");
   if (!svg || !window.requestAnimationFrame) return;
