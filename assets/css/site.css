@@ -131,7 +131,7 @@ a { color: inherit; }
 }
 .hero .px { width: auto; height: 64px; margin: 0 auto 14px; filter: invert(1); }
 .hero .px.ico-dumbbell { height: 44px; margin-top: 10px; margin-bottom: 24px; }   /* wide icon: shorter, same overall footprint */
-.hero .px.ico-bars { height: 56px; margin-top: 4px; margin-bottom: 18px; }
+.hero .px.ico-bars { height: 50px; margin-top: 10px; margin-bottom: 18px; }   /* 13x10 pixel grid, drawn at exactly 5x */
 .hero h1 {
   margin: 0; font-family: var(--pixel); font-weight: 400; text-transform: uppercase;
   font-size: clamp(30px, 7vw, 54px); line-height: 1.05; letter-spacing: .26em; margin-right: -.26em;
