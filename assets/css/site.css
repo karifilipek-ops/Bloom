@@ -168,6 +168,16 @@ a { color: inherit; }
 }
 .hero.sm { padding: 30px 16px 84px; }
 .hero.sm h1 { font-size: clamp(26px, 6vw, 44px); }
+/* Calculator headers: the icon and title float gently while the box stays put.
+   Distance and speed are the two variables below, so the motion can be tuned in one place. */
+.hero.sm { --float-dist: 8px; --float-time: 4s; }
+.hero.sm .px, .hero.sm h1 { animation: hero-float var(--float-time) ease-in-out infinite; will-change: transform; }
+.hero.sm .px { animation-delay: -.6s; }   /* icon a little out of step with the title */
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(calc(var(--float-dist) * -1)); }
+}
+@media (prefers-reduced-motion: reduce) { .hero.sm .px, .hero.sm h1 { animation: none; } }
 
 .lede { text-align: center; font-family: var(--mono); font-size: 23px; line-height: 1.2; letter-spacing: .02em; margin: 0 auto 6px; max-width: 640px; }
 .lede-sub { text-align: center; color: var(--muted); font-family: var(--mono); font-size: 20px; line-height: 1.15; margin: 0 auto 26px; }
