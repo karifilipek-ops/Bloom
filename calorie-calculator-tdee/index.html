@@ -364,7 +364,7 @@
           var perWk = goalState.lbs * v / 100;                          // lb per week
           cals = T - perWk * 3500 / 7;
           rate = v < 0.625 ? "Slow" : v < 0.875 ? "Moderate" : "Fast";
-          sub = "&minus;" + (Math.round(v * 100) / 100) + "% of body weight per week &middot; about " + (goalState.metric ? (perWk / B.LB_PER_KG).toFixed(2) + " kg" : perWk.toFixed(1) + " lb");
+          sub = "About &minus;" + (goalState.metric ? (perWk / B.LB_PER_KG).toFixed(2) + " kg" : perWk.toFixed(1) + " lb") + " per week";
         }
         document.getElementById("g-rate").textContent = rate;
         document.getElementById("g-sub").innerHTML = sub;
