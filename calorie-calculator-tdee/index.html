@@ -347,7 +347,7 @@
       // Goal picker. Lose weight: 0.5-1% of body weight a week (3,500 cal per lb).
       // Bulk and recomp: three stops, each a multiple of TDEE (from the original calculator).
       var GOALS = {
-        cut: { min: 0.5, max: 1, step: 0.05, start: 0.5, ticks: [["0.5%", "Slower"], ["0.75%", "Moderate"], ["1.0%", "Faster"]] },
+        cut: { min: 0.5, max: 1, step: 0.05, start: 0.5, ticks: [["&minus;0.5%", "per week"], ["&minus;0.75%", "per week"], ["&minus;1.0%", "per week"]] },
         bulk: { stops: [["Lean bulk", 1.08, "Minimum fat gain"], ["Standard bulk", 1.15, "Slight fat gain"], ["Dirty bulk", 1.3, "Moderate fat gain"]], start: 0,
           ticks: [["Lean", "Least fat"], ["Standard", ""], ["Dirty", "Fastest"]] },
         recomp: { stops: [["Fat loss focus", 0.92, "Slightly below maintenance"], ["Standard recomp", 1, "Eat at maintenance"], ["Muscle gain focus", 1.08, "Slightly above maintenance"]], start: 1,
@@ -382,8 +382,8 @@
         } else {
           var perWk = goalState.lbs * v / 100;                          // lb per week
           cals = T - perWk * 3500 / 7;
-          rate = (Math.round(v * 100) / 100) + "% / week";
-          sub = "Estimated weight loss &middot; about " + (goalState.metric ? (perWk / B.LB_PER_KG).toFixed(2) + " kg" : perWk.toFixed(1) + " lb") + " a week";
+          rate = v < 0.625 ? "Slow" : v < 0.875 ? "Moderate" : "Fast";
+          sub = "&minus;" + (Math.round(v * 100) / 100) + "% of body weight per week &middot; about " + (goalState.metric ? (perWk / B.LB_PER_KG).toFixed(2) + " kg" : perWk.toFixed(1) + " lb");
         }
         document.getElementById("g-rate").textContent = rate;
         document.getElementById("g-sub").innerHTML = sub;
