@@ -620,6 +620,7 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 /* .peek-clip's bottom edge is the top of the letters: while it clips, he's hidden behind the word. */
 .site-footer .peek-clip { position: absolute; left: 0; right: -60px; bottom: calc(100% - 11px); height: 140px; overflow: hidden; pointer-events: none; }
 .site-footer .peek-clip.free { overflow: visible; }
+.site-footer .peek-hole { position: absolute; display: none; width: 44px; height: 14px; background: url(/assets/img/peek-hole.png) 0 0 / 300% 100% no-repeat; image-rendering: pixelated; }
 .site-footer .peek { position: absolute; left: 0; bottom: -1px; width: 44px; height: 54px; opacity: 0; }
 .site-footer .peek-guy { width: 44px; height: 54px; background: url(/assets/img/peek-me.png) 0 0 / 400% 100% no-repeat; image-rendering: pixelated; }
 .site-footer .peek-guy.flip { transform: scaleX(-1); }

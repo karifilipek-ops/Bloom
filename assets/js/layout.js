@@ -53,7 +53,7 @@
 
   var footer = document.createElement("footer");
   footer.className = "site-footer";
-  footer.innerHTML = '<div class="by-wrap"><div class="peek-clip" aria-hidden="true"><div class="peek"></div></div><i class="peek-shadow" aria-hidden="true"></i><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>';
+  footer.innerHTML = '<div class="by-wrap"><i class="peek-hole" aria-hidden="true"></i><div class="peek-clip" aria-hidden="true"><div class="peek"></div></div><i class="peek-shadow" aria-hidden="true"></i><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>';
   document.body.appendChild(footer);
 
   // Pixel me in the footer: he pops up out of the ground beside "Built by Tony / @trainbloom" (like
@@ -63,6 +63,11 @@
   (function () {
     var clip = footer.querySelector(".peek-clip"), peek = footer.querySelector(".peek");
     var wrap = footer.querySelector(".by-wrap"), shadow = footer.querySelector(".peek-shadow");
+    var hole = footer.querySelector(".peek-hole");
+    function holeSize(n) {                               // 0 = gone, 1..3 = opening sizes
+      hole.style.display = n ? "block" : "none";
+      if (n) hole.style.backgroundPosition = ((n - 1) * 50) + "% 0";
+    }
     peek.innerHTML = '<div class="peek-guy"></div>';
     var guy = peek.firstChild;
     var STAND = 0, BLINK = 1, BREATHE = 2, CROUCH = 3;
@@ -120,13 +125,21 @@
     function run() {
       geometry(); measure();
       var x2 = textW() + 4;
+      var wr = wrap.getBoundingClientRect();              // centred under his feet, on the ground line (pixel-snapped)
+      hole.style.left = snap(x2 + 22 - 22, wr.left) + "px";
+      hole.style.top = snap(parseFloat(clip.style.top) + 140 - 7, wr.top) + "px";
       // 15fps frames, [x, y]: y = 0 is the ground line (the bottom text line's baseline) right beside
       // the words. He shoots up out of the ground (hidden below that line), hops, and drops back down.
       var path = [[x2, 36], [x2, 14], [x2, -4], [x2, -10], [x2, -12], [x2, -10], [x2, -5]];
       frame(STAND); peek.style.opacity = 1;
-      var f = 0;
+      // A hole opens in the ground, he shoots up out of it, and it closes behind him while he's in the air.
+      var holeAt = { 0: 1, 1: 2, 2: 3, 6: 2, 7: 1, 8: 0 }, LEAD = 3;   // path frame -> hole size
+      var f = -LEAD;
       (function step() {
-        if (f >= path.length) { land(x2); return; }
+        var hf = f + LEAD;
+        if (f < 0) { holeSize(holeAt[hf]); f++; setTimeout(step, TICK); return; }
+        if (hf in holeAt) holeSize(holeAt[hf]);
+        if (f >= path.length) { holeSize(0); land(x2); return; }
         var pt = path[f++];
         if (pt[1] <= 0) clip.classList.add("free");      // fully out of the ground
         pose(pt[0], pt[1]);
@@ -136,7 +149,7 @@
     pose(0, H + 2);
     if ("IntersectionObserver" in window) {
       var io = new IntersectionObserver(function (en) {
-        if (en[0].isIntersecting) { io.disconnect(); setTimeout(run, 450); }
+        if (en[0].isIntersecting) { io.disconnect(); setTimeout(run, 1450); }
       });
       io.observe(footer);
     } else setTimeout(run, 1000);
