@@ -172,7 +172,10 @@ a { color: inherit; }
 .hero-art p { font-size: 2.15cqw; margin-top: .9cqw; color: #d3cfe3; font-weight: 300; letter-spacing: .01em; }
 /* Phones: the banner takes the canvas's own 4:3 shape. */
 @media (max-width: 640px) {
-  .hero-art { aspect-ratio: 640 / 480; }
+  .hero-art { aspect-ratio: 640 / 552; }   /* 15% taller than the desktop canvas; hero.js spreads the art out to fill it */
+  .hero-stage .hs-l { font-size: 24px; }
+  .hero-stage .hs-v { font-size: 37px; }
+  .hero-stage .hs-u { font-size: 21px; }
   .hero-copy { padding-top: 4.2cqw; }
   .hero-art h1 { font-size: 8.4cqw; letter-spacing: .22em; margin-right: -.22em; text-shadow: .5cqw .5cqw 0 var(--lav-dark); }
   .hero-art p { font-size: 3.4cqw; margin-top: 1.4cqw; }

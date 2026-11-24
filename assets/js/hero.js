@@ -2,8 +2,57 @@
 // a dotted line draws out to the side, and the stat fades in at the end of it. Then it all stays put.
 (function () {
   var svg = document.querySelector(".hero-stage");
-  if (!svg || !window.requestAnimationFrame) return;
-  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return; // markup is the finished frame
+  if (!svg) return;
+
+  // Phones: the banner is 15% taller (640 x 552 canvas) and everything spreads out to use it:
+  // a bigger figure, stat columns pushed further out, rows further apart (bigger type is in the CSS).
+  // The markup holds the desktop layout; this swaps the coordinates in, and back if the screen widens.
+  var PHONE = {
+    view: "0 0 640 552",
+    fig: "translate(320 150) scale(.31) translate(0 -58)",
+    // [label x, row centre y, body point x, body point y] in the order of the stats in the markup:
+    // TDEE, body fat, 1RM squat (left column), VO2 max, protein (right column)
+    stats: [[186, 228, -50, 330], [186, 330, -70, 560], [186, 432, -85, 900], [454, 280, 45, 330], [454, 382, 175, 560]]
+  };
+  var useEl = svg.querySelector(".hm-fig use"), lineEls = svg.querySelectorAll(".hl"), maskEls = svg.querySelectorAll(".hlm");
+  var maskBoxes = svg.querySelectorAll("mask[id^='hl-m']"), dotEls = svg.querySelectorAll(".hd"), statEls = svg.querySelectorAll(".hs");
+  var desk = {
+    view: svg.getAttribute("viewBox"), fig: useEl.getAttribute("transform"),
+    d: Array.prototype.map.call(lineEls, function (l) { return l.getAttribute("d"); }),
+    dots: Array.prototype.map.call(dotEls, function (g) { return [g.firstChild.getAttribute("cx"), g.firstChild.getAttribute("cy")]; }),
+    text: Array.prototype.map.call(statEls, function (g) {
+      return Array.prototype.map.call(g.querySelectorAll("text"), function (t) { return [t.getAttribute("x"), t.getAttribute("y")]; });
+    })
+  };
+  function applyLayout(phone) {
+    svg.setAttribute("viewBox", phone ? PHONE.view : desk.view);
+    useEl.setAttribute("transform", phone ? PHONE.fig : desk.fig);
+    Array.prototype.forEach.call(maskBoxes, function (m) { m.setAttribute("height", phone ? 552 : 480); });
+    Array.prototype.forEach.call(statEls, function (g, i) {
+      var texts = g.querySelectorAll("text"), d, ax, ay;
+      if (phone) {
+        var st = PHONE.stats[i], left = i < 3, row = st[1];
+        ax = (320 + 0.31 * st[2]).toFixed(1); ay = (150 + 0.31 * (st[3] - 58)).toFixed(1);
+        d = "M" + ax + "," + ay + (left ? " L218," + row + " L198," + row : " L422," + row + " L442," + row);
+        texts[0].setAttribute("x", st[0]); texts[0].setAttribute("y", row - 10);
+        texts[1].setAttribute("x", st[0]); texts[1].setAttribute("y", row + 27);
+      } else {
+        d = desk.d[i]; ax = desk.dots[i][0]; ay = desk.dots[i][1];
+        texts[0].setAttribute("x", desk.text[i][0][0]); texts[0].setAttribute("y", desk.text[i][0][1]);
+        texts[1].setAttribute("x", desk.text[i][1][0]); texts[1].setAttribute("y", desk.text[i][1][1]);
+      }
+      lineEls[i].setAttribute("d", d); maskEls[i].setAttribute("d", d);
+      Array.prototype.forEach.call(dotEls[i].querySelectorAll("circle"), function (c) { c.setAttribute("cx", ax); c.setAttribute("cy", ay); });
+    });
+  }
+  var phoneMq = window.matchMedia ? matchMedia("(max-width: 640px)") : { matches: false };
+  applyLayout(phoneMq.matches);
+
+  if (!window.requestAnimationFrame) return;
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (phoneMq.addEventListener) phoneMq.addEventListener("change", function (e) { applyLayout(e.matches); });
+    return;                                              // markup is the finished frame
+  }
 
   var fig = svg.querySelector(".hm-fig");
   var masks = svg.querySelectorAll(".hlm"), dots = svg.querySelectorAll(".hd"), stats = svg.querySelectorAll(".hs");
@@ -34,6 +83,10 @@
   }
   pinUnits();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(pinUnits);
+  if (phoneMq.addEventListener) phoneMq.addEventListener("change", function (e) {   // e.g. rotating a tablet
+    applyLayout(e.matches); pinUnits();
+    for (var i = 0; i < masks.length; i++) { lens[i] = masks[i].getTotalLength(); masks[i].style.strokeDasharray = lens[i]; }
+  });
 
   function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
   function easeOut(x) { return 1 - Math.pow(1 - x, 3); }
