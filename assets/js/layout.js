@@ -56,8 +56,8 @@
   footer.innerHTML = '<div class="by-wrap"><div class="peek-clip" aria-hidden="true"><div class="peek"></div></div><i class="peek-shadow" aria-hidden="true"></i><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>';
   document.body.appendChild(footer);
 
-  // Pixel me in the footer: he springs up from behind the end of "Built by Tony" (like popping out of
-  // a hole), arcs over and lands beside the word, turns to face it, and idles there breathing and blinking.
+  // Pixel me in the footer: he pops up out of the ground beside "Built by Tony / @trainbloom" (like
+  // popping out of a hole), lands, turns to face the text, and idles there breathing and blinking.
   // Animated the 8-bit way: positions move on his own 2px pixel grid and update at 15fps, and the
   // landing / breathing are separate pose frames rather than any smooth scaling, so he always stays crisp.
   (function () {
@@ -69,8 +69,8 @@
     var PAD = 50, H = 54, TICK = 1000 / 15;
     // Where the text's ink actually sits (from the font metrics), relative to the top of .by-wrap:
     // he pops out from behind the top line ("Built by Tony") and lands on the bottom line's baseline.
-    var name = footer.querySelector(".by-name"), ig = footer.querySelector(".by-ig-text");
-    var DROP = 11, LINE_END = 0;
+    var ig = footer.querySelector(".by-ig-text");
+    var DROP = 0;
     function inkBox(el, sample) {
       // a zero-size marker sitting on the text's baseline gives the exact baseline position
       var mark = document.createElement("span");
@@ -83,12 +83,11 @@
       return { top: base - c.measureText(sample).actualBoundingBoxAscent, base: base, right: el.getBoundingClientRect().right - w.left };
     }
     function geometry() {
-      var a = inkBox(name, "B"), b = inkBox(ig, "t");
+      var b = inkBox(ig, "t");
       clip.style.bottom = "auto";
-      clip.style.top = Math.round(a.top - 1 - 140) + "px";          // clip edge: 1px above the top line's letters
-      DROP = Math.round(b.base - (a.top - 1));                       // ...down to the bottom line's baseline
+      clip.style.top = Math.round(b.base - 140) + "px";              // clip edge = the ground line beside the text
+      DROP = 0;
       shadow.style.bottom = "auto"; shadow.style.top = Math.round(b.base - 1) + "px";
-      LINE_END = a.right;
     }
     function frame(n) { guy.style.backgroundPosition = (n * 100 / 3) + "% 0"; }
     var bx = 0, by = 0;
@@ -120,24 +119,16 @@
     }
     function run() {
       geometry(); measure();
-      var W = textW(), x1 = LINE_END - 40, x2 = W + 4;
-      // Each entry is one 15fps frame: [x, y]. y = 0 means his feet are level with the letter tops;
-      // while y > 0 the clip hides whatever is still below that line (behind the word).
-      // The pop out is fast (2 frames), then one gravity arc over and down to the baseline beside the word.
-      var path = [[x1, 30], [x1, 4]];
-      var N = 9, TOP = -6;                               // arc frames, apex height above the letters
-      for (var i = 1; i <= N; i++) {
-        var p = i / N, xa = x1 + (x2 - x1) * p;
-        var ya = p < 0.4 ? TOP * Math.sin((p / 0.4) * Math.PI / 2)        // rise to the apex...
-                         : TOP + (DROP - TOP) * Math.pow((p - 0.4) / 0.6, 2); // ...then fall faster
-        path.push([xa, ya]);
-      }
+      var x2 = textW() + 4;
+      // 15fps frames, [x, y]: y = 0 is the ground line (the bottom text line's baseline) right beside
+      // the words. He shoots up out of the ground (hidden below that line), hops, and drops back down.
+      var path = [[x2, 36], [x2, 14], [x2, -4], [x2, -10], [x2, -12], [x2, -10], [x2, -5]];
       frame(STAND); peek.style.opacity = 1;
       var f = 0;
       (function step() {
         if (f >= path.length) { land(x2); return; }
         var pt = path[f++];
-        if (pt[1] <= 0) clip.classList.add("free");      // fully clear of the letters
+        if (pt[1] <= 0) clip.classList.add("free");      // fully out of the ground
         pose(pt[0], pt[1]);
         setTimeout(step, TICK);
       })();

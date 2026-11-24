@@ -607,7 +607,7 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .faq .body a { color: var(--lav-dark); text-decoration-thickness: 1px; text-underline-offset: 2px; }
 
 /* ---------- Footer ---------- */
-.site-footer { text-align: center; padding: 46px 16px 30px; color: var(--muted); font-size: 13px; }
+.site-footer { text-align: center; padding: 18px 16px 30px; color: var(--muted); font-size: 13px; }
 .site-footer p { margin: 2px 0; }
 .site-footer p { font-family: var(--mono); font-size: 17px; letter-spacing: .03em; }
 .site-footer .by-wrap { position: relative; display: inline-block; }
