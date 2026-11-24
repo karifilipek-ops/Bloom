@@ -53,65 +53,74 @@
 
   var footer = document.createElement("footer");
   footer.className = "site-footer";
-  footer.innerHTML = '<div class="by-wrap"><div class="peek" aria-hidden="true"></div><i class="peek-shadow" aria-hidden="true"></i><p class="by">By Trainbloom</p></div>';
+  footer.innerHTML = '<div class="by-wrap"><div class="peek-clip" aria-hidden="true"><div class="peek"></div></div><i class="peek-shadow" aria-hidden="true"></i><p class="by">By Trainbloom</p></div>';
   document.body.appendChild(footer);
 
-  // Pixel me in the footer (frames from his turnaround sheet): pops up on the end of "By Trainbloom",
-  // turns to his right, hops down beside the word, turns back round toward the text, and stays there blinking.
+  // Pixel me in the footer: he springs up from behind the end of "By Trainbloom" (like popping out of
+  // a hole), arcs over and lands beside the word, turns to face it, and idles there breathing and blinking.
+  // Animated the 8-bit way: positions move on his own 2px pixel grid and update at 15fps, and the
+  // landing / breathing are separate pose frames rather than any smooth scaling, so he always stays crisp.
   (function () {
-    var peek = footer.querySelector(".peek"), wrap = footer.querySelector(".by-wrap");
-    var shadow = footer.querySelector(".peek-shadow");
+    var clip = footer.querySelector(".peek-clip"), peek = footer.querySelector(".peek");
+    var wrap = footer.querySelector(".by-wrap"), shadow = footer.querySelector(".peek-shadow");
     peek.innerHTML = '<div class="peek-guy"></div>';
     var guy = peek.firstChild;
-    var FRONT = 0, THREE_Q_R = 1, SIDE_R = 2, THREE_Q_L = 3, BLINK_L = 4;
-    var PAD = 50, HALF = 18, DROP = 11;                 // DROP: letter tops -> baseline
-    function frame(n) { guy.style.backgroundPosition = (n * 25) + "% 0"; }
-    // Positions snap to his 2px pixel grid on screen and he's never scaled, so his pixels stay crisp.
+    var STAND = 0, BLINK = 1, BREATHE = 2, CROUCH = 3;
+    var PAD = 50, H = 54, DROP = 11, TICK = 1000 / 15;   // DROP: letter tops -> baseline
+    function frame(n) { guy.style.backgroundPosition = (n * 100 / 3) + "% 0"; }
     var bx = 0, by = 0;
     function snap(v, base) { return Math.round((base + v) / 2) * 2 - base; }
     function pose(x, y) { peek.style.transform = "translate(" + snap(x, bx) + "px," + snap(y, by) + "px)"; }
     function measure() { peek.style.transform = "none"; var r = peek.getBoundingClientRect(); bx = r.left; by = r.top; }
-    function blinkLoop() {
-      frame(BLINK_L);
-      setTimeout(function () { frame(THREE_Q_L); }, 140);
-      setTimeout(blinkLoop, 2500 + Math.random() * 2500);
-    }
-    function settle() { shadow.classList.add("on"); setTimeout(blinkLoop, 900); }
     var textW = function () { return wrap.offsetWidth - PAD; };
-    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      measure(); peek.style.opacity = 1; frame(THREE_Q_L); pose(textW() + 4, DROP); settle(); return;
-    }
 
-    function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+    function idle() {                                    // breathe in/out; now and then a blink
+      var n = 0, nextBlink = 6 + Math.floor(Math.random() * 6);
+      (function step() {
+        n++;
+        if (n === nextBlink) { frame(BLINK); nextBlink = n + 6 + Math.floor(Math.random() * 6); setTimeout(function () { frame(STAND); }, 140); }
+        else frame(n % 2 ? BREATHE : STAND);
+        setTimeout(step, 520);
+      })();
+    }
+    function land(x2, quick) {
+      clip.classList.add("free"); peek.style.opacity = 1; pose(x2, DROP); shadow.classList.add("on");
+      if (quick) { guy.classList.add("flip"); idle(); return; }
+      frame(CROUCH);
+      setTimeout(function () { frame(BREATHE); }, TICK);                      // soak up the landing...
+      setTimeout(function () { frame(STAND); }, TICK * 2);                    // ...and stand
+      setTimeout(function () { guy.classList.add("flip"); }, TICK * 2 + 300); // turn to face the text
+      setTimeout(idle, TICK * 2 + 900);
+    }
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      frame(STAND); measure(); land(textW() + 4, true); return;
+    }
     function run() {
       measure();
-      var W = textW(), x1 = W - HALF - 6, x2 = W + 4;
-      // [until ms, what to do] - each step holds until its time is up
-      var POP = 300, T1 = POP + 380, T2 = T1 + 100, T3 = T2 + 120, T4 = T3 + 420, T5 = T4 + 140, T6 = T5 + 100, T7 = T6 + 110;
-      var start = null;
-      frame(FRONT);
+      var W = textW(), x1 = W - 40, x2 = W + 4;
+      // One gravity arc: starts hidden below the letter tops, peaks above them, lands on the baseline.
+      var T = 720, APEX = 0.632, Y0 = H + 2, TOP = -12;   // TOP chosen so the arc ends exactly on DROP
+      var k = (Y0 - TOP) / (APEX * APEX), start = null, last = -1;
+      frame(STAND); peek.style.opacity = 1;
       (function tick(now) {
         if (start == null) start = now;
-        var t = now - start;
-        if (t < POP) {                                   // pop in with a tiny hop
-          var p = t / POP;
-          peek.style.opacity = clamp(p * 3); pose(x1, -6 * Math.sin(Math.PI * p));
-        } else if (t < T1) { peek.style.opacity = 1; frame(FRONT); pose(x1, 0); }
-        else if (t < T2) { frame(THREE_Q_R); pose(x1, 0); }      // turn to his right...
-        else if (t < T3) { frame(SIDE_R); pose(x1, 0); }
-        else if (t < T4) {                               // ...little jump down beside the word
-          var j = (t - T3) / (T4 - T3);
-          frame(SIDE_R); pose(x1 + (x2 - x1) * j, DROP * j * j - 10 * Math.sin(Math.PI * j));
-        } else if (t < T5) { frame(SIDE_R); pose(x2, DROP); shadow.classList.add("on"); }
-        else if (t < T6) { frame(THREE_Q_R); pose(x2, DROP); }  // turn back round...
-        else if (t < T7) { frame(FRONT); pose(x2, DROP); }
-        else { frame(THREE_Q_L); pose(x2, DROP); settle(); return; }   // ...to face the text
+        var f = Math.floor((now - start) / TICK);              // 15fps steps
+        if (f !== last) {
+          last = f;
+          var p = Math.min(f * TICK / T, 1);
+          if (p >= 1) { land(x2); return; }
+          var y = TOP + k * (p - APEX) * (p - APEX);
+          var x = x1 + (x2 - x1) * Math.max(0, (p - 0.25) / 0.75);   // straight up first, then over
+          if (y <= 0) clip.classList.add("free");                    // clear of the letters
+          pose(x, Math.min(y, Y0));
+        }
         requestAnimationFrame(tick);
       })(performance.now());
     }
+    pose(0, H + 2);
     if ("IntersectionObserver" in window) {
       var io = new IntersectionObserver(function (en) {
-        if (en[0].isIntersecting) { io.disconnect(); setTimeout(run, 400); }
+        if (en[0].isIntersecting) { io.disconnect(); setTimeout(run, 450); }
       });
       io.observe(footer);
     } else setTimeout(run, 1000);

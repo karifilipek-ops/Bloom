@@ -617,14 +617,15 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
    .by-wrap's top), walks to the end of the word, hops down, and ends up standing on the baseline
    (23px down) just after it. Drawn at exactly 2x, the same pixel size as the footer font. */
 .site-footer .by-wrap { padding-right: 50px; }   /* his final spot, so text + him stay centred together */
-.site-footer .peek { position: absolute; left: 0; bottom: calc(100% - 12px); width: 36px; height: 56px; pointer-events: none; opacity: 0; }
-.site-footer .peek-guy {
-  width: 36px; height: 56px;
-  background: url(/assets/img/peek-me.png) 0 0 / 500% 100% no-repeat; image-rendering: pixelated;
-}
+/* .peek-clip's bottom edge is the top of the letters: while it clips, he's hidden behind the word. */
+.site-footer .peek-clip { position: absolute; left: 0; right: -60px; bottom: calc(100% - 12px); height: 140px; overflow: hidden; pointer-events: none; }
+.site-footer .peek-clip.free { overflow: visible; }
+.site-footer .peek { position: absolute; left: 0; bottom: 0; width: 44px; height: 54px; opacity: 0; }
+.site-footer .peek-guy { width: 44px; height: 54px; background: url(/assets/img/peek-me.png) 0 0 / 400% 100% no-repeat; image-rendering: pixelated; }
+.site-footer .peek-guy.flip { transform: scaleX(-1); }
 .site-footer .peek-shadow {
-  position: absolute; right: 16px; bottom: calc(100% - 25px); width: 24px; height: 3px; border-radius: 50%;
-  background: rgba(30,26,40,.16); transform: scaleX(0); transition: transform .25s ease-out;
+  position: absolute; right: 12px; bottom: calc(100% - 25px); width: 24px; height: 3px; border-radius: 50%;
+  background: rgba(30,26,40,.16); transform: scaleX(0); transition: transform .2s ease-out;
 }
 .site-footer .peek-shadow.on { transform: scaleX(1); }
 .site-footer .by { position: relative; z-index: 1; font-family: var(--pixel); font-size: 21px; letter-spacing: .26em; text-transform: uppercase; color: var(--ink-soft); margin: 0 -.26em 0 0; }
