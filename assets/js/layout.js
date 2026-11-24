@@ -102,6 +102,32 @@
 
   // Reveal: wait for the fonts and the images near the top, then fade the page in (see the <head> script).
   if (window.bloomShow) {
+    // Fade the top of the page in piece by piece: hero first, then the title, then the cards one after another.
+    var plainShow = window.bloomShow;
+    window.bloomShow = function () {
+      if (!document.documentElement.classList.contains("loading")) return;
+      var calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var seq = [], vh = window.innerHeight;
+      var add = function (el, d) { if (el && el.getBoundingClientRect().top < vh) seq.push([el, d]); };
+      var hdr = document.querySelector(".site-header");
+      if (hdr) add(hdr, 0);
+      var grid = document.querySelector("main .grid");
+      var d = 0;
+      Array.prototype.forEach.call(document.querySelectorAll("main > *"), function (el, i) {
+        if (el === grid) {
+          Array.prototype.forEach.call(grid.children, function (card, j) { add(card, d + j * 90); });
+        } else add(el, d);
+        d = i === 0 ? 450 : d + 180;   // the hero gets a head start
+      });
+      seq.forEach(function (s) {
+        if (!s[0].animate) return;
+        s[0].animate(
+          calm ? [{ opacity: 0 }, { opacity: 1 }]
+               : [{ opacity: 0, translate: "0 16px" }, { opacity: 1, translate: "0 0" }],
+          { duration: 1000, delay: s[1], easing: "cubic-bezier(.22,1,.36,1)", fill: "backwards" });
+      });
+      plainShow();
+    };
     var waits = [];
     if (document.fonts && document.fonts.load) {
       ['16px "Jersey 10"', "16px VT323", "16px Poppins"].forEach(function (f) { waits.push(document.fonts.load(f).catch(function () {})); });

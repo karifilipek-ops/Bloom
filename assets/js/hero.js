@@ -105,8 +105,8 @@
       cur = next; t = 0; first = false;
     }
   }
-  // Start once the page has faded in, so the count-up is actually seen.
+  // Start once the hero has mostly faded in, so the count-up begins on a settled page.
   if (document.documentElement.classList.contains("loading")) {
-    document.addEventListener("bloom:shown", function () { requestAnimationFrame(tick); }, { once: true });
+    document.addEventListener("bloom:shown", function () { setTimeout(function () { requestAnimationFrame(tick); }, 700); }, { once: true });
   } else requestAnimationFrame(tick);
 })();

@@ -11,7 +11,7 @@
   <link rel="preload" href="/assets/fonts/poppins-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/css/fonts.css">
   <script>/* Hold the page until fonts and icons are ready, then fade it in once (max 1.5s). */
-  (function(h){h.classList.add("loading");window.bloomShow=function(){if(!h.classList.contains("loading"))return;h.classList.remove("loading");document.dispatchEvent(new Event("bloom:shown"))};setTimeout(window.bloomShow,1500)})(document.documentElement);</script>
+  (function(h){h.classList.add("loading");window.bloomShow=function(){if(!h.classList.contains("loading"))return;h.classList.remove("loading");document.dispatchEvent(new Event("bloom:shown"))};setTimeout(function(){window.bloomShow()},1500)})(document.documentElement);</script>
   <link rel="stylesheet" href="/assets/css/site.css">
 </head>
 <body>
