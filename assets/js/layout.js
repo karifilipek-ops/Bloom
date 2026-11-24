@@ -64,4 +64,30 @@
     "<p>&copy; " + year + " Bodymath.io</p>" +
     '<p><a href="mailto:anthony@trainbloom.com">anthony@trainbloom.com</a></p>';
   document.body.appendChild(footer);
+
+  // Calculator headers: ~40 star dots that each drift on their own small loop and twinkle.
+  // A seeded random keeps the layout the same on every visit.
+  var hero = document.querySelector(".hero.sm");
+  if (hero) {
+    var seed = 7;
+    function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+    var stars = document.createElement("div");
+    stars.className = "stars";
+    stars.setAttribute("aria-hidden", "true");
+    for (var k = 0; k < 40; k++) {
+      var st = document.createElement("i");
+      var r = rnd();
+      if (r < 0.18) st.className = "s-lav"; else if (r > 0.9) st.className = "s-big";
+      st.style.left = (rnd() * 98 + 1).toFixed(1) + "%";
+      st.style.top = (rnd() * 72 + 2).toFixed(1) + "%";       // keep clear of the grid floor
+      st.style.setProperty("--t", (5 + rnd() * 6).toFixed(1) + "s");
+      st.style.setProperty("--d", (-rnd() * 10).toFixed(1) + "s");
+      st.style.setProperty("--dx", ((rnd() - 0.5) * 10).toFixed(1) + "px");
+      st.style.setProperty("--dy", (-3 - rnd() * 7).toFixed(1) + "px");
+      st.style.setProperty("--o", (0.35 + rnd() * 0.45).toFixed(2));
+      stars.appendChild(st);
+    }
+    hero.insertBefore(stars, hero.firstChild);
+    hero.classList.add("has-stars");
+  }
 })();
