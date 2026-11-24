@@ -84,7 +84,7 @@
           <div class="stat hl"><div class="k">Weekly loss</div><div class="v" id="r-rate"></div><div class="s">Your target pace</div></div>
         </div>
         <svg class="chart" id="r-chart" viewBox="0 0 600 240" role="img" aria-label="Projected weight over time, fastest and slowest timeline"></svg>
-        <div class="legend" style="margin-top:8px"><span><i style="width:20px;height:2px;border:0;border-radius:0;align-self:center;background:repeating-linear-gradient(90deg,#242424 0 5px,transparent 5px 9px)"></i>Faster end</span><span><i style="width:20px;height:2px;border:0;border-radius:0;align-self:center;background:repeating-linear-gradient(90deg,#6f6496 0 5px,transparent 5px 9px)"></i>Slower end</span><span><i style="background:repeating-linear-gradient(to bottom,rgba(195,143,216,.75) 0 3px,rgba(195,143,216,.3) 3px 6px)"></i>Your window</span></div>
+        <div class="legend" style="margin-top:8px"><span><i style="width:20px;height:1.5px;border:0;border-radius:0;align-self:center;background:repeating-linear-gradient(90deg,#242424 0 5px,transparent 5px 9px)"></i>Faster end</span><span><i style="width:20px;height:1.5px;border:0;border-radius:0;align-self:center;background:repeating-linear-gradient(90deg,#6f6496 0 5px,transparent 5px 9px)"></i>Slower end</span><span><i style="background:repeating-linear-gradient(to bottom,rgba(195,143,216,.75) 0 3px,rgba(195,143,216,.3) 3px 6px)"></i>Your window</span></div>
         <div class="callout" id="r-tip"></div>
         <p class="note">Assumes your lean mass stays the same and all the weight you lose is fat, so treat it as a planning range. Expect water-weight swings week to week.</p>
       </div>
@@ -103,8 +103,8 @@
         var g = document.getElementById("goal"); if (g.value === "15" || g.value === "25") g.value = v === "f" ? 25 : 15;
         // rough visible-abs ranges (vary with genetics, muscle and lighting)
         document.getElementById("abs-hint").textContent = v === "f"
-          ? "Abs usually start showing around 16–20% body fat (sharp definition is closer to 14–16%)."
-          : "Abs usually start showing around 10–12% body fat (a sharp six-pack is closer to 8–10%).";
+          ? "Abs usually start showing around 14–17% body fat (sharp definition is closer to 10–13%)."
+          : "Abs usually start showing around 8–10% body fat (a sharp six-pack is closer to 5–7%).";
       });
       var aggr = B.seg("aggr");
       var form = document.getElementById("form");
@@ -173,8 +173,8 @@
         var tri = x(0) + "," + y(w) + " " + x(fastWk) + "," + y(goalW) + " " + x(weeks) + "," + y(goalW);
         svg += '<polygon fill="url(#dl-grad)" fill-opacity=".3" points="' + tri + '"/>';                   // light tint
         svg += '<polygon fill="url(#dl-grad)" fill-opacity=".6" mask="url(#dl-mask)" points="' + tri + '"/>';   // horizontal stripes
-        svg += '<polyline fill="none" stroke="#6f6496" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 7" points="' + x(0) + "," + y(w) + " " + x(weeks) + "," + y(goalW) + '"/>';   // slow: dashed, lavender
-        svg += '<polyline fill="none" stroke="#242424" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 7" points="' + x(0) + "," + y(w) + " " + x(fastWk) + "," + y(goalW) + '"/>';   // fast: dashed
+        svg += '<polyline fill="none" stroke="#6f6496" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 6" points="' + x(0) + "," + y(w) + " " + x(weeks) + "," + y(goalW) + '"/>';   // slow: dashed, lavender
+        svg += '<polyline fill="none" stroke="#242424" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 6" points="' + x(0) + "," + y(w) + " " + x(fastWk) + "," + y(goalW) + '"/>';   // fast: dashed
         svg += '<circle cx="' + x(0) + '" cy="' + y(w) + '" r="4.5" fill="#242424"/>';
         var ticks = Math.min(6, span);
         for (var t = 0; t <= ticks; t++) {
