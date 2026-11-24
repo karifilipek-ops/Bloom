@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CREATINE CALCULATOR | Bodymath.io</title>
-  <meta name="description" content="Figure out how much creatine to take each day based on your lean body mass and diet, plus an optional loading phase.">
+  <meta name="description" content="Find your daily creatine dose range, sized to your body weight, training, diet and goals (muscle or brain), not a one-size-fits-all 5 g. Plus an optional loading phase.">
   <link rel="canonical" href="https://www.trainbloom.com/creatine-calculator/">
   <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="/assets/img/favicon.png">
@@ -19,44 +19,53 @@
       <img class="px" src="/assets/icons/creatine.png" alt="" height="64">
       <h1>Creatine<br>Calculator</h1>
     </header>
-    <p class="lede">Use the calculator below to figure out how much creatine to take each day for your desired goal</p>
+    <p class="lede">Use the calculator below to find your daily creatine dose. Sized to your body and training, not a one-size-fits-all 5 g.</p>
 
     <form class="calc" id="form" novalidate>
       <h2>Your stats</h2>
       <div class="fields">
-        <div class="field">
+        <div class="field full">
           <span class="label">Units</span>
           <div class="seg" data-name="units" data-remember>
             <button data-value="imperial" aria-pressed="true">lbs</button>
             <button data-value="metric">kg</button>
           </div>
         </div>
-        <div class="field">
-          <span class="label">Gender</span>
-          <div class="seg" data-name="sex">
-            <button data-value="m" aria-pressed="true">Male</button>
-            <button data-value="f">Female</button>
-          </div>
-        </div>
         <div class="field full">
-          <label for="weight">Weight</label>
+          <label for="weight">Body weight</label>
           <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="180"><span class="u" data-wu>lb</span></div>
         </div>
-        <div class="field full">
-          <label for="bf">Body fat percentage: <span id="bf-out">20</span>%</label>
-          <input type="range" id="bf" min="5" max="60" step="1" value="20">
-          <div class="range-ends"><span>5%</span><span>60%</span></div>
-          <details class="bf-guide">
-            <summary>Not sure? Use the body fat guide</summary>
-            <p class="hint">Tap the one that looks most like you. Close enough is fine.</p>
-            <div class="bf-cards" id="bf-cards"></div>
-          </details>
+        <div class="field full has-info">
+          <label for="hours" class="label-row"><span>Weekly workout hours <button class="info" type="button" aria-expanded="false" aria-controls="i-hours" aria-label="What counts as workout hours?">?</button></span><span id="hours-out">1 hr</span></label>
+          <div class="info-pop" id="i-hours" role="note" hidden>Any exercise counts, not just lifting: cardio, sports, classes. Everyday walking doesn&rsquo;t.</div>
+          <div class="gym" aria-hidden="true">
+            <svg class="gym-icon" viewBox="0 0 22 11" shape-rendering="crispEdges"><rect x="0" y="2" width="2" height="7"/><rect x="3" y="0" width="3" height="11"/><rect x="6" y="4" width="10" height="3"/><rect x="16" y="0" width="3" height="11"/><rect x="20" y="2" width="2" height="7"/></svg>
+            <div class="gym-bar"><i class="gym-fill" id="gym-fill"></i></div>
+          </div>
+          <input type="range" id="hours" min="0" max="8" step="0.01" value="1">
+          <div class="range-ends"><span>0</span><span>8+</span></div>
+        </div>
+        <div class="field full has-info">
+          <span class="label">What&rsquo;s it for? <button class="info" type="button" aria-expanded="false" aria-controls="i-goal" aria-label="What's the difference?">?</button></span>
+          <div class="info-pop" id="i-goal" role="note" hidden>Your brain takes up creatine slower than muscle, so brain benefits need a higher dose.</div>
+          <div class="seg" data-name="goal">
+            <button data-value="muscle" aria-pressed="true">Muscle</button>
+            <button data-value="brain">Muscle + brain</button>
+          </div>
+        </div>
+        <div class="field full has-info">
+          <span class="label">Age range <button class="info" type="button" aria-expanded="false" aria-controls="i-age" aria-label="Why does age matter?">?</button></span>
+          <div class="info-pop" id="i-age" role="note" hidden>Creatine helps older adults hold onto muscle, so the low end goes up a little.</div>
+          <div class="seg" data-name="age">
+            <button data-value="0" aria-pressed="true">Under 50</button>
+            <button data-value="1">50+</button>
+          </div>
         </div>
         <div class="field full">
           <span class="label">Do you eat a mostly plant-based diet?</span>
           <div class="seg" data-name="plant">
-            <button data-value="2">Yes</button>
             <button data-value="0" aria-pressed="true">No</button>
+            <button data-value="1">Yes</button>
           </div>
           <div class="hint">Most dietary creatine comes from meat and fish, so plant-based eaters start with lower stores and benefit from a little more.</div>
         </div>
@@ -64,17 +73,27 @@
       <div class="actions"><button class="btn" type="submit">Calculate</button></div>
 
       <div class="results" id="results" hidden aria-live="polite">
-        <div class="big">
-          <div class="k">Recommended daily creatine dose</div>
-          <div class="v"><span id="r-dose"></span> <small>g/day</small></div>
-          <div class="s" id="r-scoop"></div>
+        <h2 class="h-center">Your creatine dose</h2>
+        <div class="big big-opt" style="background:var(--pink)">
+          <div class="k">Daily range</div>
+          <div class="v"><span id="r-range"></span> <small>g/day</small></div>
+          <div class="s" id="r-why"></div>
         </div>
-        <div class="stats">
-          <div class="stat"><div class="k">Lean body mass</div><div class="v" id="r-lbm"></div><div class="s">What your dose is based on</div></div>
-          <div class="stat hl"><div class="k">Fully saturated</div><div class="v">3–4 weeks</div><div class="s">Taken every day, rest days included</div></div>
+        <div class="stats pair">
+          <div class="stat"><div class="k">Sweet spot</div><div class="v"><span id="r-dose"></span><small>g/day</small></div><div class="s" id="r-scoop"></div></div>
+          <div class="stat"><div class="k">Fully saturated</div><div class="v">3&ndash;4<small>weeks</small></div><div class="s">Taken daily, rest days too</div></div>
         </div>
-        <div class="callout"><strong style="font-weight:600">Want it to kick in faster?</strong> You can "load" with <span id="r-load"></span> g a day (split into 4 doses) for 5–7 days, then drop to your daily dose. It's optional: loading just gets you to full saturation in about a week instead of a month.</div>
-        <p class="note">Use creatine monohydrate. Timing doesn't matter much, so take it whenever you'll remember. If you have kidney problems or take medication, check with your doctor first.</p>
+        <div class="callout"><strong>Want it to kick in faster?</strong> Optionally load with <strong id="r-load"></strong> a day, split into 4 doses, for 5&ndash;7 days. Then drop to your daily dose. Loading saturates your muscles in about a week instead of 3&ndash;4.</div>
+        <p class="note">Use creatine monohydrate. Timing doesn&rsquo;t matter much, so take it whenever you&rsquo;ll remember. If you have kidney problems or take medication, check with your doctor first.</p>
+        <details class="method">
+          <summary>How this is calculated</summary>
+          <div class="body">
+            <p><strong>Why not just 5 g?</strong> The classic 3&ndash;5 g a day was set for an average-sized person. Research now doses creatine by body weight, about 0.1 g per kg a day (Antonio et al., 2021), with studies using 0.03&ndash;0.14 g/kg. So bigger and more active people need more.</p>
+            <p><strong>Your range</strong> runs from about 0.07 to 0.1 g per kg of body weight (never under 5 g). More weekly training moves your sweet spot toward the top.</p>
+            <p><strong>Adjustments:</strong> +2 g if you eat mostly plant-based (lower starting stores). If you&rsquo;re 50+, the low end goes up. For brain benefits the range goes up about 3&ndash;5 g: the brain takes up creatine slowly, and studies that raised brain levels used higher doses (Candow et al., 2023). Capped at 20 g a day.</p>
+            <p><strong>Safety:</strong> creatine is one of the most-studied supplements and is well tolerated in healthy people, including long term.</p>
+          </div>
+        </details>
       </div>
     </form>
   </main>
@@ -84,29 +103,61 @@
   <script>
     (function () {
       var B = Bloom;
-      var bodyFat = B.bodyFat();
       var units = B.unitSystem();
-      var sex = B.seg("sex", bodyFat.render);
-      var plant = B.seg("plant");
+      var goal = B.seg("goal"), age = B.seg("age"), plant = B.seg("plant");
       var form = document.getElementById("form");
+
+      // Workout hours slider (0-8+)
+      var hoursEl = document.getElementById("hours"), gymFill = document.getElementById("gym-fill");
+      function hrs() { return Math.round(+hoursEl.value); }   // whole hours for the label and the math
+      function renderHours() {
+        var h = hrs();
+        document.getElementById("hours-out").textContent = h >= 8 ? "8+ hrs" : h + (h === 1 ? " hr" : " hrs");
+        gymFill.style.width = (+hoursEl.value / 8 * 100) + "%";
+      }
+      hoursEl.addEventListener("input", renderHours);
+      hoursEl.addEventListener("keydown", function (e) {
+        var d = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
+        if (!d) return;
+        e.preventDefault();
+        hoursEl.value = Math.max(0, Math.min(8, hrs() + d));
+        renderHours();
+      });
+      hoursEl.addEventListener("change", function () { hoursEl.value = hrs(); gymFill.classList.add("snap"); renderHours(); setTimeout(function () { gymFill.classList.remove("snap"); }, 200); });
+      renderHours();
+
+      // Daily creatine, dosed by body weight (Antonio et al. 2021: ~0.1 g/kg/day; relative doses in
+      // the literature span 0.03-0.14 g/kg/day). Range = 0.07-0.10 g/kg, never under 5 g.
+      // Training volume places the sweet spot inside the range; diet, age and goal shift the range.
+      function dosing(kg, h, brain, older, vegan) {
+        var lo = Math.max(5, 0.07 * kg), hi = Math.max(lo + 2, 0.10 * kg);
+        if (older) lo = Math.max(lo, 0.08 * kg);                      // 50+: hold onto muscle
+        if (vegan) { lo += 2; hi += 2; }                              // lower starting stores
+        if (brain) { lo += 3; hi += 5; }                              // brain uptake is slow; higher intakes
+        hi = Math.min(20, hi); lo = Math.min(lo, hi - 1);
+        lo = Math.round(lo); hi = Math.max(lo + 1, Math.round(hi));
+        var t = 0.25 + 0.75 * Math.min(8, h) / 8;                     // 0 hrs -> lower quarter, 8+ -> top
+        return { lo: lo, hi: hi, dose: Math.round(lo + (hi - lo) * t) };
+      }
 
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         var metric = units() === "metric", w = B.num("weight");
-        if (!B.error(form, !(w > 0) ? "Please enter your weight." : "")) return;
-
-        var lbm = w - w * bodyFat.value() * 0.01;                       // in the units entered
-        // Original thresholds: lbs 100 / 180, kg 45.4 / 81.6
-        var cut = metric ? [45.4, 81.6] : [100, 180];
-        var base = lbm <= cut[0] ? 3 : lbm <= cut[1] ? 5 : 8;
-        var dose = base + parseFloat(plant());
+        if (!B.error(form, !(w > 0) ? "Please enter your body weight." : "")) return;
         var kg = metric ? w : w / B.LB_PER_KG;
+        var d = dosing(kg, hrs(), goal() === "brain", age() === "1", plant() === "1");
 
-        document.getElementById("r-dose").textContent = dose;
-        var tsp = Math.round(dose / 5 * 2) / 2;
-        document.getElementById("r-scoop").textContent = "About " + (tsp < 1 ? "½" : String(tsp).replace(".5", "½")) + " level teaspoon" + (tsp > 1 ? "s" : "") + " of creatine monohydrate";
-        document.getElementById("r-lbm").textContent = B.fmt(lbm) + (metric ? " kg" : " lbs");
-        document.getElementById("r-load").textContent = Math.round(kg * 0.3);
+        document.getElementById("r-range").textContent = d.lo + "–" + d.hi;
+        var bits = ["your body weight", "training"];
+        if (plant() === "1") bits.push("a plant-based diet");
+        if (age() === "1") bits.push("age");
+        if (goal() === "brain") bits.push("brain benefits");
+        document.getElementById("r-why").textContent = "Based on " + bits.slice(0, -1).join(", ") + " and " + bits[bits.length - 1];
+        document.getElementById("r-dose").textContent = d.dose;
+        var scoops = Math.round(d.dose / 5 * 2) / 2;                  // standard scoop ≈ 5 g
+        document.getElementById("r-scoop").textContent = "About " + String(scoops).replace(".5", "½") + " scoop" + (scoops > 1 ? "s" : "") + " (5 g scoop)";
+        var load = Math.min(30, Math.round(kg * 0.3));
+        document.getElementById("r-load").textContent = load + " g";
 
         B.show(document.getElementById("results"));
       });
