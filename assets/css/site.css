@@ -307,6 +307,8 @@ input[type="range"] { width: 100%; accent-color: var(--lav-dark); height: 28px; 
 /* label with its value pushed to the right */
 .field .label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .label-row > span:last-child { color: var(--lav-dark); text-transform: none; font-size: 1.25em; letter-spacing: .08em; }
+.label-row > span { white-space: nowrap; }
+@media (max-width: 560px) { .field .label-row { font-size: 15px; letter-spacing: .14em; } }
 .field.has-info { position: relative; }
 .field.has-info > .info-pop { top: 32px; left: 0; right: 0; }
 /* workout-hours slider: pixel dumbbell + 8-cell bar that fills one cell per hour */
@@ -354,6 +356,7 @@ input[type="range"] { width: 100%; accent-color: var(--lav-dark); height: 28px; 
 .results[hidden] { display: none; }
 .results h2 { margin-top: 26px; }
 .results > h2:first-child { margin-top: 0; }
+.calc h2.h-center { text-align: center; }
 .big { background: var(--paper); border: 2px solid var(--ink); border-radius: var(--r-md); padding: 18px; text-align: center; margin-bottom: 16px; }
 .big .k, .stat .k { font-family: var(--pixel); font-size: 17px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); text-shadow: var(--px-shadow); }
 .big .v { font-family: var(--pixel); font-size: clamp(48px, 11vw, 66px); line-height: 1.05; letter-spacing: .06em; text-shadow: 3px 3px 0 var(--lav-line); }
@@ -580,7 +583,7 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
 /* ---------- Protein gauge ---------- */
-.gauge { position: relative; margin: 70px 6px 44px; }
+.gauge { position: relative; margin: 100px 6px 44px; }   /* room for the shaker pin above the track */
 .gauge-track { display: flex; height: 30px; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; background: var(--paper); }
 .gauge-track span { display: flex; align-items: center; justify-content: center; min-width: 0; overflow: hidden; }
 .gauge-track span + span { border-left: 2px solid var(--ink); }

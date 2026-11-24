@@ -44,14 +44,6 @@
           <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="180"><span class="u" data-wu>lb</span></div>
         </div>
         <div class="field full">
-          <span class="label">Age range</span>
-          <div class="seg" data-name="age">
-            <button data-value="1" aria-pressed="true">Under 35</button>
-            <button data-value="1.15">35–60</button>
-            <button data-value="1.3">61+</button>
-          </div>
-        </div>
-        <div class="field full">
           <label for="bf">Body fat percentage: <span id="bf-out">20</span>%</label>
           <input type="range" id="bf" min="5" max="60" step="1" value="20">
           <div class="range-ends"><span>5%</span><span>60%</span></div>
@@ -62,27 +54,36 @@
           </details>
         </div>
         <div class="field full">
-          <span class="label">How many hours do you work out each week?</span>
-          <div class="seg multi" data-name="hours">
-            <button data-value="1" aria-pressed="true">0–1</button>
-            <button data-value="1.15">1–3</button>
-            <button data-value="1.3">4–6</button>
-            <button data-value="1.4">7+</button>
+          <span class="label">Age range</span>
+          <div class="seg" data-name="age">
+            <button data-value="1" aria-pressed="true">Under 35</button>
+            <button data-value="1.15">35–60</button>
+            <button data-value="1.3">61+</button>
           </div>
         </div>
+        <div class="field full has-info">
+          <label for="hours" class="label-row"><span>Weekly workout hours <button class="info" type="button" aria-expanded="false" aria-controls="i-hours" aria-label="What counts as workout hours?">?</button></span><span id="hours-out">1 hr</span></label>
+          <div class="info-pop" id="i-hours" role="note" hidden>Any exercise counts, not just lifting: cardio, sports, classes. Everyday walking doesn&rsquo;t.</div>
+          <div class="gym" aria-hidden="true">
+            <svg class="gym-icon" viewBox="0 0 22 11" shape-rendering="crispEdges"><rect x="0" y="2" width="2" height="7"/><rect x="3" y="0" width="3" height="11"/><rect x="6" y="4" width="10" height="3"/><rect x="16" y="0" width="3" height="11"/><rect x="20" y="2" width="2" height="7"/></svg>
+            <div class="gym-bar" id="gym-bar"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <input type="range" id="hours" min="0" max="8" step="1" value="1">
+          <div class="range-ends"><span>0</span><span>8+</span></div>
+        </div>
         <div class="field full">
-          <label for="plant">Do you eat a mostly plant-based diet?</label>
-          <select id="plant">
-            <option value="1" selected>No</option>
-            <option value="1.1">Yes</option>
-          </select>
+          <span class="label">Do you eat a mostly plant-based diet?</span>
+          <div class="seg" data-name="plant">
+            <button data-value="1" aria-pressed="true">No</button>
+            <button data-value="1.1">Yes</button>
+          </div>
           <div class="hint">If 90%+ of your food comes from plant-based foods.</div>
         </div>
       </div>
       <div class="actions"><button class="btn" type="submit">Calculate</button></div>
 
       <div class="results" id="results" hidden aria-live="polite">
-        <h2>Protein goals</h2>
+        <h2 class="h-center">Your protein goals</h2>
         <div class="stats">
           <div class="stat"><div class="k">Minimum</div><div class="v"><span id="r-min"></span>g/day</div><div class="s">The minimum to optimize physical progress</div></div>
           <div class="stat"><div class="k">Maximum</div><div class="v"><span id="r-max"></span>g/day</div><div class="s">Past this, little extra benefit</div></div>
@@ -184,7 +185,17 @@
       var units = B.unitSystem();
       var sex = B.seg("sex", bodyFat.render);
       var age = B.seg("age");
-      var hours = B.seg("hours");
+      var plant = B.seg("plant");
+      // Workout hours slider (0-8+), mapped onto the original groups: 0-1, 2-3, 4-6, 7+ hrs.
+      var hoursEl = document.getElementById("hours"), gymCells = document.querySelectorAll("#gym-bar i");
+      function hours() { var h = +hoursEl.value; return h <= 1 ? 1 : h <= 3 ? 1.15 : h <= 6 ? 1.3 : 1.4; }
+      function renderHours() {
+        var h = +hoursEl.value;
+        document.getElementById("hours-out").textContent = h >= 8 ? "8+ hrs" : h + (h === 1 ? " hr" : " hrs");
+        for (var i = 0; i < gymCells.length; i++) gymCells[i].classList.toggle("on", i < h);
+      }
+      hoursEl.addEventListener("input", renderHours);
+      renderHours();
       var form = document.getElementById("form");
 
       // Option values from the original calculator
@@ -196,7 +207,7 @@
         var w = B.num("weight");
         if (!B.error(form, !(w > 0) ? "Please enter your weight." : "")) return;
 
-        var factor = (GENDER[sex()] + parseFloat(age()) + parseFloat(hours()) + parseFloat(document.getElementById("plant").value)) / 4;
+        var factor = (GENDER[sex()] + parseFloat(age()) + hours() + parseFloat(plant())) / 4;
         var lbm = w - w * bodyFat.value() * 0.01;                      // lean body mass, in the units entered
         var min, max, opt;
         if (u === "metric") { min = lbm * 1.76; max = lbm * 2.65; opt = lbm * 2.2 * factor; }   // original kg formulas
@@ -205,7 +216,7 @@
         document.getElementById("r-min").textContent = B.fmt(min);
         document.getElementById("r-max").textContent = B.fmt(max);
         document.getElementById("r-opt").textContent = B.fmt(opt);
-        document.getElementById("r-basis").textContent = "Based on your lean body mass of " + B.fmt(lbm) + (u === "metric" ? " kg." : " lbs.");
+        document.getElementById("r-basis").innerHTML = "<strong>Why lean body mass?</strong> Your protein needs come from your muscle, not your body fat, so using total weight would overshoot for anyone carrying extra fat. These numbers use your lean body mass of " + B.fmt(lbm) + (u === "metric" ? " kg." : " lbs.");
 
         // Gauge: scale runs from 0 to 125% of the maximum
         var end = max * 1.25, pct = function (v) { return Math.max(0, Math.min(100, v / end * 100)); };
