@@ -114,7 +114,7 @@
         <p class="goal-foot">Estimates based on your TDEE.</p>
         <div class="callout callout-tip" id="g-tip" hidden></div>
         <div class="callout" id="g-note" hidden>
-          <strong style="font-weight:600">Important note:</strong> Our calculator offers an estimate based off standard formula, please remember extreme calorie restriction can do much more harm than good. For some smaller, less active individuals the suggested intake may calculate to below 1,200 calories. Intake lower than this likely won't provide essential nutrients your body needs, risk of muscle loss, other health concerns, and is not recommended. Always consult a registered dietitian before making major dietary adjustments.
+          <strong style="font-weight:600">Important note:</strong> My calculator offers an estimate based off standard formula, please remember extreme calorie restriction can do much more harm than good. For some smaller, less active individuals the suggested intake may calculate to below 1,200 calories. Intake lower than this likely won't provide essential nutrients your body needs, risk of muscle loss, other health concerns, and is not recommended. Always consult a registered dietitian before making major dietary adjustments.
         </div>
 
         <h2 style="margin-top:28px">TDEE if&hellip;</h2>
@@ -458,10 +458,10 @@
         // TDEE at five activity levels (steps a day + workout hours a week), same formula as above.
         var LEVELS = [
           ["No activity", 3000, 0, "&asymp;3,000 steps &middot; no workouts"],
-          ["A little activity", 6000, 2, "&asymp;6,000 steps &middot; 2 hrs a week"],
-          ["Some activity", 9000, 4, "&asymp;9,000 steps &middot; 4 hrs a week"],
-          ["A lot of activity", 12000, 6, "&asymp;12,000 steps &middot; 6 hrs a week"],
-          ["A TON of activity", 15000, 8, "15,000+ steps &middot; 8+ hrs a week"]
+          ["A little activity", 6000, 2, "&asymp;6,000 steps &middot; 2 hrs working out a week"],
+          ["Some activity", 9000, 4, "&asymp;9,000 steps &middot; 4 hrs working out a week"],
+          ["A lot of activity", 12000, 6, "&asymp;12,000 steps &middot; 6 hrs working out a week"],
+          ["A TON of activity", 15000, 8, "15,000+ steps &middot; 8+ hrs working out a week"]
         ].map(function (l) { return { name: l[0], sub: l[3], cal: bmr * (1 + 0.0625 * l[2]) + stepCals(l[1], kgs) }; });
         var near = 0;
         LEVELS.forEach(function (l, i) { if (Math.abs(l.cal - tdee) < Math.abs(LEVELS[near].cal - tdee)) near = i; });
