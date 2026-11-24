@@ -2,54 +2,6 @@
 // he eases out to the left while the female figure eases in from the right, and the numbers
 // recount to hers. Then back again, forever.
 // Stats, in order: TDEE, body fat, 1RM squat, VO2 max, protein, potential.
-// Title: "number glitch" reveal. Each letter slot flickers through random digits, then locks into its
-// letter, left to right. Every slot keeps its letter's exact width and start point, and only uses digits
-// that fit inside it, so nothing shifts or spills over. The dot, and any slot too narrow for a digit, stays put.
-(function () {
-  var h1 = document.querySelector(".hero-art h1");
-  if (!h1 || !window.requestAnimationFrame) return;
-  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  var text = h1.textContent;
-  h1.setAttribute("aria-label", text);
-  h1.style.opacity = "0";                                          // hidden until the reveal starts (no flash)
-  setTimeout(function () { h1.style.opacity = ""; }, 2500);        // safety net if anything goes wrong
-  function start() {
-    h1.innerHTML = "";
-    var spans = text.split("").map(function (ch) {
-      var sp = document.createElement("span");
-      sp.className = "gl-ch"; sp.setAttribute("aria-hidden", "true"); sp.textContent = ch;
-      h1.appendChild(sp); return sp;
-    });
-    // measure each digit in the title's font, and each letter slot
-    var probe = document.createElement("span"); probe.className = "gl-ch"; h1.appendChild(probe);
-    var digitW = "0123456789".split("").map(function (d) { probe.textContent = d; return probe.getBoundingClientRect().width; });
-    h1.removeChild(probe);
-    spans.forEach(function (sp, i) {
-      var w = sp.getBoundingClientRect().width;
-      sp.style.width = w + "px";
-      var fits = [];
-      digitW.forEach(function (dw, d) { if (dw <= w + 0.5) fits.push(String(d)); });
-      sp._digits = /[a-z0-9]/i.test(text[i]) && fits.length ? fits : null;   // null (dot, or a slot too narrow for any digit): never scramble
-    });
-    h1.style.opacity = "";
-    var t0 = null, STEP = 70, LEAD = 220, lastSwap = 0;
-    function frame(now) {
-      if (t0 == null) t0 = now;
-      var t = now - t0, done = true, swap = now - lastSwap > 55;
-      if (swap) lastSwap = now;
-      spans.forEach(function (sp, i) {
-        if (!sp._digits || t >= LEAD + i * STEP) { if (sp.textContent !== text[i]) sp.textContent = text[i]; return; }
-        done = false;
-        if (swap) sp.textContent = sp._digits[Math.floor(Math.random() * sp._digits.length)];
-      });
-      if (!done) requestAnimationFrame(frame);
-      else h1.textContent = text;                                  // back to plain text
-    }
-    requestAnimationFrame(frame);
-  }
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(start); else start();
-})();
-
 (function () {
   var svg = document.querySelector(".hero-stage");
   if (!svg || !window.requestAnimationFrame) return;
