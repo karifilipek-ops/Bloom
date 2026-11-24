@@ -56,63 +56,56 @@
   footer.innerHTML = '<div class="by-wrap"><div class="peek" aria-hidden="true"></div><i class="peek-shadow" aria-hidden="true"></i><p class="by">By Trainbloom</p></div>';
   document.body.appendChild(footer);
 
-  // Pixel me in the footer: pops up on the end of "By Trainbloom", hops down beside it,
-  // turns to face the text, and stays there blinking.
+  // Pixel me in the footer (frames from his turnaround sheet): pops up on the end of "By Trainbloom",
+  // turns to his right, hops down beside the word, turns back round toward the text, and stays there blinking.
   (function () {
     var peek = footer.querySelector(".peek"), wrap = footer.querySelector(".by-wrap");
     var shadow = footer.querySelector(".peek-shadow");
     peek.innerHTML = '<div class="peek-guy"></div>';
     var guy = peek.firstChild;
-    var STAND = 0, BLINK = 1, PAD = 50, HALF = 22, DROP = 11;   // DROP: letter tops -> baseline
-    function frame(n) { guy.style.backgroundPosition = (n * 100) + "% 0"; }
-    // Every position is snapped to his 2px pixel grid on the actual screen and nothing is ever scaled
-    // (except a clean mirror), so his pixels never smear or wobble while he moves.
+    var FRONT = 0, THREE_Q_R = 1, SIDE_R = 2, THREE_Q_L = 3, BLINK_L = 4;
+    var PAD = 50, HALF = 18, DROP = 11;                 // DROP: letter tops -> baseline
+    function frame(n) { guy.style.backgroundPosition = (n * 25) + "% 0"; }
+    // Positions snap to his 2px pixel grid on screen and he's never scaled, so his pixels stay crisp.
     var bx = 0, by = 0;
     function snap(v, base) { return Math.round((base + v) / 2) * 2 - base; }
-    function pose(x, y, flip) {
-      peek.style.transform = "translate(" + snap(x, bx) + "px," + snap(y, by) + "px)";
-      guy.style.transform = flip ? "scaleX(-1)" : "none";
-    }
+    function pose(x, y) { peek.style.transform = "translate(" + snap(x, bx) + "px," + snap(y, by) + "px)"; }
+    function measure() { peek.style.transform = "none"; var r = peek.getBoundingClientRect(); bx = r.left; by = r.top; }
     function blinkLoop() {
-      frame(BLINK);
-      setTimeout(function () { frame(STAND); }, 140);
+      frame(BLINK_L);
+      setTimeout(function () { frame(THREE_Q_L); }, 140);
       setTimeout(blinkLoop, 2500 + Math.random() * 2500);
     }
     function settle() { shadow.classList.add("on"); setTimeout(blinkLoop, 900); }
     var textW = function () { return wrap.offsetWidth - PAD; };
-    function measure() {
-      peek.style.transform = "none";
-      var r = peek.getBoundingClientRect(); bx = r.left; by = r.top;
-    }
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      measure(); peek.style.opacity = 1; frame(STAND); pose(textW() + 4, DROP, true); settle(); return;
+      measure(); peek.style.opacity = 1; frame(THREE_Q_L); pose(textW() + 4, DROP); settle(); return;
     }
 
     function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
     function run() {
       measure();
-      var W = textW(), x1 = W - HALF - 6, x2 = W + 4;   // he appears on the last letters
-      var POP = 300, WAIT = 550, JUMP = 420, PAUSE = 450;
-      var tJump = POP + WAIT, tLand = tJump + JUMP, tTurn = tLand + PAUSE;
+      var W = textW(), x1 = W - HALF - 6, x2 = W + 4;
+      // [until ms, what to do] - each step holds until its time is up
+      var POP = 300, T1 = POP + 380, T2 = T1 + 100, T3 = T2 + 120, T4 = T3 + 420, T5 = T4 + 140, T6 = T5 + 100, T7 = T6 + 110;
       var start = null;
-      frame(STAND);
+      frame(FRONT);
       (function tick(now) {
         if (start == null) start = now;
         var t = now - start;
         if (t < POP) {                                   // pop in with a tiny hop
           var p = t / POP;
-          peek.style.opacity = clamp(p * 3);
-          pose(x1, -6 * Math.sin(Math.PI * p), false);
-        } else if (t < tJump) {                          // stands on the letters for a beat
-          peek.style.opacity = 1; pose(x1, 0, false);
-        } else if (t < tLand) {                          // little jump: an arc down to the baseline
-          var j = (t - tJump) / JUMP;
-          pose(x1 + (x2 - x1) * j, DROP * j * j - 10 * Math.sin(Math.PI * j), false);
-        } else if (t < tTurn) {
-          pose(x2, DROP, false); shadow.classList.add("on");
-        } else {                                         // turn to face the text, and stay
-          pose(x2, DROP, true); settle(); return;
-        }
+          peek.style.opacity = clamp(p * 3); pose(x1, -6 * Math.sin(Math.PI * p));
+        } else if (t < T1) { peek.style.opacity = 1; frame(FRONT); pose(x1, 0); }
+        else if (t < T2) { frame(THREE_Q_R); pose(x1, 0); }      // turn to his right...
+        else if (t < T3) { frame(SIDE_R); pose(x1, 0); }
+        else if (t < T4) {                               // ...little jump down beside the word
+          var j = (t - T3) / (T4 - T3);
+          frame(SIDE_R); pose(x1 + (x2 - x1) * j, DROP * j * j - 10 * Math.sin(Math.PI * j));
+        } else if (t < T5) { frame(SIDE_R); pose(x2, DROP); shadow.classList.add("on"); }
+        else if (t < T6) { frame(THREE_Q_R); pose(x2, DROP); }  // turn back round...
+        else if (t < T7) { frame(FRONT); pose(x2, DROP); }
+        else { frame(THREE_Q_L); pose(x2, DROP); settle(); return; }   // ...to face the text
         requestAnimationFrame(tick);
       })(performance.now());
     }
