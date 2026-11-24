@@ -166,7 +166,7 @@
         var fastWk = (w - goalW) / fastRate;
         // the window: from the start, between the fast and slow paths, down to the goal
         var tri = x(0) + "," + y(w) + " " + x(fastWk) + "," + y(goalW) + " " + x(weeks) + "," + y(goalW);
-        svg += '<polygon fill="url(#dl-grad)" fill-opacity=".28" points="' + tri + '"/>';                  // light tint
+        svg += '<polygon fill="url(#dl-grad)" fill-opacity=".55" points="' + tri + '"/>';                  // light tint
         svg += '<polygon fill="url(#dl-grad)" mask="url(#dl-mask)" points="' + tri + '"/>';                // bold stripes
         svg += '<polyline fill="none" stroke="#6f6496" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 7" points="' + x(0) + "," + y(w) + " " + x(weeks) + "," + y(goalW) + '"/>';   // slow: dotted
         svg += '<polyline fill="none" stroke="#242424" stroke-width="3" stroke-dasharray="9 6" points="' + x(0) + "," + y(w) + " " + x(fastWk) + "," + y(goalW) + '"/>';   // fast: dashed
