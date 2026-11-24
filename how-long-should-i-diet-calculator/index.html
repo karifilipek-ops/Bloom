@@ -101,10 +101,10 @@
       var sex = B.seg("sex", function (v) {
         bodyFat.render(v);
         var g = document.getElementById("goal"); if (g.value === "15" || g.value === "25") g.value = v === "f" ? 25 : 15;
-        // rough visible-abs ranges (vary with genetics, muscle and lighting)
+        // when abs start showing (Legion Athletics figures; varies with genetics, muscle and lighting)
         document.getElementById("abs-hint").textContent = v === "f"
-          ? "Abs usually start showing around 14–17% body fat (sharp definition is closer to 10–13%)."
-          : "Abs usually start showing around 8–10% body fat (a sharp six-pack is closer to 5–7%).";
+          ? "Abs usually start showing around 20% body fat."
+          : "Abs usually start showing around 15% body fat, with a full six-pack coming together closer to 10%.";
       });
       var aggr = B.seg("aggr");
       var form = document.getElementById("form");
