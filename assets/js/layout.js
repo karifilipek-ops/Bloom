@@ -59,7 +59,7 @@
   // Pixel me: every so often he pops up from behind "By Trainbloom", looks around, and ducks back down.
   (function () {
     var peek = footer.querySelector(".peek"), wrap = footer.querySelector(".by-wrap");
-    peek.innerHTML = '<img class="peek-guy" src="/assets/img/peek-me.png" alt="" width="53" height="47">';
+    peek.innerHTML = '<div class="peek-guy"></div>';   // sprite sheet: normal, looking left, blinking
     var guy = peek.firstChild;
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { peek.classList.add("up"); return; }
 
@@ -70,6 +70,12 @@
       var room = wrap.offsetWidth - peek.offsetWidth;          // somewhere along the text, new spot each time
       peek.style.left = Math.round(Math.random() * Math.max(room, 0)) + "px";
       peek.classList.add("up");
+      var face = function (n) { guy.style.backgroundPosition = (n * 50) + "% 0"; };
+      face(0);
+      setTimeout(function () { face(1); }, 650);                 // glance to the side...
+      setTimeout(function () { face(0); }, 1250);                // ...back at you
+      setTimeout(function () { face(2); }, 1700);                // blink
+      setTimeout(function () { face(0); }, 1840);
       later(function () { peek.classList.remove("up");
         later(pop, 4500 + Math.random() * 4000); }, 2300);
     }
