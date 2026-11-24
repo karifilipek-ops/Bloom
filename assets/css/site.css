@@ -197,10 +197,6 @@ a { color: inherit; }
 
 .lede { text-align: center; font-family: var(--mono); font-size: 23px; line-height: 1.2; letter-spacing: .02em; margin: 0 auto 6px; max-width: 640px; }
 .lede-sub { text-align: center; color: var(--muted); font-family: var(--mono); font-size: 20px; line-height: 1.15; margin: 0 auto 26px; }
-/* 1RM page: faint pixel bench / squat / deadlift icons under the intro */
-.lift-icons { display: flex; justify-content: center; align-items: flex-end; gap: 34px; margin: -8px 0 22px; opacity: .3; }
-.lift-icons img { height: 34px; width: auto; }
-@media (max-width: 560px) { .lift-icons { gap: 26px; } .lift-icons img { height: 28px; } }
 .lede + .calc { margin-top: 22px; }
 
 /* ---------- Section heading (hoo.be style) ---------- */
@@ -333,6 +329,21 @@ input[type="range"] { width: 100%; accent-color: var(--lav-dark); height: 28px; 
 }
 .gym-fill.snap { transition: width .18s ease-out; }
 @media (max-width: 560px) { .gym { height: 48px; gap: 14px; padding: 0 12px; } .gym-icon { width: 44px; height: 22px; } .gym-bar { height: 16px; } }
+/* 1RM: loaded barbell under the weight input */
+.bb { margin: 10px 0 4px; padding: 10px 12px; background: var(--paper); border: 2px solid var(--ink); border-radius: var(--r-sm); }
+.bb svg { display: block; width: 100%; height: 60px; }
+@media (max-width: 560px) { .bb svg { height: 48px; } }
+/* "next up" card linking to another calculator */
+.next-card {
+  display: block; margin-top: 26px; padding: 18px; text-decoration: none; color: inherit; text-align: center;
+  background: var(--lav-soft); border: 2px solid var(--ink); border-radius: var(--r-md); box-shadow: 4px 4px 0 var(--lav);
+  transition: transform .1s, box-shadow .1s;
+}
+.next-card:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--lav); }
+.next-k { font-family: var(--mono); font-size: 17px; color: var(--lav-dark); letter-spacing: .04em; }
+.next-h { font-family: var(--pixel); font-size: 24px; letter-spacing: .14em; text-transform: uppercase; text-shadow: var(--px-shadow); margin: 2px 0 6px; }
+.next-card p { font-family: var(--mono); font-size: 19px; line-height: 1.2; color: var(--ink-soft); margin: 0 auto 14px; max-width: 460px; }
+.next-btn { font-size: 17px; padding: 8px 18px; letter-spacing: .14em; }
 /* step slider: pixel sneakers + footprint trail */
 #steps-out { color: var(--lav-dark); }
 .trail {

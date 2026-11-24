@@ -22,11 +22,6 @@
     <p class="lede">Use the calculator below to estimate your one-rep max.</p>
     <p class="lede-sub">(Probably more than you think and slightly less than you’ve been telling people...)</p>
 
-    <div class="lift-icons" aria-hidden="true">
-      <img class="px" src="/assets/icons/lift-bench.png" alt="">
-      <img class="px" src="/assets/icons/lift-squat.png" alt="">
-      <img class="px" src="/assets/icons/lift-deadlift.png" alt="">
-    </div>
     <form class="calc" id="form" novalidate>
       <h2>Your best set</h2>
       <div class="fields">
@@ -39,6 +34,8 @@
         <div class="field full">
           <label for="weight">Weight lifted</label>
           <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="225"><span class="u" data-wu>lb</span></div>
+          <div class="bb" aria-hidden="true"><svg id="bb-svg" viewBox="-130 0 260 60" shape-rendering="crispEdges" preserveAspectRatio="xMidYMid meet"></svg></div>
+          <p class="hint" id="bb-txt">Enter a weight to load the bar.</p>
         </div>
         <div class="field full">
           <label for="reps">Reps: <span id="reps-out">1</span></label>
@@ -60,6 +57,12 @@
             <tbody id="r-table"></tbody>
           </table>
         </div>
+        <a class="next-card" href="/strength-standards-calculator/">
+          <div class="next-k">Next up</div>
+          <div class="next-h">See how you stack up</div>
+          <p>Compare your lifts to strength standards for your bodyweight, age and sex with my Strength Standards calculator.</p>
+          <span class="btn next-btn">Check my strength level &#9656;</span>
+        </a>
       </div>
     </form>
   </main>
@@ -69,7 +72,41 @@
   <script>
     (function () {
       var B = Bloom;
-      var units = B.unitSystem();
+      var units = B.unitSystem(function () { if (window.renderBar) renderBar(); });
+
+      // Loaded barbell: as the weight changes, draw the bar with the plates that make it up.
+      // Plates per side: [weight, width, height, fill] on a 60-unit-tall canvas.
+      var PLATES = {
+        imperial: { bar: 45, unit: "lb", p: [[45, 9, 54, "#242424"], [35, 8, 46, "#6f6496"], [25, 7, 38, "#9d91be"], [10, 5, 28, "#c9c3e6"], [5, 4, 20, "#e9e6f3"], [2.5, 3, 16, "#fff"]] },
+        metric: { bar: 20, unit: "kg", p: [[25, 9, 54, "#242424"], [20, 9, 50, "#3a3552"], [15, 8, 44, "#6f6496"], [10, 6, 34, "#9d91be"], [5, 5, 24, "#c9c3e6"], [2.5, 4, 18, "#e9e6f3"], [1.25, 3, 14, "#fff"]] }
+      };
+      var bbSvg = document.getElementById("bb-svg"), bbTxt = document.getElementById("bb-txt");
+      window.renderBar = function () {
+        var set = PLATES[units()], w = B.num("weight");
+        var side = [], left = (w - set.bar) / 2;
+        if (w >= set.bar) set.p.forEach(function (pl) { while (left >= pl[0] - 1e-9 && side.length < 14) { side.push(pl); left -= pl[0]; } });
+        var GRIP = 38, COL = 5, GAP = 3, plateW = side.reduce(function (t, pl) { return t + pl[1] + GAP; }, 0);
+        var half = Math.max(130, GRIP + COL + plateW + 16);
+        var r = function (x, y, w2, h, fill, stroke) { return '<rect x="' + x + '" y="' + y + '" width="' + w2 + '" height="' + h + '" fill="' + fill + '"' + (stroke ? ' stroke="#242424" stroke-width="1"' : "") + "/>"; };
+        var out = r(-half + 4, 27, 2 * half - 8, 6, "#8a87a0") + r(-GRIP, 28, 2 * GRIP, 4, "#45415c");   // sleeves + knurled grip
+        [-1, 1].forEach(function (d) {
+          out += r(d < 0 ? -GRIP - COL : GRIP, 22, COL, 16, "#242424");                               // collars
+          var x = GRIP + COL + 1;
+          side.forEach(function (pl) {
+            out += r(d < 0 ? -x - pl[1] : x, 30 - pl[2] / 2, pl[1], pl[2], pl[3], true);
+            x += pl[1] + GAP;
+          });
+        });
+        bbSvg.setAttribute("viewBox", -half + " 0 " + 2 * half + " 60");
+        bbSvg.innerHTML = out;
+        var u = " " + set.unit;
+        if (!(w > 0)) bbTxt.textContent = "Enter a weight to load the bar.";
+        else if (w < set.bar) bbTxt.textContent = "Lighter than an empty " + set.bar + u + " bar.";
+        else if (!side.length) bbTxt.textContent = "Just the " + set.bar + u + " bar.";
+        else bbTxt.textContent = set.bar + u + " bar + each side: " + side.map(function (pl) { return pl[0]; }).join(", ") + (left > 0.01 ? " (closest you can load)" : "");
+      };
+      document.getElementById("weight").addEventListener("input", renderBar);
+      renderBar();
       var form = document.getElementById("form");
       var reps = document.getElementById("reps"), repsOut = document.getElementById("reps-out");
       reps.addEventListener("input", function () { repsOut.textContent = reps.value; });
