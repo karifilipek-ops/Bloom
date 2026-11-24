@@ -62,7 +62,7 @@
     var peek = footer.querySelector(".peek"), wrap = footer.querySelector(".by-wrap");
     peek.innerHTML = '<div class="peek-guy"></div>';
     var guy = peek.querySelector(".peek-guy");
-    function face(n) { guy.style.backgroundPosition = (n * 50) + "% 0"; }   // 0 normal, 1 glancing, 2 blink
+    function face(n) { guy.style.backgroundPosition = (n * 100) + "% 0"; }   // 0 normal, 1 blink
     function state(s) { peek.className = "peek" + (s ? " " + s : ""); }
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { state("up"); return; }
 
@@ -75,10 +75,8 @@
       peek.style.left = Math.round(Math.random() * Math.max(room, 0)) + "px";
       face(0);
       at(0, function () { state("sneak"); });                      // eyes creep up over the letters
-      at(1150, function () { face(1); });                         // glance
-      at(1600, function () { face(0); });
       at(1850, function () { state("up"); });                     // boing
-      at(2650, function () { face(2); });                         // blink
+      at(2650, function () { face(1); });                         // blink
       at(2790, function () { face(0); });
       at(3300, function () { state(""); });                       // duck
       at(3300 + 4000 + Math.random() * 4000, pop);

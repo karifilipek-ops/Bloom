@@ -615,7 +615,7 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
    the box is clipped at that line, so from the waist down he's hidden behind the text. */
 .site-footer .peek { position: absolute; left: 0; bottom: calc(100% - 12px); width: 30px; height: 42px; overflow: hidden; pointer-events: none; }
 .site-footer .peek-guy {
-  width: 30px; height: 54px; background: url(/assets/img/peek-me.png) 0 0 / 300% 100% no-repeat; image-rendering: pixelated;
+  width: 30px; height: 54px; background: url(/assets/img/peek-me.png) 0 0 / 200% 100% no-repeat; image-rendering: pixelated;
   transform: translateY(60px); transition: transform .22s cubic-bezier(.5,0,.75,0);
 }
 .site-footer .peek.sneak .peek-guy { transform: translateY(20px); transition: transform .7s ease-out; }   /* just hair and eyes */
