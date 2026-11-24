@@ -177,11 +177,12 @@ a { color: inherit; }
   position: absolute; width: 2px; height: 2px;
   animation: star-drift var(--t) ease-in-out var(--d) infinite;
 }
-.hero .stars i::after {                /* ...and its dot sparkles: grows, glows and fades on a faster beat */
+.hero .stars i::after {                /* ...and a few of them sparkle: grow, glow and fade, slowly */
   content: ""; position: absolute; inset: 0; background: #fff; border-radius: 50%;
   box-shadow: 0 0 4px 1px rgba(255, 255, 255, .55);
-  animation: star-sparkle var(--s) ease-in-out var(--d) infinite;
+  opacity: var(--o);
 }
+.hero .stars i.spark::after { animation: star-sparkle var(--s) ease-in-out var(--d) infinite; }   /* only ~10 stars sparkle */
 .hero .stars i.s-lav::after { background: #cfc8ff; box-shadow: 0 0 4px 1px rgba(207, 200, 255, .6); }
 .hero .stars i.s-big { width: 3px; height: 3px; }
 @keyframes star-drift {
