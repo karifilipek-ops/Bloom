@@ -2,41 +2,50 @@
 // he eases out to the left while the female figure eases in from the right, and the numbers
 // recount to hers. Then back again, forever.
 // Stats, in order: TDEE, body fat, 1RM squat, VO2 max, protein, potential.
-// Title: "number glitch" reveal. Each letter starts as a flickering random digit and locks into place
-// left to right. Letters keep their final width while scrambling so the title doesn't jump around.
+// Title: glitch/code-in reveal. The real letters stay in place the whole time; each one flickers on
+// in turn (left to right) with a split-colour glow and a tiny jitter, then settles solid.
 (function () {
   var h1 = document.querySelector(".hero-art h1");
   if (!h1 || !window.requestAnimationFrame) return;
   if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   var text = h1.textContent;
   h1.setAttribute("aria-label", text);
-  h1.style.opacity = "0";                                          // hidden until the scramble starts (no flash)
+  h1.style.opacity = "0";                                          // hidden until the reveal starts (no flash)
   setTimeout(function () { h1.style.opacity = ""; }, 2500);        // safety net if anything goes wrong
   function start() {
     h1.innerHTML = "";
     var spans = text.split("").map(function (ch) {
       var sp = document.createElement("span");
-      sp.className = "gl-ch"; sp.setAttribute("aria-hidden", "true"); sp.textContent = ch;
+      sp.className = "gl-ch"; sp.setAttribute("aria-hidden", "true"); sp.textContent = ch; sp.style.opacity = "0";
       h1.appendChild(sp); return sp;
     });
-    spans.forEach(function (sp) { sp.style.width = sp.getBoundingClientRect().width + "px"; });   // lock each width
     h1.classList.add("glitching");
     h1.style.opacity = "";
-    var t0 = null, STEP = 70, LEAD = 220, lastSwap = 0;
+    var t0 = null, LEAD = 150, STEP = 75, GLITCH = 280, lastTick = 0;
     function frame(now) {
       if (t0 == null) t0 = now;
-      var t = now - t0, done = true, swap = now - lastSwap > 55;
-      if (swap) lastSwap = now;
+      var t = now - t0, done = true, tick = now - lastTick > 45;   // re-roll the flicker ~22x a second
+      if (tick) lastTick = now;
       spans.forEach(function (sp, i) {
-        if (t >= LEAD + i * STEP) { sp.textContent = text[i]; sp.classList.remove("gl-on"); }
-        else { done = false; if (swap) { sp.textContent = String(Math.floor(Math.random() * 10)); sp.classList.add("gl-on"); } }
+        var r = t - (LEAD + i * STEP);
+        if (r < 0) { done = false; return; }                       // not started yet: stays invisible
+        if (r < GLITCH) {                                          // flickering in
+          done = false;
+          if (tick) {
+            var on = Math.random() < 0.3 + 0.7 * r / GLITCH;       // more often visible as it settles
+            sp.style.opacity = on ? (0.55 + Math.random() * 0.45).toFixed(2) : "0.15";
+            sp.style.transform = "translateX(" + ((Math.random() - 0.5) * 3).toFixed(1) + "px)";
+            sp.classList.add("gl-on");
+          }
+        } else if (sp.classList.contains("gl-on") || sp.style.opacity !== "1") {   // settled
+          sp.style.opacity = "1"; sp.style.transform = ""; sp.classList.remove("gl-on");
+        }
       });
       if (!done) requestAnimationFrame(frame);
-      else { h1.classList.remove("glitching"); setTimeout(function () { h1.textContent = text; }, 150); }   // back to plain text
+      else { h1.classList.remove("glitching"); h1.textContent = text; }   // back to plain text
     }
     requestAnimationFrame(frame);
   }
-  // wait for the pixel font so the locked widths are right
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(start); else start();
 })();
 
