@@ -57,9 +57,9 @@
           <div class="info-pop" id="i-hours" role="note" hidden>Any exercise counts, not just lifting: cardio, sports, classes. Walking goes in steps.</div>
           <div class="gym" aria-hidden="true">
             <svg class="gym-icon" viewBox="0 0 22 11" shape-rendering="crispEdges"><rect x="0" y="2" width="2" height="7"/><rect x="3" y="0" width="3" height="11"/><rect x="6" y="4" width="10" height="3"/><rect x="16" y="0" width="3" height="11"/><rect x="20" y="2" width="2" height="7"/></svg>
-            <div class="gym-bar" id="gym-bar"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="gym-bar"><i class="gym-fill" id="gym-fill"></i></div>
           </div>
-          <input type="range" id="hours" min="0" max="8" step="1" value="1">
+          <input type="range" id="hours" min="0" max="8" step="0.01" value="1">
           <div class="range-ends"><span>0</span><span>8+</span></div>
         </div>
         <div class="field full">
@@ -185,14 +185,25 @@
       var sex = B.seg("sex", bodyFat.render);
       // Workout hours slider (0-8+). Activity multiplier rises 0.0625 per weekly hour:
       // 1.0 at 0 hrs up to 1.5 at 8+, matching the original buckets at 0, 2, 4 and 8 hours.
-      var hoursEl = document.getElementById("hours"), gymCells = document.querySelectorAll("#gym-bar i");
-      function hours() { return 1 + 0.0625 * +hoursEl.value; }
+      var hoursEl = document.getElementById("hours"), gymFill = document.getElementById("gym-fill");
+      function hrs() { return Math.round(+hoursEl.value); }   // whole hours for the label and the math
+      function hours() { return 1 + 0.0625 * hrs(); }
       function renderHours() {
-        var h = +hoursEl.value;
+        var h = hrs();
         document.getElementById("hours-out").textContent = h >= 8 ? "8+ hrs" : h + (h === 1 ? " hr" : " hrs");
-        for (var i = 0; i < gymCells.length; i++) gymCells[i].classList.toggle("on", i < h);
+        gymFill.style.width = (+hoursEl.value / 8 * 100) + "%";               // fill follows the thumb smoothly
       }
       hoursEl.addEventListener("input", renderHours);
+      // arrow keys still move a whole hour at a time
+      hoursEl.addEventListener("keydown", function (e) {
+        var d = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
+        if (!d) return;
+        e.preventDefault();
+        hoursEl.value = Math.max(0, Math.min(8, hrs() + d));
+        renderHours();
+      });
+      // let go of the slider: settle on the nearest whole hour
+      hoursEl.addEventListener("change", function () { hoursEl.value = hrs(); gymFill.classList.add("snap"); renderHours(); setTimeout(function () { gymFill.classList.remove("snap"); }, 200); });
       renderHours();
       var stepsEl = document.getElementById("steps");
       // Calories from walking scale with body weight: ~0.0005 cal per kg per step

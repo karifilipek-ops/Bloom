@@ -317,16 +317,17 @@ input[type="range"] { width: 100%; accent-color: var(--lav-dark); height: 28px; 
   background: var(--paper); border: 2px solid var(--ink); border-radius: var(--r-sm);
 }
 .gym-icon { flex: none; width: 66px; height: 33px; fill: var(--ink); }
-/* the bar is a wedge: a thin point on the left (0 hrs) growing to full height on the right (8+).
-   The 8 cells are still there for the fill; the wedge shape is cut with clip-path. */
+/* the bar is a wedge: a thin point on the left (0 hrs) growing to full height on the right (8+),
+   cut with clip-path; .gym-fill inside it is the filled part. */
 .gym-bar {
   flex: 1; display: flex; height: 22px; background: #e4e1ec;
   clip-path: polygon(0 100%, 100% 0, 100% 100%);
 }
-.gym-bar i { flex: 1; transition: background .2s; }
-.gym-bar i.on {   /* lavender with fine scanlines */
+.gym-fill {       /* grows smoothly with the slider; lavender with fine scanlines */
+  display: block; height: 100%; width: 0;
   background: repeating-linear-gradient(to bottom, var(--lav) 0 2px, #8f83b3 2px 3px);
 }
+.gym-fill.snap { transition: width .18s ease-out; }
 @media (max-width: 560px) { .gym { height: 48px; gap: 14px; padding: 0 12px; } .gym-icon { width: 44px; height: 22px; } .gym-bar { height: 16px; } }
 /* step slider: pixel sneakers + footprint trail */
 #steps-out { color: var(--lav-dark); }
