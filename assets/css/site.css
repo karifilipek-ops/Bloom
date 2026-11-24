@@ -611,9 +611,10 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .site-footer p { margin: 2px 0; }
 .site-footer p { font-family: var(--mono); font-size: 17px; letter-spacing: .03em; }
 .site-footer .by-wrap { position: relative; display: inline-block; }
-.site-footer .peek { position: absolute; left: 0; bottom: calc(100% - 8px); width: 46px; height: 50px; overflow: hidden; pointer-events: none; }
-.site-footer .peek-guy { display: block; width: 46px; height: auto; transform: translateY(105%); transition: transform .28s cubic-bezier(.5,0,.75,0); }
+.site-footer .peek { position: absolute; left: 0; bottom: calc(100% - 7px); width: 72px; height: 45px; overflow: hidden; pointer-events: none; }
+.site-footer .peek-guy { display: block; width: 100%; height: 100%; transform: translateY(105%); transition: transform .28s cubic-bezier(.5,0,.75,0); }
 .site-footer .peek.up .peek-guy { transform: translateY(0); transition: transform .42s cubic-bezier(.34,1.45,.6,1); }   /* little springy pop */
+.site-footer .peek-guy.blink .eye-top { fill: #f2bb8c; }
 .site-footer .by { position: relative; z-index: 1; font-family: var(--pixel); font-size: 21px; letter-spacing: .26em; text-transform: uppercase; color: var(--ink-soft); margin: 0 -.26em 0 0; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
