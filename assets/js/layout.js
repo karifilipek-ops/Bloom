@@ -56,15 +56,15 @@
   footer.innerHTML = '<div class="by-wrap"><div class="peek" aria-hidden="true"></div><p class="by">By Trainbloom</p></div>';
   document.body.appendChild(footer);
 
-  // Pixel me peeking over "By Trainbloom": his hands grab the top of the letters, he sneaks his eyes up,
-  // then pops up with a bounce, glances around, blinks, and ducks back down. Then again somewhere else.
+  // Pixel me behind "By Trainbloom": he sneaks his eyes up over the letters, then pops up to the waist
+  // with a bounce, glances around, blinks, and ducks back down. Then again somewhere else.
   (function () {
     var peek = footer.querySelector(".peek"), wrap = footer.querySelector(".by-wrap");
-    peek.innerHTML = '<div class="peek-head"><div class="peek-guy"></div></div><i class="peek-hand l"></i><i class="peek-hand r"></i>';
+    peek.innerHTML = '<div class="peek-guy"></div>';
     var guy = peek.querySelector(".peek-guy");
     function face(n) { guy.style.backgroundPosition = (n * 50) + "% 0"; }   // 0 normal, 1 glancing, 2 blink
     function state(s) { peek.className = "peek" + (s ? " " + s : ""); }
-    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { state("hands up"); return; }
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { state("up"); return; }
 
     var timers = [], visible = false;
     function at(ms, fn) { timers.push(setTimeout(fn, ms)); }
@@ -74,16 +74,14 @@
       var room = wrap.offsetWidth - peek.offsetWidth;            // a new spot along the text each time
       peek.style.left = Math.round(Math.random() * Math.max(room, 0)) + "px";
       face(0);
-      at(0, function () { state("hands"); });                     // hands slap onto the ledge
-      at(350, function () { state("hands sneak"); });             // eyes creep up over the letters
+      at(0, function () { state("sneak"); });                      // eyes creep up over the letters
       at(1150, function () { face(1); });                         // glance
       at(1600, function () { face(0); });
-      at(1850, function () { state("hands up"); });               // boing
+      at(1850, function () { state("up"); });                     // boing
       at(2650, function () { face(2); });                         // blink
       at(2790, function () { face(0); });
-      at(3300, function () { state("hands"); });                  // duck
-      at(3600, function () { state(""); });                       // let go
-      at(3600 + 4000 + Math.random() * 4000, pop);
+      at(3300, function () { state(""); });                       // duck
+      at(3300 + 4000 + Math.random() * 4000, pop);
     }
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function (en) {
