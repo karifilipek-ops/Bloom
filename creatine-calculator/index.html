@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CREATINE CALCULATOR | Bodymath.io</title>
-  <meta name="description" content="Find your daily creatine dose range, sized to your body weight, training, diet and goals (muscle or brain), not a one-size-fits-all 5 g. Plus an optional loading phase.">
+  <meta name="description" content="Find your daily creatine dose range, sized to your lean body mass, training, diet and goals (muscle or brain), not a one-size-fits-all 5 g. Plus an optional loading phase.">
   <link rel="canonical" href="https://www.trainbloom.com/creatine-calculator/">
   <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="/assets/img/favicon.png">
@@ -24,16 +24,33 @@
     <form class="calc" id="form" novalidate>
       <h2>Your stats</h2>
       <div class="fields">
-        <div class="field full">
-          <span class="label">Units</span>
+        <div class="field">
+          <span class="label">Imperial / Metric</span>
           <div class="seg" data-name="units" data-remember>
             <button data-value="imperial" aria-pressed="true">lbs</button>
             <button data-value="metric">kg</button>
           </div>
         </div>
+        <div class="field">
+          <span class="label">Gender</span>
+          <div class="seg" data-name="sex">
+            <button data-value="m" aria-pressed="true">Male</button>
+            <button data-value="f">Female</button>
+          </div>
+        </div>
         <div class="field full">
-          <label for="weight">Body weight</label>
+          <label for="weight">Weight</label>
           <div class="unit-wrap"><input type="number" id="weight" inputmode="decimal" min="0" placeholder="180"><span class="u" data-wu>lb</span></div>
+        </div>
+        <div class="field full">
+          <label for="bf">Body fat percentage: <span id="bf-out">20</span>%</label>
+          <input type="range" id="bf" min="5" max="60" step="1" value="20">
+          <div class="range-ends"><span>5%</span><span>60%</span></div>
+          <details class="bf-guide">
+            <summary>Not sure? Use the body fat guide</summary>
+            <p class="hint">Tap the one that looks most like you. Close enough is fine.</p>
+            <div class="bf-cards" id="bf-cards"></div>
+          </details>
         </div>
         <div class="field full has-info">
           <label for="hours" class="label-row"><span>Weekly workout hours <button class="info" type="button" aria-expanded="false" aria-controls="i-hours" aria-label="What counts as workout hours?">?</button></span><span id="hours-out">1 hr</span></label>
@@ -84,12 +101,13 @@
           <div class="stat"><div class="k">Fully saturated</div><div class="v">3&ndash;4<small>weeks</small></div><div class="s">Taken daily, rest days too</div></div>
         </div>
         <div class="callout"><strong>Want it to kick in faster?</strong> Optionally load with <strong id="r-load"></strong> a day, split into 4 doses, for 5&ndash;7 days. Then drop to your daily dose. Loading saturates your muscles in about a week instead of 3&ndash;4.</div>
+        <p class="note" id="r-basis"></p>
         <p class="note">Use creatine monohydrate. Timing doesn&rsquo;t matter much, so take it whenever you&rsquo;ll remember. If you have kidney problems or take medication, check with your doctor first.</p>
         <details class="method">
           <summary>How this is calculated</summary>
           <div class="body">
             <p><strong>Why not just 5 g?</strong> The classic 3&ndash;5 g a day was set for an average-sized person. Research now doses creatine by body weight, about 0.1 g per kg a day (Antonio et al., 2021), with studies using 0.03&ndash;0.14 g/kg. So bigger and more active people need more.</p>
-            <p><strong>Your range</strong> runs from about 0.07 to 0.1 g per kg of body weight (never under 5 g). More weekly training moves your sweet spot toward the top.</p>
+            <p><strong>Your range</strong> is based on your lean body mass, since almost all of your creatine is stored in muscle. It works out to about 0.07&ndash;0.1 g per kg of body weight for someone around 20% body fat, a bit more if you&rsquo;re leaner and a bit less if you carry more fat. Never under 5 g. More weekly training moves your sweet spot toward the top.</p>
             <p><strong>Adjustments:</strong> +2 g if you eat mostly plant-based (lower starting stores). If you&rsquo;re 50+, the low end goes up. For brain benefits the range goes up about 3&ndash;5 g: the brain takes up creatine slowly, and studies that raised brain levels used higher doses (Candow et al., 2023). The top of the range is capped at 12 g a day.</p>
             <p><strong>Safety:</strong> creatine is one of the most-studied supplements and is well tolerated in healthy people, including long term.</p>
           </div>
@@ -171,7 +189,9 @@
   <script>
     (function () {
       var B = Bloom;
+      var bodyFat = B.bodyFat();
       var units = B.unitSystem();
+      var sex = B.seg("sex", bodyFat.render);
       var goal = B.seg("goal"), age = B.seg("age"), plant = B.seg("plant");
       var form = document.getElementById("form");
 
@@ -194,12 +214,14 @@
       hoursEl.addEventListener("change", function () { hoursEl.value = hrs(); gymFill.classList.add("snap"); renderHours(); setTimeout(function () { gymFill.classList.remove("snap"); }, 200); });
       renderHours();
 
-      // Daily creatine, dosed by body weight (Antonio et al. 2021: ~0.1 g/kg/day; relative doses in
-      // the literature span 0.03-0.14 g/kg/day). Range = 0.07-0.10 g/kg, never under 5 g.
-      // Training volume places the sweet spot inside the range; diet, age and goal shift the range.
-      function dosing(kg, h, brain, older, vegan) {
-        var lo = Math.max(5, 0.07 * kg), hi = Math.max(lo + 2, 0.10 * kg);
-        if (older) lo = Math.max(lo, 0.08 * kg);                      // 50+: hold onto muscle
+      // Daily creatine, dosed by lean body mass (creatine is stored almost entirely in muscle).
+      // Literature doses by body weight (Antonio et al. 2021: ~0.1 g/kg/day; range 0.03-0.14 g/kg/day);
+      // the lean-mass factors below are those divided by 0.8, so someone at 20% body fat gets the same
+      // as 0.07-0.10 g/kg of body weight. Leaner people get a bit more, higher body fat a bit less.
+      // Never under 5 g, never over 12 g. Training places the sweet spot inside the range.
+      function dosing(lbmKg, h, brain, older, vegan) {
+        var lo = Math.max(5, 0.0875 * lbmKg), hi = Math.max(lo + 2, 0.125 * lbmKg);
+        if (older) lo = Math.max(lo, 0.10 * lbmKg);                   // 50+: hold onto muscle
         if (vegan) { lo += 2; hi += 2; }                              // lower starting stores
         if (brain) { lo += 3; hi += 5; }                              // brain uptake is slow; higher intakes
         hi = Math.min(12, hi); lo = Math.min(lo, hi - 1);              // never recommend more than 12 g a day
@@ -213,10 +235,11 @@
         var metric = units() === "metric", w = B.num("weight");
         if (!B.error(form, !(w > 0) ? "Please enter your body weight." : "")) return;
         var kg = metric ? w : w / B.LB_PER_KG;
-        var d = dosing(kg, hrs(), goal() === "brain", age() === "1", plant() === "1");
+        var lbm = w * (1 - bodyFat.value() / 100), lbmKg = kg * (1 - bodyFat.value() / 100);
+        var d = dosing(lbmKg, hrs(), goal() === "brain", age() === "1", plant() === "1");
 
         document.getElementById("r-range").textContent = d.lo + "–" + d.hi;
-        var bits = ["your body weight", "training"];
+        var bits = ["your lean body mass", "training"];
         if (plant() === "1") bits.push("a plant-based diet");
         if (age() === "1") bits.push("age");
         if (goal() === "brain") bits.push("brain benefits");
@@ -226,6 +249,7 @@
         document.getElementById("r-scoop").textContent = "About " + String(scoops).replace(".5", "½") + " scoop" + (scoops > 1 ? "s" : "") + " (5 g scoop)";
         var load = Math.min(30, Math.round(kg * 0.3));
         document.getElementById("r-load").textContent = load + " g";
+        document.getElementById("r-basis").textContent = "Based on your lean body mass of " + B.fmt(lbm) + (metric ? " kg." : " lbs.");
 
         B.show(document.getElementById("results"));
       });
