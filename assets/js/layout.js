@@ -99,4 +99,17 @@
     hero.insertBefore(stars, hero.firstChild);
     hero.classList.add("has-stars");
   }
+
+  // Reveal: wait for the fonts and the images near the top, then fade the page in (see the <head> script).
+  if (window.bloomShow) {
+    var waits = [];
+    if (document.fonts && document.fonts.load) {
+      ['16px "Jersey 10"', "16px VT323", "16px Poppins"].forEach(function (f) { waits.push(document.fonts.load(f).catch(function () {})); });
+    }
+    Array.prototype.forEach.call(document.querySelectorAll("main img"), function (img) {
+      if (img.getBoundingClientRect().top > window.innerHeight * 1.5) return;
+      if (!img.complete) waits.push(new Promise(function (r) { img.addEventListener("load", r); img.addEventListener("error", r); }));
+    });
+    Promise.all(waits).then(function () { requestAnimationFrame(function () { requestAnimationFrame(window.bloomShow); }); });
+  }
 })();

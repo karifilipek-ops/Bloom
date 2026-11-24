@@ -105,5 +105,8 @@
       cur = next; t = 0; first = false;
     }
   }
-  requestAnimationFrame(tick);
+  // Start once the page has faded in, so the count-up is actually seen.
+  if (document.documentElement.classList.contains("loading")) {
+    document.addEventListener("bloom:shown", function () { requestAnimationFrame(tick); }, { once: true });
+  } else requestAnimationFrame(tick);
 })();

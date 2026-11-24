@@ -34,7 +34,13 @@
 }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; background: var(--bg); }
+/* First load: the page waits (hidden) until fonts and icons are in, then fades up once. */
+html.loading body { opacity: 0; }
+html.loading main { transform: translateY(10px); }
+body { transition: opacity .5s ease; }
+main { transition: transform .6s cubic-bezier(.22,1,.36,1); }
+@media (prefers-reduced-motion: reduce) { html.loading main { transform: none; } }
 body {
   margin: 0;
   background: var(--bg);
