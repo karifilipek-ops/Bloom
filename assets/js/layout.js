@@ -53,60 +53,8 @@
 
   var footer = document.createElement("footer");
   footer.className = "site-footer";
-  footer.innerHTML = '<div class="by-wrap"><div class="peek" aria-hidden="true"></div><p class="by">By Trainbloom</p></div>';
+  footer.innerHTML = '<p class="by">By Trainbloom</p>';
   document.body.appendChild(footer);
-
-  // Pixel me: every so often he pops up from behind "By Trainbloom", blinks, and ducks back down.
-  (function () {
-    var peek = footer.querySelector(".peek"), wrap = footer.querySelector(".by-wrap");
-    var ROWS = [                      // 24 x 15, one character per pixel
-      "........O....O..........",
-      ".......OhO..OhO.........",
-      "......OHHHOOHHHOO.......",
-      ".....OHHHHHHHHHHHO......",
-      ".....OHHhHHHHHHhHHO.....",
-      ".....OHHHHHHHHHHHHO.....",
-      ".....OHHHHHHHHHHHHO.....",
-      ".....OHHHSSHSSSSSHO.....",
-      ".....OHSSSSSSSSSSHO.....",
-      ".....OSSSeSSSSeSSSO.....",
-      ".....OSSSESSSSESSSO.....",
-      ".....OSSSSSSSSSSSSO.....",
-      ".OOO.OsSSSSSSSSSSsO.OOO.",
-      "OSSSO.OsSSSSSSSSsO.OSSSO",
-      "OsSsO..OOOOOOOOOO..OsSsO"
-    ];
-    var FILL = { O: "#2a1d18", H: "#6b3c1f", h: "#93562c", S: "#f2bb8c", s: "#d99a6c", E: "#1a1414", e: "#1a1414" };
-    var px = "";
-    ROWS.forEach(function (r, y) {
-      for (var x = 0; x < r.length; x++) {
-        var c = r[x];
-        if (FILL[c]) px += '<rect x="' + x + '" y="' + y + '" width="1.02" height="1.02" fill="' + FILL[c] + '"' + (c === "e" ? ' class="eye-top"' : "") + "/>";
-      }
-    });
-    peek.innerHTML = '<svg class="peek-guy" viewBox="0 0 24 15" shape-rendering="crispEdges">' + px + "</svg>";
-    var guy = peek.firstChild;
-    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { peek.classList.add("up"); return; }
-
-    var timer = null, visible = false;
-    function later(fn, ms) { timer = setTimeout(fn, ms); }
-    function pop() {
-      if (!visible) return;
-      var room = wrap.offsetWidth - peek.offsetWidth;          // somewhere along the text, new spot each time
-      peek.style.left = Math.round(Math.random() * Math.max(room, 0)) + "px";
-      peek.classList.add("up");
-      later(function () { guy.classList.add("blink");
-        later(function () { guy.classList.remove("blink");
-          later(function () { peek.classList.remove("up");
-            later(pop, 4500 + Math.random() * 4000); }, 1300); }, 140); }, 900);
-    }
-    if ("IntersectionObserver" in window) {
-      new IntersectionObserver(function (en) {
-        var was = visible; visible = en[0].isIntersecting;
-        if (visible && !was) { clearTimeout(timer); later(pop, 700); }
-      }).observe(footer);
-    } else { visible = true; later(pop, 1500); }
-  })();
 
   // Header banners (calculator pages and the home page): star dots that each drift on their own
   // small loop, a few of them sparkling.
