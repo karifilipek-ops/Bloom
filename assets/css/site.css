@@ -455,8 +455,8 @@ table.tbl tr.hl td, table.tbl td.hl { background: var(--lav-soft); color: var(--
 }
 .calc .sub-h { font-family: var(--pixel); font-size: 17px; letter-spacing: .14em; text-transform: uppercase; text-align: center; text-shadow: var(--px-shadow); margin-top: 22px; }
 .goal-hint { margin: 2px 0 10px; font-family: var(--mono); font-size: 18px; line-height: 1.1; color: var(--muted); }
-.goal-rate { font-family: var(--pixel); font-size: clamp(34px, 7vw, 46px); line-height: 1; letter-spacing: .04em; text-shadow: 2px 2px 0 var(--lav-line); }
-.goal-sub { font-family: var(--mono); font-size: 19px; line-height: 1.1; color: var(--ink-soft); margin: 8px 0 8px; min-height: 1.1em; }
+.goal-rate { display: inline-block; margin-top: 14px; padding: 7px 18px 6px; font-family: var(--pixel); font-size: 22px; line-height: 1; letter-spacing: .1em; text-transform: uppercase; background: var(--lav-soft); border: 2px solid var(--ink); border-radius: 999px; box-shadow: 3px 3px 0 var(--lav); }
+.goal-sub { font-family: var(--mono); font-size: 19px; line-height: 1.2; color: var(--ink-soft); margin: 12px 0 16px; min-height: 1.2em; }
 .goal-ticks { display: flex; justify-content: space-between; margin-top: 2px; }
 .goal-ticks span { flex: 1; display: flex; flex-direction: column; font-family: var(--mono); font-size: 16px; line-height: 1.1; color: var(--muted); letter-spacing: .04em; }
 .goal-ticks span:first-child { text-align: left; }
@@ -705,9 +705,11 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 /* ---------- Phone polish: tighter tracking so headings, buttons and tables fit cleanly ---------- */
 .tbl .abbr { display: none; }
 @media (max-width: 560px) {
-  .calc h2, .section-title { font-size: 26px; letter-spacing: .12em; line-height: 1.25; }
-  .calc .sub-h { font-size: 19px; letter-spacing: .12em; }
-  .goal-k { font-size: 23px; letter-spacing: .12em; }
+  .calc h2, .section-title { font-size: 30px; letter-spacing: .1em; line-height: 1.25; }
+  .calc .sub-h { font-size: 20px; letter-spacing: .12em; }
+  .goal-k { font-size: 24px; letter-spacing: .12em; }
+  .goal-tabs { margin-bottom: 30px; }
+  .goal-hint { margin-top: 6px; }
   .goal-pace { text-align: center; }
   .learn-h { font-size: 22px; letter-spacing: .16em; }
   .seg button { font-size: 15px; letter-spacing: .08em; padding: 9px 4px; }
