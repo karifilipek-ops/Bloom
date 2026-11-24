@@ -306,7 +306,9 @@ input[type="range"] { width: 100%; accent-color: var(--lav-dark); height: 28px; 
 
 /* label with its value pushed to the right */
 .field .label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
-.label-row span { color: var(--lav-dark); text-transform: none; font-size: 1.25em; letter-spacing: .08em; }
+.label-row > span:last-child { color: var(--lav-dark); text-transform: none; font-size: 1.25em; letter-spacing: .08em; }
+.field.has-info { position: relative; }
+.field.has-info > .info-pop { top: 32px; left: 0; right: 0; }
 /* workout-hours slider: pixel dumbbell + 8-cell bar that fills one cell per hour */
 .gym {
   display: flex; align-items: center; gap: 20px; height: 68px; padding: 0 18px; margin: 2px 0 4px;
