@@ -168,13 +168,13 @@ a { color: inherit; }
   display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
   padding-top: 2.6cqw;
 }
-.hero-art h1 { font-size: 6.9cqw; letter-spacing: .07em; margin: 0 -.07em 0 0; line-height: .9; text-shadow: none; }
+.hero-art h1 { font-size: 5.4cqw; letter-spacing: .26em; margin: 0 -.26em 0 0; line-height: .9; text-shadow: .3cqw .3cqw 0 var(--lav-dark); }   /* same wide, shadowed pixel type as the calculator titles */
 .hero-art p { font-size: 2.15cqw; margin-top: .9cqw; color: #d3cfe3; font-weight: 300; letter-spacing: .01em; }
 /* Phones: the banner takes the canvas's own 4:3 shape. */
 @media (max-width: 640px) {
   .hero-art { aspect-ratio: 640 / 480; }
   .hero-copy { padding-top: 4.2cqw; }
-  .hero-art h1 { font-size: 11cqw; }
+  .hero-art h1 { font-size: 8.4cqw; letter-spacing: .22em; margin-right: -.22em; text-shadow: .5cqw .5cqw 0 var(--lav-dark); }
   .hero-art p { font-size: 3.4cqw; margin-top: 1.4cqw; }
 }
 .hero.sm { padding: 57px 16px 57px; } /* even top/bottom so the icon + title sit in the vertical middle */
