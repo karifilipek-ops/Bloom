@@ -83,7 +83,7 @@
           <div class="stat hl"><div class="k">Weekly loss</div><div class="v" id="r-rate"></div><div class="s">Your target pace</div></div>
         </div>
         <svg class="chart" id="r-chart" viewBox="0 0 600 240" role="img" aria-label="Projected weight over time, fastest and slowest timeline"></svg>
-        <div class="legend" style="margin-top:8px"><span><i style="background:#242424"></i>Faster end of your range</span><span><i style="background:#9d91be"></i>Slower end of your range</span></div>
+        <div class="legend" style="margin-top:8px"><span><i style="background:#242424"></i>Faster end</span><span><i style="background:#6f6496"></i>Slower end</span><span><i style="background:repeating-linear-gradient(to bottom,#b3a9d6 0 2px,#9d91be 2px 3px)"></i>Your window</span></div>
         <div class="callout" id="r-tip"></div>
         <p class="note">Assumes your lean mass stays the same and all the weight you lose is fat, so treat it as a planning range. Expect water-weight swings week to week.</p>
       </div>
@@ -149,21 +149,27 @@
         var top = w + (w - goalW) * 0.08, bot = goalW - (w - goalW) * 0.15, span = Math.max(1, Math.ceil(weeks));
         var x = function (wk) { return L + (W - L - R) * wk / span; };
         var y = function (v) { return T + (H - T - Bm) * (top - v) / (top - bot); };
-        var svg = "";
+        var MONO = ' font-family="VT323, monospace" font-size="15"';
+        // scanline pattern (same look as the site's filled bars) for the window between the two paces
+        var svg = '<defs><pattern id="dl-scan" width="4" height="3" patternUnits="userSpaceOnUse">' +
+          '<rect width="4" height="2" fill="#b3a9d6"/><rect y="2" width="4" height="1" fill="#9d91be"/></pattern></defs>';
         for (var k = 0; k <= 4; k++) {
           var v = bot + (top - bot) * k / 4, yy = y(v);
           svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + yy + '" y2="' + yy + '" stroke="#e2e2e8"/>';
-          svg += '<text x="' + (L - 8) + '" y="' + (yy + 4) + '" text-anchor="end" font-size="11" fill="#8a8a93" font-family="Poppins,sans-serif">' + Math.round(v) + "</text>";
+          svg += '<text x="' + (L - 8) + '" y="' + (yy + 4) + '" text-anchor="end"' + MONO + ' fill="#8a8a93">' + Math.round(v) + "</text>";
         }
         svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(goalW) + '" y2="' + y(goalW) + '" stroke="#6f6496" stroke-dasharray="5 4" stroke-width="1.5"/>';
-        svg += '<text x="' + (W - R) + '" y="' + (y(goalW) + 15) + '" text-anchor="end" font-size="11" fill="#6f6496" font-family="Poppins,sans-serif">Goal ' + Math.round(goalW) + u + "</text>";
+        svg += '<text x="' + (W - R) + '" y="' + (y(goalW) + 15) + '" text-anchor="end"' + MONO + ' fill="#6f6496">Goal ' + Math.round(goalW) + u + "</text>";
         var fastWk = (w - goalW) / fastRate;
-        svg += '<polyline fill="none" stroke="#9d91be" stroke-width="3" points="' + x(0) + "," + y(w) + " " + x(weeks) + "," + y(goalW) + '"/>';
-        svg += '<polyline fill="none" stroke="#242424" stroke-width="3" points="' + x(0) + "," + y(w) + " " + x(fastWk) + "," + y(goalW) + " " + x(span) + "," + y(goalW) + '"/>';
+        // the window: from the start, between the fast and slow paths, down to the goal
+        svg += '<polygon fill="url(#dl-scan)" points="' + x(0) + "," + y(w) + " " + x(fastWk) + "," + y(goalW) + " " + x(weeks) + "," + y(goalW) + '"/>';
+        svg += '<polyline fill="none" stroke="#6f6496" stroke-width="3" stroke-linejoin="round" points="' + x(0) + "," + y(w) + " " + x(weeks) + "," + y(goalW) + '"/>';
+        svg += '<polyline fill="none" stroke="#242424" stroke-width="3" stroke-linejoin="round" points="' + x(0) + "," + y(w) + " " + x(fastWk) + "," + y(goalW) + '"/>';
+        svg += '<circle cx="' + x(0) + '" cy="' + y(w) + '" r="4.5" fill="#242424"/>';
         var ticks = Math.min(6, span);
         for (var t = 0; t <= ticks; t++) {
           var wk = Math.round(span * t / ticks);
-          svg += '<text x="' + x(wk) + '" y="' + (H - 12) + '" text-anchor="middle" font-size="11" fill="#8a8a93" font-family="Poppins,sans-serif">wk ' + wk + "</text>";
+          svg += '<text x="' + x(wk) + '" y="' + (H - 12) + '" text-anchor="middle"' + MONO + ' fill="#8a8a93">wk ' + wk + "</text>";
         }
         document.getElementById("r-chart").innerHTML = svg;
       }
