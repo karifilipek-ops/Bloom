@@ -53,14 +53,13 @@
           </details>
         </div>
         <div class="field full has-info">
-          <label for="hours" class="label-row"><span>Weekly workout hours <button class="info" type="button" aria-expanded="false" aria-controls="i-hours" aria-label="What counts as workout hours?">?</button></span><span id="hours-out">1 hr</span></label>
+          <span class="label">Weekly workout hours <button class="info" type="button" aria-expanded="false" aria-controls="i-hours" aria-label="What counts as workout hours?">?</button></span>
           <div class="info-pop" id="i-hours" role="note" hidden>Any exercise counts, not just lifting: cardio, sports, classes. Everyday walking doesn&rsquo;t.</div>
-          <div class="gym" aria-hidden="true">
-            <svg class="gym-icon" viewBox="0 0 22 11" shape-rendering="crispEdges"><rect x="0" y="2" width="2" height="7"/><rect x="3" y="0" width="3" height="11"/><rect x="6" y="4" width="10" height="3"/><rect x="16" y="0" width="3" height="11"/><rect x="20" y="2" width="2" height="7"/></svg>
-            <div class="gym-bar"><i class="gym-fill" id="gym-fill"></i></div>
+          <div class="seg" data-name="hours">
+            <button data-value="0" aria-pressed="true">0&ndash;2</button>
+            <button data-value="0.5">3&ndash;5</button>
+            <button data-value="1">6+</button>
           </div>
-          <input type="range" id="hours" min="0" max="8" step="0.01" value="1">
-          <div class="range-ends"><span>0</span><span>8+</span></div>
         </div>
         <div class="field full has-info">
           <span class="label">What&rsquo;s it for? <button class="info" type="button" aria-expanded="false" aria-controls="i-goal" aria-label="What's the difference?">?</button></span>
@@ -195,24 +194,10 @@
       var goal = B.seg("goal"), age = B.seg("age"), plant = B.seg("plant");
       var form = document.getElementById("form");
 
-      // Workout hours slider (0-8+)
-      var hoursEl = document.getElementById("hours"), gymFill = document.getElementById("gym-fill");
-      function hrs() { return Math.round(+hoursEl.value); }   // whole hours for the label and the math
-      function renderHours() {
-        var h = hrs();
-        document.getElementById("hours-out").textContent = h >= 8 ? "8+ hrs" : h + (h === 1 ? " hr" : " hrs");
-        gymFill.style.width = (+hoursEl.value / 8 * 100) + "%";
-      }
-      hoursEl.addEventListener("input", renderHours);
-      hoursEl.addEventListener("keydown", function (e) {
-        var d = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
-        if (!d) return;
-        e.preventDefault();
-        hoursEl.value = Math.max(0, Math.min(8, hrs() + d));
-        renderHours();
-      });
-      hoursEl.addEventListener("change", function () { hoursEl.value = hrs(); gymFill.classList.add("snap"); renderHours(); setTimeout(function () { gymFill.classList.remove("snap"); }, 200); });
-      renderHours();
+      // Weekly workout hours: 3 buttons that place the sweet spot at the low end (0-2 hrs),
+      // middle (3-5) or top (6+) of the range.
+      var hoursSeg = B.seg("hours");
+      function hrs() { return +hoursSeg(); }
 
       // Daily creatine, dosed by lean body mass (creatine is stored almost entirely in muscle).
       // Literature doses by body weight (Antonio et al. 2021: ~0.1 g/kg/day; range 0.03-0.14 g/kg/day);
@@ -226,8 +211,8 @@
         if (brain) { lo += 3; hi += 5; }                              // brain uptake is slow; higher intakes
         hi = Math.min(12, hi); lo = Math.min(lo, hi - 1);              // never recommend more than 12 g a day
         lo = Math.round(lo); hi = Math.max(lo + 1, Math.round(hi));
-        var t = 0.25 + 0.75 * Math.min(8, h) / 8;                     // 0 hrs -> lower quarter, 8+ -> top
-        return { lo: lo, hi: hi, dose: Math.round(lo + (hi - lo) * t) };
+        var t = h;                                                    // 0 = low end, 0.5 = middle, 1 = top
+        return { lo: lo, hi: hi, dose: Math.round(lo + (hi - lo) * t - 0.001) };   // ties round down
       }
 
       form.addEventListener("submit", function (e) {
