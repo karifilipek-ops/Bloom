@@ -166,22 +166,35 @@
           svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + yy + '" y2="' + yy + '" stroke="#e2e2e8"/>';
           svg += '<text x="' + (L - 8) + '" y="' + (yy + 4) + '" text-anchor="end"' + MONO + ' fill="#8a8a93">' + Math.round(v) + "</text>";
         }
-        svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(goalW) + '" y2="' + y(goalW) + '" stroke="#6f6496" stroke-dasharray="5 4" stroke-width="1.5"/>';
+        svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(goalW) + '" y2="' + y(goalW) + '" stroke="#6f6496" stroke-width="1.5"/>';   // goal line: solid
         svg += '<text x="' + (W - R) + '" y="' + (y(goalW) + 15) + '" text-anchor="end"' + MONO + ' fill="#6f6496">Goal ' + Math.round(goalW) + u + "</text>";
         var fastWk = (w - goalW) / fastRate;
-        // the window: from the start, between the fast and slow paths, down to the goal
+        // the window: from the start, between the fast and slow paths, down to the goal.
+        // Everything inside <g clip-path> is revealed left to right when the chart draws.
+        svg += '<clipPath id="dl-reveal"><rect id="dl-reveal-r" x="0" y="0" width="' + W + '" height="' + H + '"/></clipPath><g clip-path="url(#dl-reveal)">';
         var tri = x(0) + "," + y(w) + " " + x(fastWk) + "," + y(goalW) + " " + x(weeks) + "," + y(goalW);
         svg += '<polygon fill="url(#dl-grad)" fill-opacity=".3" points="' + tri + '"/>';                   // light tint
         svg += '<polygon fill="url(#dl-grad)" fill-opacity=".6" mask="url(#dl-mask)" points="' + tri + '"/>';   // horizontal stripes
         svg += '<polyline fill="none" stroke="#6f6496" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 6" points="' + x(0) + "," + y(w) + " " + x(weeks) + "," + y(goalW) + '"/>';   // slow: dashed, lavender
         svg += '<polyline fill="none" stroke="#242424" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 6" points="' + x(0) + "," + y(w) + " " + x(fastWk) + "," + y(goalW) + '"/>';   // fast: dashed
-        svg += '<circle cx="' + x(0) + '" cy="' + y(w) + '" r="4.5" fill="#242424"/>';
+        svg += '</g><circle cx="' + x(0) + '" cy="' + y(w) + '" r="4.5" fill="#242424"/>';
         var ticks = Math.min(6, span);
         for (var t = 0; t <= ticks; t++) {
           var wk = Math.round(span * t / ticks);
           svg += '<text x="' + x(wk) + '" y="' + (H - 12) + '" text-anchor="middle"' + MONO + ' fill="#8a8a93">wk ' + wk + "</text>";
         }
         document.getElementById("r-chart").innerHTML = svg;
+        // draw out: grow the reveal from the start point to the right edge
+        var rect = document.getElementById("dl-reveal-r");
+        if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        var x0 = x(0), t0 = null;
+        rect.setAttribute("width", x0);
+        requestAnimationFrame(function step(now) {
+          if (t0 == null) t0 = now;
+          var k = Math.min(1, (now - t0) / 1100), e = 1 - Math.pow(1 - k, 3);
+          rect.setAttribute("width", x0 + (W - x0) * e);
+          if (k < 1) requestAnimationFrame(step);
+        });
       }
     })();
   </script>
