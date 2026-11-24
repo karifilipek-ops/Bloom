@@ -97,25 +97,27 @@
     }
     function run() {
       measure();
-      var W = textW(), x1 = W - 40, x2 = W + 4;
-      // One gravity arc: starts hidden below the letter tops, peaks above them, lands on the baseline.
-      var T = 720, APEX = 0.632, Y0 = H + 2, TOP = -12;   // TOP chosen so the arc ends exactly on DROP
-      var k = (Y0 - TOP) / (APEX * APEX), start = null, last = -1;
+      var W = textW(), x1 = W - 38, x2 = W + 4;
+      // Each entry is one 15fps frame: [x, y]. y = 0 means his feet are level with the letter tops;
+      // while y > 0 the clip hides whatever is still below that line (behind the word).
+      // The pop out is fast (2 frames), then one gravity arc over and down to the baseline beside the word.
+      var path = [[x1, 30], [x1, 4]];
+      var N = 9, TOP = -16;                               // arc frames, apex height above the letters
+      for (var i = 1; i <= N; i++) {
+        var p = i / N, xa = x1 + (x2 - x1) * p;
+        var ya = p < 0.4 ? TOP * Math.sin((p / 0.4) * Math.PI / 2)        // rise to the apex...
+                         : TOP + (DROP - TOP) * Math.pow((p - 0.4) / 0.6, 2); // ...then fall faster
+        path.push([xa, ya]);
+      }
       frame(STAND); peek.style.opacity = 1;
-      (function tick(now) {
-        if (start == null) start = now;
-        var f = Math.floor((now - start) / TICK);              // 15fps steps
-        if (f !== last) {
-          last = f;
-          var p = Math.min(f * TICK / T, 1);
-          if (p >= 1) { land(x2); return; }
-          var y = TOP + k * (p - APEX) * (p - APEX);
-          var x = x1 + (x2 - x1) * Math.max(0, (p - 0.25) / 0.75);   // straight up first, then over
-          if (y <= 0) clip.classList.add("free");                    // clear of the letters
-          pose(x, Math.min(y, Y0));
-        }
-        requestAnimationFrame(tick);
-      })(performance.now());
+      var f = 0;
+      (function step() {
+        if (f >= path.length) { land(x2); return; }
+        var pt = path[f++];
+        if (pt[1] <= 0) clip.classList.add("free");      // fully clear of the letters
+        pose(pt[0], pt[1]);
+        setTimeout(step, TICK);
+      })();
     }
     pose(0, H + 2);
     if ("IntersectionObserver" in window) {
