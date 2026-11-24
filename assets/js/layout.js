@@ -127,6 +127,28 @@
           { duration: 1000, delay: s[1], easing: "cubic-bezier(.22,1,.36,1)", fill: "backwards" });
       });
       plainShow();
+
+      // Cards further down the page fade up the same way as they scroll into view.
+      if (grid && "IntersectionObserver" in window) {
+        var later = Array.prototype.filter.call(grid.children, function (c) {
+          return !seq.some(function (x) { return x[0] === c; });
+        });
+        later.forEach(function (c) { c.style.opacity = "0"; });
+        var io = new IntersectionObserver(function (entries) {
+          var n = 0;
+          entries.forEach(function (en) {
+            if (!en.isIntersecting) return;
+            var c = en.target;
+            io.unobserve(c);
+            c.style.opacity = "";
+            if (c.animate) c.animate(
+              calm ? [{ opacity: 0 }, { opacity: 1 }]
+                   : [{ opacity: 0, translate: "0 16px" }, { opacity: 1, translate: "0 0" }],
+              { duration: 900, delay: n++ * 90, easing: "cubic-bezier(.22,1,.36,1)", fill: "backwards" });
+          });
+        }, { rootMargin: "0px 0px -8% 0px" });
+        later.forEach(function (c) { io.observe(c); });
+      }
     };
     var waits = [];
     if (document.fonts && document.fonts.load) {
