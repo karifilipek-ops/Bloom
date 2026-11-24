@@ -63,8 +63,9 @@
           <input type="range" id="hours" min="0" max="8" step="1" value="1">
           <div class="range-ends"><span>0</span><span>8+</span></div>
         </div>
-        <div class="field full">
-          <span class="label">Age range</span>
+        <div class="field full has-info">
+          <span class="label">Age range <button class="info" type="button" aria-expanded="false" aria-controls="i-age" aria-label="Why does age matter?">?</button></span>
+          <div class="info-pop" id="i-age" role="note" hidden>Protein needs slightly increase with age.</div>
           <div class="seg" data-name="age">
             <button data-value="1" aria-pressed="true">Under 35</button>
             <button data-value="1.15">35–60</button>
