@@ -65,21 +65,24 @@
     '<p><a href="mailto:anthony@trainbloom.com">anthony@trainbloom.com</a></p>';
   document.body.appendChild(footer);
 
-  // Calculator headers: ~40 star dots that each drift on their own small loop and twinkle.
+  // Header banners (calculator pages and the home page): star dots that each drift on their own
+  // small loop, a few of them sparkling.
   // A seeded random keeps the layout the same on every visit.
-  var hero = document.querySelector(".hero.sm");
+  var hero = document.querySelector(".hero.sm, .hero-art");
+  var wide = hero && hero.classList.contains("hero-art");
+  var count = wide ? Math.max(30, Math.min(56, Math.round(hero.clientWidth / 20))) : 40;   // home banner: scale to its width
   if (hero) {
     var seed = 7;
     function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
     var stars = document.createElement("div");
     stars.className = "stars";
     stars.setAttribute("aria-hidden", "true");
-    for (var k = 0; k < 40; k++) {
+    for (var k = 0; k < count; k++) {
       var st = document.createElement("i");
       var r = rnd();
       if (r < 0.18) st.className = "s-lav"; else if (r > 0.9) st.className = "s-big";
       st.style.left = (rnd() * 98 + 1).toFixed(1) + "%";
-      st.style.top = (rnd() * 72 + 2).toFixed(1) + "%";       // keep clear of the grid floor
+      st.style.top = (rnd() * (wide ? 94 : 72) + 2).toFixed(1) + "%";   // calculator headers keep clear of the grid floor
       st.style.setProperty("--t", (8 + rnd() * 5).toFixed(1) + "s");          // drift loop
       st.style.setProperty("--s", (6 + rnd() * 4).toFixed(1) + "s");            // sparkle beat (slow)
       if (k % 4 === 0) st.classList.add("spark");                          // 10 of the 40 sparkle
