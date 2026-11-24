@@ -59,7 +59,7 @@
   // Pixel me: every so often he pops up from behind "By Trainbloom", looks around, and ducks back down.
   (function () {
     var peek = footer.querySelector(".peek"), wrap = footer.querySelector(".by-wrap");
-    peek.innerHTML = '<img class="peek-guy" src="/assets/img/peek-me.png" alt="" width="55" height="102">';
+    peek.innerHTML = '<img class="peek-guy" src="/assets/img/peek-me.png" alt="" width="62" height="102">';
     var guy = peek.firstChild;
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { peek.classList.add("up"); return; }
 
