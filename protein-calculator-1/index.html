@@ -84,9 +84,9 @@
 
       <div class="results" id="results" hidden aria-live="polite">
         <h2 class="h-center">Your protein goals</h2>
-        <div class="stats">
-          <div class="stat"><div class="k">Minimum</div><div class="v"><span id="r-min"></span>g/day</div><div class="s">The minimum to optimize physical progress</div></div>
-          <div class="stat"><div class="k">Maximum</div><div class="v"><span id="r-max"></span>g/day</div><div class="s">Past this, little extra benefit</div></div>
+        <div class="stats pair">
+          <div class="stat"><div class="k">Minimum</div><div class="v"><span id="r-min"></span><small>g/day</small></div><div class="s">The least for optimal progress</div></div>
+          <div class="stat"><div class="k">Maximum</div><div class="v"><span id="r-max"></span><small>g/day</small></div><div class="s">Little extra benefit past this</div></div>
         </div>
         <div class="gauge" id="gauge" aria-hidden="true">
           <div class="gauge-pin" id="g-pin"><img class="px" src="/assets/icons/protein.png" alt=""><span id="g-pin-t"></span></div>
@@ -99,10 +99,10 @@
           <div class="gauge-tick" id="g-max"></div>
         </div>
 
-        <div class="big" style="background:var(--pink)">
+        <div class="big big-opt" style="background:var(--pink)">
           <div class="k">Optimal intake</div>
           <div class="v"><span id="r-opt"></span> <small>g/day</small></div>
-          <div class="s">Your estimated optimal protein intake based on your inputs</div>
+          <div class="s">Your estimated daily target</div>
         </div>
         <p class="note" id="r-basis"></p>
       </div>
@@ -111,6 +111,14 @@
     <section class="learn faq" aria-labelledby="learn-h">
       <h2 class="learn-h" id="learn-h">Protein FAQ</h2>
       <p class="learn-sub">Tap a question to open it.</p>
+      <details>
+        <summary>Why is my protein based on lean body mass instead of my total weight?</summary>
+        <div class="body">
+          <p>Your protein needs come from your muscle and other lean tissue, not your body fat. Fat needs very little protein to maintain.</p>
+          <p>Take two people who both weigh 200 lbs: one at 12% body fat, one at 35%. The leaner person carries about 46 lbs more lean mass, so they need noticeably more protein.</p>
+          <p>Basing it on total weight would overshoot for anyone carrying extra fat, sometimes by a lot, making the goal harder to hit for no extra benefit. Lean body mass keeps your number matched to what your body actually uses.</p>
+        </div>
+      </details>
       <details>
         <summary>Why is my protein goal higher for fat loss than it is for building muscle?</summary>
         <div class="body">
@@ -216,7 +224,7 @@
         document.getElementById("r-min").textContent = B.fmt(min);
         document.getElementById("r-max").textContent = B.fmt(max);
         document.getElementById("r-opt").textContent = B.fmt(opt);
-        document.getElementById("r-basis").innerHTML = "<strong>Why lean body mass?</strong> Your protein needs come from your muscle, not your body fat, so using total weight would overshoot for anyone carrying extra fat. These numbers use your lean body mass of " + B.fmt(lbm) + (u === "metric" ? " kg." : " lbs.");
+        document.getElementById("r-basis").textContent = "Based on your lean body mass of " + B.fmt(lbm) + (u === "metric" ? " kg." : " lbs.");
 
         // Gauge: scale runs from 0 to 125% of the maximum
         var end = max * 1.25, pct = function (v) { return Math.max(0, Math.min(100, v / end * 100)); };

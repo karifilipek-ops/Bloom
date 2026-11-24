@@ -385,6 +385,18 @@ input[type="range"] { width: 100%; accent-color: var(--lav-dark); height: 28px; 
 .stat .v { font-family: var(--pixel); font-size: 32px; line-height: 1.2; letter-spacing: .05em; text-transform: uppercase; }
 .stat .s { font-family: var(--mono); font-size: 16px; line-height: 1.15; color: var(--muted); }
 .stat.hl { background: var(--lav-soft); }
+/* two stat cards that stay side by side, even on phones (protein min / max) */
+.stats.pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.stat .v small { font-size: .5em; margin-left: 4px; color: var(--ink-soft); letter-spacing: .1em; }
+@media (max-width: 560px) {
+  .stats.pair { gap: 10px; }
+  .stats.pair .stat { padding: 10px 12px; }
+  .stats.pair .k { font-size: 14px; letter-spacing: .14em; }
+  .stats.pair .v { font-size: 30px; }
+  .stats.pair .s { font-size: 15px; }
+  .big-opt { padding: 14px 12px 12px; }
+  .big-opt .v { font-size: 52px; }
+}
 
 .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 2px solid var(--ink); border-radius: var(--r-md); margin: 8px 0 16px; background: var(--paper); }
 table.tbl { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 19px; line-height: 1.1; }
