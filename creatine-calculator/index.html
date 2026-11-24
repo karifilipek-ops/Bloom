@@ -90,7 +90,7 @@
           <div class="body">
             <p><strong>Why not just 5 g?</strong> The classic 3&ndash;5 g a day was set for an average-sized person. Research now doses creatine by body weight, about 0.1 g per kg a day (Antonio et al., 2021), with studies using 0.03&ndash;0.14 g/kg. So bigger and more active people need more.</p>
             <p><strong>Your range</strong> runs from about 0.07 to 0.1 g per kg of body weight (never under 5 g). More weekly training moves your sweet spot toward the top.</p>
-            <p><strong>Adjustments:</strong> +2 g if you eat mostly plant-based (lower starting stores). If you&rsquo;re 50+, the low end goes up. For brain benefits the range goes up about 3&ndash;5 g: the brain takes up creatine slowly, and studies that raised brain levels used higher doses (Candow et al., 2023). Capped at 20 g a day.</p>
+            <p><strong>Adjustments:</strong> +2 g if you eat mostly plant-based (lower starting stores). If you&rsquo;re 50+, the low end goes up. For brain benefits the range goes up about 3&ndash;5 g: the brain takes up creatine slowly, and studies that raised brain levels used higher doses (Candow et al., 2023). The top of the range is capped at 12 g a day.</p>
             <p><strong>Safety:</strong> creatine is one of the most-studied supplements and is well tolerated in healthy people, including long term.</p>
           </div>
         </details>
@@ -134,7 +134,7 @@
         if (older) lo = Math.max(lo, 0.08 * kg);                      // 50+: hold onto muscle
         if (vegan) { lo += 2; hi += 2; }                              // lower starting stores
         if (brain) { lo += 3; hi += 5; }                              // brain uptake is slow; higher intakes
-        hi = Math.min(20, hi); lo = Math.min(lo, hi - 1);
+        hi = Math.min(12, hi); lo = Math.min(lo, hi - 1);              // never recommend more than 12 g a day
         lo = Math.round(lo); hi = Math.max(lo + 1, Math.round(hi));
         var t = 0.25 + 0.75 * Math.min(8, h) / 8;                     // 0 hrs -> lower quarter, 8+ -> top
         return { lo: lo, hi: hi, dose: Math.round(lo + (hi - lo) * t) };
