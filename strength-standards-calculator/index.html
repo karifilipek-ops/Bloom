@@ -156,13 +156,16 @@
             std.forEach(function (t, i) { if (orm >= t) reached = i; });
             // position on a 0–5 scale: whole levels plus progress toward the next
             var lo = reached < 0 ? 0 : std[reached], hi = reached < 4 ? std[reached + 1] : std[4] * 1.15;
-            var score = Math.min(5, (reached + 1) + Math.max(0, Math.min(1, (orm - lo) / (hi - lo))));
+            var prog = Math.max(0, Math.min(1, (orm - lo) / (hi - lo)));    // progress toward the next level
+            var score = Math.min(5, (reached + 1) + prog);
+            // arrow sits inside the reached level's segment, moved along by progress (never on a dividing line)
+            var pin = reached < 0 ? 0 : (reached + 0.06 + 0.88 * prog) / 5;
             scores.push(score);
             var next = reached < 4 ? "<strong>" + show(std[reached + 1] - orm) + unit + "</strong> to " + LEVELS[reached + 1] : "Top level reached";
             cards += '<div class="lift-card"><div class="lift-head"><span class="k">' + l[1] + '</span><span class="lvl">' + (reached < 0 ? "Untrained" : LEVELS[reached]) + "</span></div>" +
               '<div class="lift-sub">Est. 1RM ' + show(orm) + unit + " · " + (orm / bwKg).toFixed(2) + "× bodyweight · " + next + "</div>" +
               '<div class="lvl-track">' + LEVELS.map(function (n, i) { return '<span class="' + (i <= reached ? "on" : "") + '"></span>'; }).join("") +
-              '<i class="meter-pin" style="left:' + (score / 5 * 100) + '%"></i></div>' +
+              '<i class="meter-pin" style="left:' + (pin * 100) + '%"></i></div>' +
               '<div class="meter-labels"><span>Beg</span><span>Nov</span><span>Int</span><span>Adv</span><span>Elite</span></div></div>';
           }
           return "<tr><td>" + l[1] + "</td>" + std.map(function (t, i) {
