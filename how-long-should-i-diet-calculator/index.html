@@ -55,6 +55,7 @@
         <div class="field">
           <label for="goal">Goal body fat</label>
           <div class="unit-wrap"><input type="number" id="goal" inputmode="decimal" min="5" max="50" value="15"><span class="u">%</span></div>
+          <div class="hint" id="abs-hint"></div>
         </div>
         <div class="field">
           <label for="start">Start date</label>
@@ -100,6 +101,10 @@
       var sex = B.seg("sex", function (v) {
         bodyFat.render(v);
         var g = document.getElementById("goal"); if (g.value === "15" || g.value === "25") g.value = v === "f" ? 25 : 15;
+        // rough visible-abs ranges (vary with genetics, muscle and lighting)
+        document.getElementById("abs-hint").textContent = v === "f"
+          ? "Abs usually start showing around 16–20% body fat (sharp definition is closer to 14–16%)."
+          : "Abs usually start showing around 10–12% body fat (a sharp six-pack is closer to 8–10%).";
       });
       var aggr = B.seg("aggr");
       var form = document.getElementById("form");
