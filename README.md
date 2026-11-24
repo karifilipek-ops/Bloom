@@ -36,6 +36,8 @@ Then open http://localhost:8000.
 
 ## Deploy
 
+`vercel.json` limits Vercel to deploying `main`; working branches (`claude/...`) are not deployed, which keeps the free plan under its daily deploy limit.
+
 Any static host works (Netlify, Vercel, Cloudflare Pages, GitHub Pages). Point it at the repo root with no build command, then move the `trainbloom.com` domain over from Wix.
 
 ## Workout tracker
