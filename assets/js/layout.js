@@ -131,7 +131,9 @@
       // 15fps frames, [x, y]: y = 0 is the ground line (the bottom text line's baseline) right beside
       // the words. He shoots up out of the ground (hidden below that line), hops, and drops back down.
       var path = [[x2, 36], [x2, 14], [x2, -4], [x2, -10], [x2, -12], [x2, -10], [x2, -5]];
-      frame(STAND); peek.style.opacity = 1;
+      frame(STAND);
+      pose(x2, H + 4);                                   // park him out of sight below the ground first
+      // (measure() clears his transform, which would otherwise flash him at the left edge of the text)
       // A hole opens in the ground, he shoots up out of it, and it closes behind him while he's in the air.
       var holeAt = { 0: 1, 1: 2, 2: 3, 6: 2, 7: 1, 8: 0 }, LEAD = 3;   // path frame -> hole size
       var f = -LEAD;
@@ -141,6 +143,7 @@
         if (hf in holeAt) holeSize(holeAt[hf]);
         if (f >= path.length) { holeSize(0); land(x2); return; }
         var pt = path[f++];
+        peek.style.opacity = 1;
         if (pt[1] <= 0) clip.classList.add("free");      // fully out of the ground
         pose(pt[0], pt[1]);
         setTimeout(step, TICK);
