@@ -617,7 +617,7 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
    .by-wrap's top), walks to the end of the word, hops down, and ends up standing on the baseline
    (23px down) just after it. Drawn at exactly 2x, the same pixel size as the footer font. */
 .site-footer .by-wrap { padding-right: 50px; }   /* his final spot, so text + him stay centred together */
-.site-footer .peek { position: absolute; left: 0; bottom: calc(100% - 12px); width: 44px; height: 54px; pointer-events: none; opacity: 0; will-change: transform; }
+.site-footer .peek { position: absolute; left: 0; bottom: calc(100% - 12px); width: 44px; height: 54px; pointer-events: none; opacity: 0; }
 .site-footer .peek-guy {
   width: 44px; height: 54px; transform-origin: 50% 100%;
   background: url(/assets/img/peek-me.png) 0 0 / 200% 100% no-repeat; image-rendering: pixelated;
