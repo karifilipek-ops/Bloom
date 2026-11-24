@@ -84,7 +84,7 @@
     function easeOutBack(x) { var c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); }
     function run() {
       var W = textW(), x0 = W * 0.3 - HALF, x1 = W - HALF - 4, x2 = W + 4;
-      var POP = 450, WAIT = 500, WALK = Math.max(1200, (x1 - x0) / 0.04), CROUCH = 120, JUMP = 420, LAND = 140, PAUSE = 380;
+      var POP = 420, WAIT = 300, WALK = Math.max(700, (x1 - x0) / 0.075), CROUCH = 120, JUMP = 420, LAND = 140, PAUSE = 380;
       var tWalk = POP + WAIT, tCrouch = tWalk + WALK, tJump = tCrouch + CROUCH, tLand = tJump + JUMP, tTurn = tLand + LAND + PAUSE;
       var start = null;
       peek.style.opacity = 1;
@@ -97,7 +97,7 @@
         } else if (t < tWalk) {
           frame(STAND); pose(x0, 0, 1, 1, false);
         } else if (t < tCrouch) {                        // walk along the letter tops: little 2px bounces, no flailing
-          var w = (t - tWalk) / WALK, ph = ((t - tWalk) % 300) / 300;
+          var w = (t - tWalk) / WALK, ph = ((t - tWalk) % 220) / 220;
           frame(STAND);
           pose(x0 + (x1 - x0) * w, -2 * Math.sin(Math.PI * ph), 1, 1, false);
         } else if (t < tJump) {                          // crouch at the edge
