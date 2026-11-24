@@ -55,7 +55,7 @@
         <div class="field full">
           <label for="hours" class="label-row">Weekly workout hours <span id="hours-out">1 hr</span></label>
           <div class="gym" aria-hidden="true">
-            <svg class="gym-icon" id="gym-icon" viewBox="0 0 32 16" shape-rendering="crispEdges"></svg>
+            <svg class="gym-icon" viewBox="0 0 22 11" shape-rendering="crispEdges"><rect x="0" y="2" width="2" height="7"/><rect x="3" y="0" width="3" height="11"/><rect x="6" y="4" width="10" height="3"/><rect x="16" y="0" width="3" height="11"/><rect x="20" y="2" width="2" height="7"/></svg>
             <div class="gym-bar" id="gym-bar"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
           </div>
           <input type="range" id="hours" min="0" max="8" step="1" value="1">
@@ -186,39 +186,8 @@
       // 1.0 at 0 hrs up to 1.5 at 8+, matching the original buckets at 0, 2, 4 and 8 hours.
       var hoursEl = document.getElementById("hours"), gymCells = document.querySelectorAll("#gym-bar i");
       function hours() { return 1 + 0.0625 * +hoursEl.value; }
-      // Pixel dumbbell that loads up as hours go up. Each stage: plate heights from the handle
-      // outward, plate width, handle length and thickness (units on a 32x16 grid). Stage 0 is a bare bar.
-      var BELLS = [
-        { plates: [4], pw: 1, handle: 14, bar: 2 },
-        { plates: [6], pw: 2, handle: 7, bar: 2 },
-        { plates: [8], pw: 3, handle: 8, bar: 2 },
-        { plates: [8, 8], pw: 2, handle: 7, bar: 2 },
-        { plates: [10, 10], pw: 2, handle: 7, bar: 2 },
-        { plates: [10, 10, 6], pw: 2, handle: 6, bar: 2 },
-        { plates: [12, 12, 8], pw: 2, handle: 7, bar: 2 },
-        { plates: [12, 12, 12, 8], pw: 2, handle: 6, bar: 2 },
-        { plates: [16, 16, 16, 12], pw: 2, handle: 8, bar: 4 }
-      ];
-      var gymIcon = document.getElementById("gym-icon"), lastBell = -1;
-      function drawBell(k) {
-        var b = BELLS[k], side = b.plates.length * b.pw + (b.plates.length - 1);
-        var w = side * 2 + b.handle, x0 = Math.floor((32 - w) / 2), out = [];
-        function rect(x, y, rw, rh) { out.push('<rect x="' + x + '" y="' + y + '" width="' + rw + '" height="' + rh + '"/>'); }
-        rect(x0 + side, 8 - b.bar / 2, b.handle, b.bar);                      // handle
-        b.plates.forEach(function (ph, i) {
-          var off = i * (b.pw + 1);
-          rect(x0 + side - off - b.pw, 8 - ph / 2, b.pw, ph);                 // left plates, inside out
-          rect(x0 + side + b.handle + off, 8 - ph / 2, b.pw, ph);             // right plates
-        });
-        return out.join("");
-      }
       function renderHours() {
         var h = +hoursEl.value;
-        if (h !== lastBell) {
-          gymIcon.innerHTML = drawBell(h);
-          if (lastBell >= 0) { gymIcon.classList.remove("pop"); void gymIcon.offsetWidth; gymIcon.classList.add("pop"); }
-          lastBell = h;
-        }
         document.getElementById("hours-out").textContent = h >= 8 ? "8+ hrs" : h + (h === 1 ? " hr" : " hrs");
         for (var i = 0; i < gymCells.length; i++) gymCells[i].classList.toggle("on", i < h);
       }
