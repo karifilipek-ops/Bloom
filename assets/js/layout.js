@@ -80,12 +80,12 @@
       if (r < 0.18) st.className = "s-lav"; else if (r > 0.9) st.className = "s-big";
       st.style.left = (rnd() * 98 + 1).toFixed(1) + "%";
       st.style.top = (rnd() * 72 + 2).toFixed(1) + "%";       // keep clear of the grid floor
-      st.style.setProperty("--t", (5 + rnd() * 5).toFixed(1) + "s");          // drift loop
+      st.style.setProperty("--t", (8 + rnd() * 5).toFixed(1) + "s");          // drift loop
       st.style.setProperty("--s", (6 + rnd() * 4).toFixed(1) + "s");            // sparkle beat (slow)
       if (k % 4 === 0) st.classList.add("spark");                          // 10 of the 40 sparkle
       st.style.setProperty("--d", (-rnd() * 10).toFixed(1) + "s");
-      st.style.setProperty("--dx", ((rnd() - 0.5) * 22).toFixed(1) + "px");
-      st.style.setProperty("--dy", (-7 - rnd() * 12).toFixed(1) + "px");
+      st.style.setProperty("--dx", ((rnd() - 0.5) * 12).toFixed(1) + "px");
+      st.style.setProperty("--dy", (-4 - rnd() * 7).toFixed(1) + "px");
       st.style.setProperty("--o", (0.4 + rnd() * 0.4).toFixed(2));
       stars.appendChild(st);
     }
