@@ -163,7 +163,7 @@
             scores.push(score);
             var next = reached < 4 ? "<strong>" + show(std[reached + 1] - orm) + unit + "</strong> to " + LEVELS[reached + 1] : "Top level reached";
             cards += '<div class="lift-card"><div class="lift-head"><span class="k">' + l[1] + '</span><span class="lvl">' + (reached < 0 ? "Untrained" : LEVELS[reached]) + "</span></div>" +
-              '<div class="lift-sub">Est. 1RM ' + show(orm) + unit + " · " + (orm / bwKg).toFixed(2) + "× bodyweight · " + next + "</div>" +
+              '<div class="lift-sub">Est. 1RM ' + show(orm) + unit + " · " + next + "</div>" +
               '<div class="lvl-track">' + LEVELS.map(function (n, i) { return '<span class="' + (i <= reached ? "on" : "") + '"></span>'; }).join("") +
               '<i class="meter-pin" style="left:' + (pin * 100) + '%"></i></div>' +
               '<div class="meter-labels"><span>Beg</span><span>Nov</span><span>Int</span><span>Adv</span><span>Elite</span></div></div>';
