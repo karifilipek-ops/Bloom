@@ -613,7 +613,7 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .site-footer .by-wrap { position: relative; display: inline-block; }
 /* Footer: pixel me popping up behind "By Trainbloom". The letter tops are 12px below .by-wrap's top;
    the box is clipped at that line, so from the waist down he's hidden behind the text. */
-.site-footer .peek { position: absolute; left: 0; bottom: calc(100% - 12px); width: 30px; height: 42px; overflow: hidden; pointer-events: none; }
+.site-footer .peek { position: absolute; left: calc(50% - 15px); bottom: calc(100% - 12px); width: 30px; height: 42px; overflow: hidden; pointer-events: none; }
 .site-footer .peek-guy {
   width: 30px; height: 54px; background: url(/assets/img/peek-me.png) 0 0 / 200% 100% no-repeat; image-rendering: pixelated;
   transform: translateY(60px); transition: transform .22s cubic-bezier(.5,0,.75,0);
