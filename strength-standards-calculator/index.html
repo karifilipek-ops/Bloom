@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>STRENGTH STANDARDS CALCULATOR | Bodymath.io</title>
-  <meta name="description" content="Compare your squat, bench, deadlift and overhead press against common strength standards and see where you fall, from beginner to elite.">
+  <meta name="description" content="Compare your squat, bench and deadlift against common strength standards and see where you fall, from beginner to elite.">
   <link rel="canonical" href="https://www.trainbloom.com/strength-standards-calculator/">
   <link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32">
   <link rel="apple-touch-icon" href="/assets/img/favicon.png">
@@ -79,13 +79,6 @@
             <div class="unit-wrap"><input type="number" id="r-deadlift" inputmode="numeric" min="1" max="12" placeholder="1" aria-label="Deadlift reps"><span class="u">reps</span></div>
           </div>
         </div>
-        <div class="field full lift-row">
-          <span class="label">Overhead press</span>
-          <div class="row">
-            <div class="unit-wrap"><input type="number" id="w-ohp" inputmode="decimal" min="0" aria-label="Overhead press weight"><span class="u" data-wu>lb</span></div>
-            <div class="unit-wrap"><input type="number" id="r-ohp" inputmode="numeric" min="1" max="12" placeholder="1" aria-label="Overhead press reps"><span class="u">reps</span></div>
-          </div>
-        </div>
       </div>
       <div class="actions"><button class="btn" type="submit">See my level</button></div>
 
@@ -128,14 +121,14 @@
       var form = document.getElementById("form");
 
       var LEVELS = ["Beginner", "Novice", "Intermediate", "Advanced", "Elite"];
-      var LIFTS = [["squat", "Squat"], ["bench", "Bench press"], ["deadlift", "Deadlift"], ["ohp", "Overhead press"]];
+      var LIFTS = [["squat", "Squat"], ["bench", "Bench press"], ["deadlift", "Deadlift"]];
 
       // 1RM as a multiple of bodyweight AT THE REFERENCE BODYWEIGHT (80 kg men, 60 kg women).
       // Advanced ≈ median drug-free competitive lifter; Elite ≈ 90th percentile of competitors aged 18–35.
       var REF_KG = { m: 80, f: 60 };
       var RATIOS = {
-        m: { squat: [0.75, 1.25, 1.75, 2.25, 2.75], bench: [0.5, 0.75, 1.25, 1.5, 2.0], deadlift: [1.0, 1.5, 2.0, 2.5, 3.0], ohp: [0.4, 0.55, 0.8, 1.05, 1.35] },
-        f: { squat: [0.5, 0.75, 1.25, 1.75, 2.25], bench: [0.25, 0.5, 0.75, 1.0, 1.35], deadlift: [0.75, 1.0, 1.5, 2.0, 2.6], ohp: [0.2, 0.35, 0.5, 0.75, 0.9] }
+        m: { squat: [0.75, 1.25, 1.75, 2.25, 2.75], bench: [0.5, 0.75, 1.25, 1.5, 2.0], deadlift: [1.0, 1.5, 2.0, 2.5, 3.0] },
+        f: { squat: [0.5, 0.75, 1.25, 1.75, 2.25], bench: [0.25, 0.5, 0.75, 1.0, 1.35], deadlift: [0.75, 1.0, 1.5, 2.0, 2.6] }
       };
       var EXPONENT = 0.67;                                              // allometric scaling: strength ∝ bodyweight^0.67
 
