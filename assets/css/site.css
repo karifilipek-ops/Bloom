@@ -329,10 +329,6 @@ input[type="range"] { width: 100%; accent-color: var(--lav-dark); height: 28px; 
 }
 .gym-fill.snap { transition: width .18s ease-out; }
 @media (max-width: 560px) { .gym { height: 48px; gap: 14px; padding: 0 12px; } .gym-icon { width: 44px; height: 22px; } .gym-bar { height: 16px; } }
-/* 1RM: loaded barbell under the weight input */
-.bb { margin: 10px 0 4px; padding: 10px 12px; background: var(--paper); border: 2px solid var(--ink); border-radius: var(--r-sm); }
-.bb svg { display: block; width: 100%; height: 60px; }
-@media (max-width: 560px) { .bb svg { height: 48px; } }
 /* "next up" card linking to another calculator */
 .next-card {
   display: block; margin-top: 26px; padding: 18px; text-decoration: none; color: inherit; text-align: center;
