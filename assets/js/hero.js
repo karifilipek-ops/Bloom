@@ -21,8 +21,28 @@
   ];
   var nums = svg.querySelectorAll(".hs-n"), bar = svg.querySelector(".hp-fill");
   var BAR_W = +svg.querySelector(".hp-track").getAttribute("width");
-  // The numbers (with their units) and the potential bar fill move together; labels stay put.
-  var movers = Array.prototype.slice.call(svg.querySelectorAll(".hs-v")).concat([bar]);
+  // All the numbers, units and the potential bar fill live in one group that moves as a single
+  // composited layer (smooth sub-pixel motion); the labels above them stay put.
+  var vals = svg.querySelector(".hm-vals");
+
+  // Units sit in their own fixed spot so they never wobble while the digits count.
+  // Left column (right-aligned): unit at the edge, number ends just before it.
+  // Right column (left-aligned): number starts at the edge, unit after the widest value it shows.
+  function layout() {
+    Array.prototype.forEach.call(svg.querySelectorAll(".hs-u"), function (u) {
+      var i = +u.getAttribute("data-for"), n = nums[i], gap = 6;
+      if (n.getAttribute("text-anchor") === "end") {
+        n.setAttribute("x", +u.getAttribute("x") - u.getComputedTextLength() - gap);
+      } else {
+        var keep = n.textContent, widest = 0;
+        FRAMES.forEach(function (f) { n.textContent = FMT[i](f.vals[i]); widest = Math.max(widest, n.getComputedTextLength()); });
+        n.textContent = keep;
+        u.setAttribute("x", +n.getAttribute("x") + widest + gap);
+      }
+    });
+  }
+  layout();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);   // re-measure once the pixel font loads
   var SHIFT = 190; // canvas units a figure travels while sliding
   var NUDGE = 22;  // canvas units the numbers travel as they slide in/out
 
@@ -31,10 +51,8 @@
     bar.setAttribute("width", (BAR_W * v[5] / 100).toFixed(1));
   }
   function shift(x, o) {
-    for (var i = 0; i < movers.length; i++) {
-      movers[i].setAttribute("transform", "translate(" + x.toFixed(2) + " 0)");
-      movers[i].setAttribute("opacity", o.toFixed(3));
-    }
+    vals.style.transform = "translateX(" + x.toFixed(2) + "px)";
+    vals.style.opacity = o.toFixed(3);
   }
   function place(frame, x, o) {
     FRAMES[frame].fig.setAttribute("transform", "translate(" + x.toFixed(1) + " 0)");
@@ -53,31 +71,30 @@
     show(lerp(from, to, easeOut(clamp(ms / COUNT))));
   }
 
-  // One cycle (ms): hold the current figure, then slide to the other one. During the slide the
-  // numbers drift out to the left in the first part, and the new ones drift in over the second.
-  var FADE = 700, IN = 700, COUNT = 1500, HOLD = 4200, SLIDE = 1700, OUT_END = 0.4, IN_START = 0.5;
+  // One cycle (ms): hold the current figure, then slide to the other one. On the very first load
+  // the numbers fade in and count up from zero; on every swap after that they stay put and simply
+  // count from one person's values to the other's, in step with the slide.
+  var FADE = 700, IN = 750, COUNT = 950, HOLD = 4200, SLIDE = 1700;
   var zeros = [0, 0, 0, 0, 0, 0];
-  var cur = 0, t = 0, last = null, first = true, head = -250; // head: how far the numbers' entrance already got
+  var cur = 0, t = 0, last = null, first = true;
   place(0, 0, 0); place(1, SHIFT, 0); show(zeros); shift(NUDGE, 0);
 
   function tick(now) {
     requestAnimationFrame(tick);
     var dt = last == null ? 0 : Math.min(now - last, 50); // capped so a background tab doesn't jump ahead
     last = now; t += dt;
-    var next = 1 - cur, prev = first ? zeros : FRAMES[next].vals;
-    if (first) place(cur, 0, easeOut(clamp(t / FADE)));
+    var next = 1 - cur;
     if (t < HOLD) {
-      enter(t + head, prev, FRAMES[cur].vals);
+      if (first) { place(cur, 0, easeOut(clamp(t / FADE))); enter(t - 250, zeros, FRAMES[cur].vals); }
     } else if (t < HOLD + SLIDE) {
-      var s = (t - HOLD) / SLIDE, e = easeInOut(s);
+      var e = easeInOut((t - HOLD) / SLIDE);
       place(cur, -SHIFT * e, 1 - e);
       place(next, SHIFT * (1 - e), e);
-      if (s < OUT_END) { var o = easeIn(s / OUT_END); show(FRAMES[cur].vals); shift(-NUDGE * o, 1 - o); }
-      else if (s < IN_START) shift(NUDGE, 0);
-      else enter((s - IN_START) * SLIDE, FRAMES[cur].vals, FRAMES[next].vals);
+      shift(0, 1);
+      show(lerp(FRAMES[cur].vals, FRAMES[next].vals, e));   // numbers glide to the new values
     } else {
-      place(cur, SHIFT, 0); place(next, 0, 1); // parked on the right, ready to come back in
-      head = (1 - IN_START) * SLIDE; // the new numbers' entrance carries on from here
+      place(cur, SHIFT, 0); place(next, 0, 1);             // parked on the right, ready to come back in
+      show(FRAMES[next].vals);
       cur = next; t = 0; first = false;
     }
   }

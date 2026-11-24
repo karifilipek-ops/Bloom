@@ -151,6 +151,7 @@ a { color: inherit; }
 .hero-stage .hs-l { fill: #b9aef0; font-size: 21px; }
 .hero-stage .hs-v { fill: #fff; font-size: 38px; }
 .hero-stage .hs-u { font-size: 22px; fill: #cfccdb; }
+.hero-stage .hm-vals { will-change: transform, opacity; }   /* numbers move as one smooth layer */
 .hero-stage .hm-fig { fill: var(--night); stroke: #d9d3f5; stroke-width: 1px; stroke-linejoin: round; }
 .hp-track { fill: #2a2838; }
 .hp-fill { fill: #9d91be; }
