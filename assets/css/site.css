@@ -593,6 +593,7 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .faq .body { padding: 4px 16px 12px 26px; font-family: var(--mono); font-size: 19px; line-height: 1.25; }
 .faq details { background: var(--paper); }
 .faq .body p { margin: 10px 0; }
+.faq .body a { color: var(--lav-dark); text-decoration-thickness: 1px; text-underline-offset: 2px; }
 
 /* ---------- Footer ---------- */
 .site-footer { text-align: center; padding: 32px 16px 32px; color: var(--muted); font-size: 13px; }
