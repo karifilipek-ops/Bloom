@@ -63,7 +63,7 @@ a { color: inherit; }
 .site-header { position: sticky; top: 0; z-index: 50; background: var(--night); border-bottom: 1px solid #1d1b29; }
 .site-header .bar {
   max-width: 1100px; margin: 0 auto; padding: 0 16px;
-  height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  height: 56px; display: flex; align-items: center; justify-content: flex-end; gap: 16px;
 }
 .logo {
   font-family: var(--pixel); color: #fff; text-decoration: none; font-size: 26px; line-height: 1;
@@ -93,6 +93,8 @@ a { color: inherit; }
   font-family: var(--pixel); font-size: 19px; letter-spacing: .2em; text-transform: uppercase;
 }
 .nav-menu a:hover, .nav-menu a:focus-visible, .nav-menu a[aria-current="page"] { background: var(--lav-soft); outline: none; }
+.nav-menu .nav-home { border-bottom: 1px dashed var(--lav-line); margin-bottom: 4px; padding-bottom: 4px; }
+.nav-menu .nav-home a { color: var(--lav-dark); }
 
 /* ---------- Synthwave hero (from the Book List / Lifting cards) ---------- */
 .hero {
@@ -614,6 +616,7 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .site-footer a { color: var(--muted); text-decoration: none; }
 .site-footer p { font-family: var(--mono); font-size: 17px; letter-spacing: .03em; }
 .site-footer a:hover { text-decoration: underline; }
+.site-footer .by { font-family: var(--pixel); font-size: 15px; letter-spacing: .24em; text-transform: uppercase; color: var(--ink-soft); margin-top: 14px; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 

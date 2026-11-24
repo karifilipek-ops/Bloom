@@ -14,38 +14,42 @@
   var here = location.pathname.replace(/index\.html$/, "");
   if (here.slice(-1) !== "/") here += "/";
 
-  var items = CALCULATORS.map(function (c) {
-    var cur = c[0] === here ? ' aria-current="page"' : "";
-    return '<li><a href="' + c[0] + '"' + cur + ">" + c[1] + "</a></li>";
-  }).join("");
+  // Home page: no header bar (every calculator is linked right there on the page).
+  // Calculator pages: just the "Calculators" menu, with a link back to the full list first.
+  var isHome = here === "/";
+  if (!isHome) {
+    var items = '<li class="nav-home"><a href="/">All calculators</a></li>' + CALCULATORS.map(function (c) {
+      var cur = c[0] === here ? ' aria-current="page"' : "";
+      return '<li><a href="' + c[0] + '"' + cur + ">" + c[1] + "</a></li>";
+    }).join("");
 
-  var header = document.createElement("header");
-  header.className = "site-header";
-  header.innerHTML =
-    '<div class="bar">' +
-    '<a class="logo" href="/" aria-label="Trainbloom home">BLOOM</a>' +
-    '<nav class="nav" aria-label="Calculators">' +
-    '<button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu">Calculators</button>' +
-    '<ul class="nav-menu" id="nav-menu">' + items + "</ul>" +
-    "</nav></div>";
-  document.body.insertBefore(header, document.body.firstChild);
+    var header = document.createElement("header");
+    header.className = "site-header";
+    header.innerHTML =
+      '<div class="bar">' +
+      '<nav class="nav" aria-label="Calculators">' +
+      '<button class="nav-toggle" aria-expanded="false" aria-controls="nav-menu">Calculators</button>' +
+      '<ul class="nav-menu" id="nav-menu">' + items + "</ul>" +
+      "</nav></div>";
+    document.body.insertBefore(header, document.body.firstChild);
 
-  var nav = header.querySelector(".nav");
-  var toggle = header.querySelector(".nav-toggle");
-  function setOpen(open) {
-    nav.classList.toggle("open", open);
-    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    var nav = header.querySelector(".nav");
+    var toggle = header.querySelector(".nav-toggle");
+    var setOpen = function (open) {
+      nav.classList.toggle("open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    };
+    toggle.addEventListener("click", function (e) {
+      e.stopPropagation();
+      setOpen(!nav.classList.contains("open"));
+    });
+    document.addEventListener("click", function (e) {
+      if (!nav.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { setOpen(false); toggle.focus(); }
+    });
   }
-  toggle.addEventListener("click", function (e) {
-    e.stopPropagation();
-    setOpen(!nav.classList.contains("open"));
-  });
-  document.addEventListener("click", function (e) {
-    if (!nav.contains(e.target)) setOpen(false);
-  });
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") { setOpen(false); toggle.focus(); }
-  });
 
   var year = new Date().getFullYear();
   var footer = document.createElement("footer");
@@ -61,7 +65,8 @@
     '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.6 2.6 0 0 1-2.6-2.6 2.6 2.6 0 0 1 3.36-2.49V9.66a5.73 5.73 0 0 0-.76-.05 5.69 5.69 0 0 0-5.69 5.69A5.69 5.69 0 0 0 9.86 21a5.69 5.69 0 0 0 5.68-5.69V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3a4.28 4.28 0 0 1-3.24-1.48z"/></svg></a>' +
     "</div>" +
     "<p>&copy; " + year + " Bodymath.io</p>" +
-    '<p><a href="mailto:anthony@trainbloom.com">anthony@trainbloom.com</a></p>';
+    '<p><a href="mailto:anthony@trainbloom.com">anthony@trainbloom.com</a></p>' +
+    '<p class="by">By Trainbloom</p>';
   document.body.appendChild(footer);
 
   // Header banners (calculator pages and the home page): star dots that each drift on their own
