@@ -64,32 +64,4 @@
     "<p>&copy; " + year + " Bodymath.io</p>" +
     '<p><a href="mailto:anthony@trainbloom.com">anthony@trainbloom.com</a></p>';
   document.body.appendChild(footer);
-
-  // Calculator headers: split the title into letters so each one floats on its own, a beat
-  // after the one before (a slow wave). Screen readers get the plain title via aria-label.
-  var title = document.querySelector(".hero.sm h1");
-  if (title && !title.querySelector(".fl")) {
-    title.setAttribute("aria-label", title.textContent.replace(/\s+/g, " ").trim());
-    var n = 0;
-    Array.prototype.slice.call(title.childNodes).forEach(function (node) {
-      if (node.nodeType !== 3) return;                       // keep the <br> line breaks
-      var frag = document.createDocumentFragment();
-      node.nodeValue.split(/( +)/).forEach(function (word) {
-        if (!word) return;
-        if (/^ +$/.test(word)) { frag.appendChild(document.createTextNode(" ")); return; }
-        var w = document.createElement("span");
-        w.className = "fl-word";                               // keeps a word's letters on one line
-        word.split("").forEach(function (ch) {
-          var span = document.createElement("span");
-          span.className = "fl";
-          span.setAttribute("aria-hidden", "true");
-          span.style.animationDelay = (-n * 0.16).toFixed(2) + "s";
-          span.textContent = ch;
-          w.appendChild(span); n++;
-        });
-        frag.appendChild(w);
-      });
-      title.replaceChild(frag, node);
-    });
-  }
 })();
