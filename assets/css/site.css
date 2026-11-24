@@ -153,14 +153,14 @@ a { color: inherit; }
 .hero-stage { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; }
 .hero-stage text { font-family: var(--pixel); letter-spacing: 3px; }
 .hero-stage .hs-l { fill: #b9aef0; font-size: 21px; }
-.hero-stage .hs-v { fill: #fff; font-size: 38px; }
-.hero-stage .hs-u { font-size: 22px; fill: #cfccdb; }
-.hero-stage .hl { fill: none; stroke: #b9aef0; stroke-width: 2.6; stroke-linecap: round; stroke-dasharray: 0.1 7; opacity: .55; }
+.hero-stage .hs-v { fill: #e6e1f5; font-size: 32px; }
+.hero-stage .hs-u { font-size: 19px; fill: #b8b3cc; }
+.hero-stage .hl { fill: none; stroke: #b9aef0; stroke-width: 2.6; stroke-linecap: round; stroke-dasharray: 0.1 7; opacity: .72; }
 .hero-stage .hlm { fill: none; stroke: #fff; stroke-width: 10; }
 .hero-stage .hd circle { fill: #d6ccff; }
 .hero-stage .hd .hd-glow { fill: #9d91be; opacity: .35; }
-.hero-stage .hd-dots { opacity: .6; }   /* soft, to sit with the faded figure */
-.hero-stage .hm-fig { fill: var(--night); stroke: #c9c1ee; stroke-width: 1px; stroke-linejoin: round; opacity: .62; }
+.hero-stage .hd-dots { opacity: .8; }   /* soft, to sit with the faded figure */
+.hero-stage .hm-fig { fill: var(--night); stroke: #c9c1ee; stroke-width: 1px; stroke-linejoin: round; opacity: .78; }
 .hp-track { fill: #2a2838; }
 .hp-fill { fill: #9d91be; }
 .hero-copy {

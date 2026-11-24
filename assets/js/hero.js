@@ -9,7 +9,7 @@
   var masks = svg.querySelectorAll(".hlm"), dots = svg.querySelectorAll(".hd"), stats = svg.querySelectorAll(".hs");
   var lens = Array.prototype.map.call(masks, function (m) { return m.getTotalLength(); });
   var ORDER = [0, 3, 1, 4, 2];             // TDEE, VO2, body fat, protein, squat: zig-zag down
-  var FIG = 900, FIRST = 550, GAP = 250, DOT = 220, LINE = 560, TEXT = 450, COUNT = 1100, FIG_MAX = 0.62;   // figure stays soft so the stats lead
+  var FIG = 900, FIRST = 550, GAP = 250, DOT = 220, LINE = 560, TEXT = 450, COUNT = 1100, FIG_MAX = 0.78;   // figure stays soft so the stats lead
 
   // Each value counts up from 0 once its line arrives. The number is the text before the unit.
   var nums = Array.prototype.map.call(stats, function (g) {
