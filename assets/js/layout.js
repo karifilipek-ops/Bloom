@@ -53,8 +53,33 @@
 
   var footer = document.createElement("footer");
   footer.className = "site-footer";
-  footer.innerHTML = '<p class="by">By Trainbloom</p>';
+  footer.innerHTML = '<div class="by-wrap"><div class="peek" aria-hidden="true"></div><p class="by">By Trainbloom</p></div>';
   document.body.appendChild(footer);
+
+  // Pixel me: every so often he pops up from behind "By Trainbloom", looks around, and ducks back down.
+  (function () {
+    var peek = footer.querySelector(".peek"), wrap = footer.querySelector(".by-wrap");
+    peek.innerHTML = '<img class="peek-guy" src="/assets/img/peek-me.png" alt="" width="71" height="98">';
+    var guy = peek.firstChild;
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { peek.classList.add("up"); return; }
+
+    var timer = null, visible = false;
+    function later(fn, ms) { timer = setTimeout(fn, ms); }
+    function pop() {
+      if (!visible) return;
+      var room = wrap.offsetWidth - peek.offsetWidth;          // somewhere along the text, new spot each time
+      peek.style.left = Math.round(Math.random() * Math.max(room, 0)) + "px";
+      peek.classList.add("up");
+      later(function () { peek.classList.remove("up");
+        later(pop, 4500 + Math.random() * 4000); }, 2300);
+    }
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (en) {
+        var was = visible; visible = en[0].isIntersecting;
+        if (visible && !was) { clearTimeout(timer); later(pop, 700); }
+      }).observe(footer);
+    } else { visible = true; later(pop, 1500); }
+  })();
 
   // Header banners (calculator pages and the home page): star dots that each drift on their own
   // small loop, a few of them sparkling.
