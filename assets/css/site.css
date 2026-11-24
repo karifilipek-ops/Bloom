@@ -607,7 +607,7 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .faq .body a { color: var(--lav-dark); text-decoration-thickness: 1px; text-underline-offset: 2px; }
 
 /* ---------- Footer ---------- */
-.site-footer { text-align: center; padding: 8px 16px 40px; color: var(--muted); font-size: 13px; }
+.site-footer { text-align: center; padding: 30px 16px 40px; color: var(--muted); font-size: 13px; }
 .site-footer p { margin: 2px 0; }
 .site-footer p { font-family: var(--mono); font-size: 17px; letter-spacing: .03em; }
 .site-footer .by-wrap { position: relative; display: inline-block; }
@@ -620,7 +620,7 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .site-footer .peek { position: absolute; left: 0; bottom: calc(100% - 12px); width: 44px; height: 54px; pointer-events: none; opacity: 0; will-change: transform; }
 .site-footer .peek-guy {
   width: 44px; height: 54px; transform-origin: 50% 100%;
-  background: url(/assets/img/peek-me.png) 0 0 / 300% 100% no-repeat; image-rendering: pixelated;
+  background: url(/assets/img/peek-me.png) 0 0 / 200% 100% no-repeat; image-rendering: pixelated;
 }
 .site-footer .peek-shadow {
   position: absolute; right: 14px; bottom: calc(100% - 25px); width: 24px; height: 3px; border-radius: 50%;
