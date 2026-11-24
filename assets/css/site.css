@@ -611,12 +611,23 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .site-footer p { margin: 2px 0; }
 .site-footer p { font-family: var(--mono); font-size: 17px; letter-spacing: .03em; }
 .site-footer .by-wrap { position: relative; display: inline-block; }
-.site-footer .peek { position: absolute; left: 0; bottom: calc(100% - 13px); width: 60px; height: 34px; overflow: hidden; pointer-events: none; }
+/* Footer: pixel me peeking over "By Trainbloom". The text's letter tops are 12px below .by-wrap's top:
+   his head is clipped at that line (so he's behind the letters) and his hands sit on it, in front. */
+.site-footer .peek { position: absolute; left: 0; bottom: calc(100% - 12px); width: 69px; height: 39px; pointer-events: none; z-index: 2; }
+.site-footer .peek-head { position: absolute; left: 12px; bottom: 0; width: 45px; height: 39px; overflow: hidden; }
 .site-footer .peek-guy {
-  width: 60px; height: 34px; background: url(/assets/img/peek-me.png) 0 0 / 300% 100% no-repeat; image-rendering: pixelated;
-  transform: translateY(105%); transition: transform .28s cubic-bezier(.5,0,.75,0);
+  width: 45px; height: 39px; background: url(/assets/img/peek-me.png) 0 0 / 300% 100% no-repeat; image-rendering: pixelated;
+  transform: translateY(102%); transition: transform .22s cubic-bezier(.5,0,.75,0);
 }
-.site-footer .peek.up .peek-guy { transform: translateY(0); transition: transform .45s cubic-bezier(.34,1.5,.6,1); }   /* springy pop */
+.site-footer .peek.sneak .peek-guy { transform: translateY(24%); transition: transform .7s ease-out; }
+.site-footer .peek.up .peek-guy { transform: translateY(0); transition: transform .45s cubic-bezier(.3,1.7,.55,1); }
+.site-footer .peek-hand {
+  position: absolute; bottom: -2px; width: 18px; height: 12px; background: url(/assets/img/peek-hand.png) 0 0 / 100% 100%; image-rendering: pixelated;
+  opacity: 0; transform: translateY(-6px); transition: opacity .12s, transform .18s ease-in;
+}
+.site-footer .peek-hand.l { left: 0; } .site-footer .peek-hand.r { right: 0; }
+.site-footer .peek.hands .peek-hand { opacity: 1; transform: none; transition: opacity .08s, transform .25s cubic-bezier(.3,1.8,.5,1); }
+.site-footer .peek.hands .peek-hand.r { transition-delay: .07s; }
 .site-footer .by { position: relative; z-index: 1; font-family: var(--pixel); font-size: 21px; letter-spacing: .26em; text-transform: uppercase; color: var(--ink-soft); margin: 0 -.26em 0 0; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }

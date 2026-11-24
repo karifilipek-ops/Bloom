@@ -56,35 +56,42 @@
   footer.innerHTML = '<div class="by-wrap"><div class="peek" aria-hidden="true"></div><p class="by">By Trainbloom</p></div>';
   document.body.appendChild(footer);
 
-  // Pixel me: every so often he pops up from behind "By Trainbloom", looks around, and ducks back down.
+  // Pixel me peeking over "By Trainbloom": his hands grab the top of the letters, he sneaks his eyes up,
+  // then pops up with a bounce, glances around, blinks, and ducks back down. Then again somewhere else.
   (function () {
     var peek = footer.querySelector(".peek"), wrap = footer.querySelector(".by-wrap");
-    peek.innerHTML = '<div class="peek-guy"></div>';   // sprite sheet: normal, looking left, blinking
-    var guy = peek.firstChild;
-    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { peek.classList.add("up"); return; }
+    peek.innerHTML = '<div class="peek-head"><div class="peek-guy"></div></div><i class="peek-hand l"></i><i class="peek-hand r"></i>';
+    var guy = peek.querySelector(".peek-guy");
+    function face(n) { guy.style.backgroundPosition = (n * 50) + "% 0"; }   // 0 normal, 1 glancing, 2 blink
+    function state(s) { peek.className = "peek" + (s ? " " + s : ""); }
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { state("hands up"); return; }
 
-    var timer = null, visible = false;
-    function later(fn, ms) { timer = setTimeout(fn, ms); }
+    var timers = [], visible = false;
+    function at(ms, fn) { timers.push(setTimeout(fn, ms)); }
+    function stop() { timers.forEach(clearTimeout); timers = []; state(""); face(0); }
     function pop() {
       if (!visible) return;
-      var room = wrap.offsetWidth - peek.offsetWidth;          // somewhere along the text, new spot each time
+      var room = wrap.offsetWidth - peek.offsetWidth;            // a new spot along the text each time
       peek.style.left = Math.round(Math.random() * Math.max(room, 0)) + "px";
-      peek.classList.add("up");
-      var face = function (n) { guy.style.backgroundPosition = (n * 50) + "% 0"; };
       face(0);
-      setTimeout(function () { face(1); }, 650);                 // glance to the side...
-      setTimeout(function () { face(0); }, 1250);                // ...back at you
-      setTimeout(function () { face(2); }, 1700);                // blink
-      setTimeout(function () { face(0); }, 1840);
-      later(function () { peek.classList.remove("up");
-        later(pop, 4500 + Math.random() * 4000); }, 2300);
+      at(0, function () { state("hands"); });                     // hands slap onto the ledge
+      at(350, function () { state("hands sneak"); });             // eyes creep up over the letters
+      at(1150, function () { face(1); });                         // glance
+      at(1600, function () { face(0); });
+      at(1850, function () { state("hands up"); });               // boing
+      at(2650, function () { face(2); });                         // blink
+      at(2790, function () { face(0); });
+      at(3300, function () { state("hands"); });                  // duck
+      at(3600, function () { state(""); });                       // let go
+      at(3600 + 4000 + Math.random() * 4000, pop);
     }
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function (en) {
         var was = visible; visible = en[0].isIntersecting;
-        if (visible && !was) { clearTimeout(timer); later(pop, 700); }
+        if (visible && !was) { stop(); at(700, pop); }
+        if (!visible && was) stop();
       }).observe(footer);
-    } else { visible = true; later(pop, 1500); }
+    } else { visible = true; at(1500, pop); }
   })();
 
   // Header banners (calculator pages and the home page): star dots that each drift on their own
