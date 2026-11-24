@@ -53,10 +53,10 @@
 
   var footer = document.createElement("footer");
   footer.className = "site-footer";
-  footer.innerHTML = '<div class="by-wrap"><div class="peek-clip" aria-hidden="true"><div class="peek"></div></div><i class="peek-shadow" aria-hidden="true"></i><p class="by">By Trainbloom</p></div>';
+  footer.innerHTML = '<div class="by-wrap"><div class="peek-clip" aria-hidden="true"><div class="peek"></div></div><i class="peek-shadow" aria-hidden="true"></i><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>';
   document.body.appendChild(footer);
 
-  // Pixel me in the footer: he springs up from behind the end of "By Trainbloom" (like popping out of
+  // Pixel me in the footer: he springs up from behind the end of "Built by Tony" (like popping out of
   // a hole), arcs over and lands beside the word, turns to face it, and idles there breathing and blinking.
   // Animated the 8-bit way: positions move on his own 2px pixel grid and update at 15fps, and the
   // landing / breathing are separate pose frames rather than any smooth scaling, so he always stays crisp.
@@ -66,7 +66,30 @@
     peek.innerHTML = '<div class="peek-guy"></div>';
     var guy = peek.firstChild;
     var STAND = 0, BLINK = 1, BREATHE = 2, CROUCH = 3;
-    var PAD = 50, H = 54, DROP = 11, TICK = 1000 / 15;   // DROP: letter tops -> baseline
+    var PAD = 50, H = 54, TICK = 1000 / 15;
+    // Where the text's ink actually sits (from the font metrics), relative to the top of .by-wrap:
+    // he pops out from behind the top line ("Built by Tony") and lands on the bottom line's baseline.
+    var name = footer.querySelector(".by-name"), ig = footer.querySelector(".by-ig-text");
+    var DROP = 11, LINE_END = 0;
+    function inkBox(el, sample) {
+      // a zero-size marker sitting on the text's baseline gives the exact baseline position
+      var mark = document.createElement("span");
+      mark.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
+      el.insertBefore(mark, el.firstChild);
+      var w = wrap.getBoundingClientRect(), base = mark.getBoundingClientRect().top - w.top;
+      el.removeChild(mark);
+      var cs = getComputedStyle(el), c = document.createElement("canvas").getContext("2d");
+      c.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+      return { top: base - c.measureText(sample).actualBoundingBoxAscent, base: base, right: el.getBoundingClientRect().right - w.left };
+    }
+    function geometry() {
+      var a = inkBox(name, "B"), b = inkBox(ig, "t");
+      clip.style.bottom = "auto";
+      clip.style.top = Math.round(a.top - 1 - 140) + "px";          // clip edge: 1px above the top line's letters
+      DROP = Math.round(b.base - (a.top - 1));                       // ...down to the bottom line's baseline
+      shadow.style.bottom = "auto"; shadow.style.top = Math.round(b.base - 1) + "px";
+      LINE_END = a.right;
+    }
     function frame(n) { guy.style.backgroundPosition = (n * 100 / 3) + "% 0"; }
     var bx = 0, by = 0;
     function snap(v, base) { return Math.round((base + v) / 2) * 2 - base; }
@@ -93,11 +116,11 @@
       setTimeout(idle, TICK * 2 + 900);
     }
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      frame(STAND); measure(); land(textW() + 4, true); return;
+      frame(STAND); geometry(); measure(); land(textW() + 4, true); return;
     }
     function run() {
-      measure();
-      var W = textW(), x1 = W - 38, x2 = W + 4;
+      geometry(); measure();
+      var W = textW(), x1 = LINE_END - 40, x2 = W + 4;
       // Each entry is one 15fps frame: [x, y]. y = 0 means his feet are level with the letter tops;
       // while y > 0 the clip hides whatever is still below that line (behind the word).
       // The pop out is fast (2 frames), then one gravity arc over and down to the baseline beside the word.
