@@ -159,7 +159,7 @@ a { color: inherit; }
 .hero-stage .hlm { fill: none; stroke: #fff; stroke-width: 10; }
 .hero-stage .hd circle { fill: #d6ccff; }
 .hero-stage .hd .hd-glow { fill: #9d91be; opacity: .35; }
-.hero-stage .hm-fig { fill: var(--night); stroke: #d9d3f5; stroke-width: 1px; stroke-linejoin: round; }
+.hero-stage .hm-fig { fill: var(--night); stroke: #c9c1ee; stroke-width: 1px; stroke-linejoin: round; opacity: .62; }
 .hp-track { fill: #2a2838; }
 .hp-fill { fill: #9d91be; }
 .hero-copy {

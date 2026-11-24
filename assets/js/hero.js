@@ -7,17 +7,16 @@
 
   var fig = svg.querySelector(".hm-fig");
   var masks = svg.querySelectorAll(".hlm"), dots = svg.querySelectorAll(".hd"), stats = svg.querySelectorAll(".hs");
-  var bar = svg.querySelector(".hp-fill"), BAR = +bar.getAttribute("width");
   var lens = Array.prototype.map.call(masks, function (m) { return m.getTotalLength(); });
-  var ORDER = [0, 3, 1, 4, 2, 5];          // TDEE, VO2, body fat, protein, squat, potential: zig-zag down
-  var FIG = 900, FIRST = 550, GAP = 420, DOT = 220, LINE = 560, TEXT = 450, BARFILL = 700;
+  var ORDER = [0, 3, 1, 4, 2];             // TDEE, VO2, body fat, protein, squat: zig-zag down
+  var FIG = 900, FIRST = 550, GAP = 420, DOT = 220, LINE = 560, TEXT = 450, FIG_MAX = 0.62;   // figure stays soft so the stats lead
 
   function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
   function easeOut(x) { return 1 - Math.pow(1 - x, 3); }
   function easeInOut(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
 
   function render(t) {
-    fig.style.opacity = easeOut(clamp(t / FIG));
+    fig.style.opacity = FIG_MAX * easeOut(clamp(t / FIG));
     ORDER.forEach(function (i, k) {
       var s = t - FIRST - k * GAP;                                   // this stat's own clock
       dots[i].style.opacity = easeOut(clamp(s / DOT));
@@ -25,10 +24,9 @@
       var tx = clamp((s - DOT * 0.5 - LINE * 0.75) / TEXT), side = i < 3 ? 1 : -1;
       stats[i].style.opacity = easeOut(tx);
       stats[i].style.transform = "translateX(" + (side * 8 * (1 - easeOut(tx))).toFixed(2) + "px)";
-      if (i === 5) bar.setAttribute("width", (BAR * easeInOut(clamp((s - DOT * 0.5 - LINE * 0.75 - 150) / BARFILL))).toFixed(1));
     });
   }
-  var END = FIRST + (ORDER.length - 1) * GAP + DOT + LINE + TEXT + BARFILL;
+  var END = FIRST + (ORDER.length - 1) * GAP + DOT + LINE + TEXT;
   for (var i = 0; i < masks.length; i++) masks[i].style.strokeDasharray = lens[i];
   render(0);
 
