@@ -167,9 +167,14 @@
       var cs = getComputedStyle(name), c = document.createElement("canvas").getContext("2d");
       c.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
       var top = base - c.measureText("B").actualBoundingBoxAscent;
+      // A bit smaller than 2x: the scale is picked so each sprite pixel is a whole number of screen
+      // pixels (5 on most phones, 3 on most laptops), so he stays crisp.
+      var dpr = window.devicePixelRatio || 1, sc = Math.max(1, Math.round(dpr * 1.6)) / dpr;
+      var W = 41 * sc, H = 28 * sc, snap = function (v) { return Math.round(v * dpr) / dpr; };
+      dn.style.width = W + "px"; dn.style.height = H + "px";
       var nr = name.getBoundingClientRect();
-      dn.style.top = Math.round(top - 56) + "px";
-      dn.style.left = Math.round(nr.left - w.left + (nr.width - 82) / 2) + "px";
+      dn.style.top = snap(top - H) + "px";
+      dn.style.left = snap(nr.right - w.left - W - 6) + "px";     // over the right end of the words
     }
     place();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
