@@ -207,6 +207,20 @@ a { color: inherit; }
   0%, 100% { transform: scale(.55); opacity: var(--o); }
   50% { transform: scale(1.7); opacity: 1; }
 }
+/* The comet: a short bright streak with a fading tail, flying "forward" along its own angle. */
+.hero .stars i.comet {
+  width: 44px; height: 2px; border-radius: 2px; opacity: 0;
+  background: linear-gradient(90deg, rgba(207, 200, 255, 0), rgba(207, 200, 255, .5) 65%, #fff);
+  transform-origin: 100% 50%;
+  animation: comet 1.1s cubic-bezier(.3, .6, .5, 1) forwards;
+}
+.hero .stars i.comet::after { inset: -1px -1px -1px auto; width: 4px; opacity: 1; box-shadow: 0 0 6px 2px rgba(255, 255, 255, .7); }
+@keyframes comet {
+  0% { opacity: 0; transform: rotate(var(--a)) translateX(0); }
+  15% { opacity: 1; }
+  70% { opacity: .9; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateX(var(--len)); }
+}
 @media (prefers-reduced-motion: reduce) { .hero .stars i, .hero .stars i::after { animation: none; } }
 
 .lede { text-align: center; font-family: var(--mono); font-size: 23px; line-height: 1.2; letter-spacing: .02em; margin: 0 auto 6px; max-width: 640px; }

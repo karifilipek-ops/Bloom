@@ -152,7 +152,7 @@
     pose(0, H + 2);
     if ("IntersectionObserver" in window) {
       var io = new IntersectionObserver(function (en) {
-        if (en[0].isIntersecting) { io.disconnect(); setTimeout(run, 1450); }
+        if (en[0].isIntersecting) { io.disconnect(); setTimeout(run, 950); }
       });
       io.observe(footer);
     } else setTimeout(run, 1000);
@@ -177,7 +177,7 @@
       st.style.left = (rnd() * 98 + 1).toFixed(1) + "%";
       st.style.top = (rnd() * (wide ? 94 : 72) + 2).toFixed(1) + "%";   // calculator headers keep clear of the grid floor
       st.style.setProperty("--t", (8 + rnd() * 5).toFixed(1) + "s");          // drift loop
-      st.style.setProperty("--s", (6 + rnd() * 4).toFixed(1) + "s");            // sparkle beat (slow)
+      st.style.setProperty("--s", (5.2 + rnd() * 3.4).toFixed(1) + "s");        // sparkle beat (slow)
       if (k % 4 === 0) st.classList.add("spark");                          // 10 of the 40 sparkle
       st.style.setProperty("--d", (-rnd() * 10).toFixed(1) + "s");
       st.style.setProperty("--dx", ((rnd() - 0.5) * 12).toFixed(1) + "px");
@@ -187,6 +187,22 @@
     }
     hero.insertBefore(stars, hero.firstChild);
     hero.classList.add("has-stars");
+
+    // Every 7 seconds a tiny comet streaks across a random patch of the sky.
+    if (!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) {
+      setInterval(function () {
+        if (document.hidden) return;
+        var c = document.createElement("i"), right = Math.random() < 0.5;
+        var ang = 14 + Math.random() * 20;                                   // degrees below horizontal
+        c.className = "comet";
+        c.style.left = (right ? 8 + Math.random() * 45 : 45 + Math.random() * 45) + "%";
+        c.style.top = (6 + Math.random() * 40) + "%";
+        c.style.setProperty("--a", (right ? ang : 180 - ang).toFixed(1) + "deg");
+        c.style.setProperty("--len", (90 + Math.random() * 70).toFixed(0) + "px");
+        c.addEventListener("animationend", function () { c.remove(); });
+        stars.appendChild(c);
+      }, 7000);
+    }
   }
 
   // Reveal: wait for the fonts and the images near the top, then fade the page in (see the <head> script).
