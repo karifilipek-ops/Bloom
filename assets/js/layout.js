@@ -243,17 +243,17 @@
   if (VO2) (function () {
     var vo = footer.querySelector(".vo"), wrap = footer.querySelector(".by-wrap"), ig = footer.querySelector(".by-ig-text");
     var dpr = window.devicePixelRatio || 1, sc = Math.max(1, Math.round(dpr * 1.6)) / dpr;   // whole screen pixels per sprite pixel
-    var W = 41 * sc, snap = function (v) { return Math.round(v * dpr) / dpr; };
-    vo.style.width = vo.style.height = W + "px";
+    var W = 44 * sc, H = 41 * sc, snap = function (v) { return Math.round(v * dpr) / dpr; };
+    vo.style.width = W + "px"; vo.style.height = H + "px";
     wrap.style.paddingRight = Math.ceil(W + 12) + "px";
-    function frame(n) { vo.style.backgroundPosition = ((n - 1) * 100 / 19) + "% 0"; }
+    function frame(n) { vo.style.backgroundPosition = ((n - 1) * 100 / 28) + "% 0"; }
     function place() {                                   // wheels on the baseline of "@trainbloom"
       var mark = document.createElement("span");
       mark.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
       ig.insertBefore(mark, ig.firstChild);
       var base = mark.getBoundingClientRect().top - wrap.getBoundingClientRect().top;
       ig.removeChild(mark);
-      vo.style.top = snap(base - W) + "px";
+      vo.style.top = snap(base - H) + "px";
     }
     place();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
@@ -261,11 +261,17 @@
     frame(1);
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     var RUN = [[6, 100], [7, 100], [8, 100], [9, 100], [10, 100], [11, 100], [12, 100], [13, 100]];
+    // 20-27: after the test he straightens up, sways, stumbles back and collapses onto the belt;
+    // 28 is him flat out with X eyes, 29 the same with his chest heaving up. He stays there breathing hard.
     var SEQ = [[2, 260], [3, 260], [4, 300], [5, 500]].concat(RUN, RUN, RUN, RUN,
       [[14, 450], [15, 320], [16, 320], [17, 420], [18, 320], [19, 320], [18, 320], [19, 320], [18, 320], [19, 320],
-       [20, 900], [17, 380], [16, 380], [1, 900]]);
+       [20, 600], [21, 500], [22, 220], [23, 180], [24, 160], [25, 160], [26, 220], [27, 500], [28, 700]]);
+    var BREATHE = [[29, 330], [28, 330]];
     var k = 0;
-    function step() { var s = SEQ[k]; frame(s[0]); k = (k + 1) % SEQ.length; setTimeout(step, s[1]); }
+    function step() {
+      var s = k < SEQ.length ? SEQ[k] : BREATHE[(k - SEQ.length) % 2];
+      frame(s[0]); k++; setTimeout(step, s[1]);
+    }
     if ("IntersectionObserver" in window) {
       var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(step, 300); } }, { threshold: 0.6 });
       io.observe(vo);

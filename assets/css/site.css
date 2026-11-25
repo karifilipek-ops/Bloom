@@ -660,7 +660,7 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .site-footer .dn { position: absolute; left: 0; top: 0; width: 82px; height: 56px; background: url(/assets/img/donut-me.png) 0 0 / 400% 100% no-repeat; image-rendering: pixelated; pointer-events: none; z-index: 2; }
 .site-footer .by-wrap.mo-wrap { padding-top: 44px; padding-right: 22px; }
 .site-footer .mo { position: absolute; left: 0; top: 0; width: 35px; height: 63px; background: url(/assets/img/monster-me.png) 0 0 / 600% 100% no-repeat; image-rendering: pixelated; pointer-events: none; z-index: 2; }
-.site-footer .vo { position: absolute; right: 0; top: 0; width: 68px; height: 68px; background: url(/assets/img/vo2-me.png) 0 0 / 2000% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }
+.site-footer .vo { position: absolute; right: 0; top: 0; width: 68px; height: 68px; background: url(/assets/img/vo2-me.png) 0 0 / 2900% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }
 .site-footer .tm-guy { position: absolute; right: 0; top: 0; width: 70px; height: 70px; background: url(/assets/img/treadmill-me.png) 0 0 / 2400% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
