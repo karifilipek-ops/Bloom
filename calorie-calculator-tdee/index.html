@@ -91,7 +91,7 @@
 
         <div class="sub-h">Where your calories go</div>
         <div class="stack" id="r-stack"></div>
-        <div class="legend" id="r-legend"></div>
+        <div class="legend" id="r-legend" style="flex-direction:column;align-items:flex-start"></div>
 
         <h2 style="margin-top:28px">Find your daily target</h2>
         <div class="seg goal-tabs" data-name="goal">
@@ -427,8 +427,8 @@
         parts[0][1] += 100 - parts.reduce(function (t, p) { return t + p[1]; }, 0);   // keep total at 100%
         var NAMES = { BMR: "Basal metabolic rate", NEAT: "Non-exercise activity (steps)", TEF: "Digesting food", EAT: "Exercise" };
         document.getElementById("r-stack").innerHTML = parts.filter(function (p) { return p[1] > 0.05; }).map(function (p) {
-          return '<div style="flex:' + p[1] + ';background:' + p[2] + ';color:' + p[3] + '" title="' + p[0] + ': ' + Math.round(p[1]) + '%">' +
-            (p[1] >= (window.innerWidth < 560 ? 13 : 7) ? Math.round(p[1]) + "%" : "") + "</div>";
+          return '<div style="flex:' + p[1] + ' 1 0;min-width:max-content;padding:0 6px;background:' + p[2] + ';color:' + p[3] + '" title="' + p[0] + ': ' + Math.round(p[1]) + '%">' +
+            Math.round(p[1]) + "%</div>";
         }).join("");
         document.getElementById("r-legend").innerHTML = parts.map(function (p) {
           return '<span><i style="background:' + p[2] + '"></i><strong style="font-weight:600">' + p[0] + " " + Math.round(p[1]) + "%</strong> · " + NAMES[p[0]] + "</span>";
