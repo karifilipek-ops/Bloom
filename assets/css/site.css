@@ -658,6 +658,16 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .site-footer .sp { position: absolute; right: 0; top: 0; width: 44px; height: 66px; background: url(/assets/img/shake-me.png) 0 0 / 1600% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }
 .site-footer .by-wrap.dn-wrap { padding-top: 45px; padding-right: 0; }
 .site-footer .dn { position: absolute; left: 0; top: 0; width: 82px; height: 56px; background: url(/assets/img/donut-me.png) 0 0 / 400% 100% no-repeat; image-rendering: pixelated; pointer-events: none; z-index: 2; }
+.site-footer .rk { position: absolute; top: 0; width: 60px; height: 52px; background: url(/assets/img/rankup-me.png) 0 0 / 3400% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }
+/* the strength meter: six segments that fill up lavender, flashing when maxed out */
+.site-footer .rk-meter { position: absolute; top: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: none; }
+.site-footer .rk-meter b { font-family: var(--pixel); font-weight: 400; font-size: 11px; line-height: 1; letter-spacing: .05em; color: var(--lav-dark); }
+.site-footer .rk-meter span { display: flex; flex-direction: column-reverse; gap: 2px; padding: 2px; border: 2px solid var(--ink); border-radius: 2px; background: #fff; }
+.site-footer .rk-meter i { display: block; width: 8px; height: 4px; background: #ece9f5; }
+.site-footer .rk-meter i.on { background: var(--lav); }
+.site-footer .rk-meter.max i.on { animation: rk-max .5s steps(2, jump-none) infinite; }
+.site-footer .rk-meter.max b { color: var(--ink); }
+@keyframes rk-max { from { background: var(--lav); } to { background: var(--lav-dark); } }
 .site-footer .dl { position: absolute; right: 0; top: 0; width: 55px; height: 52px; background: url(/assets/img/deadlift-me.png) 0 0 / 3100% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }
 .site-footer .vo { position: absolute; right: 0; top: 0; width: 68px; height: 68px; background: url(/assets/img/vo2-me.png) 0 0 / 2900% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }
 .site-footer .tm-guy { position: absolute; right: 0; top: 0; width: 70px; height: 70px; background: url(/assets/img/treadmill-me.png) 0 0 / 2400% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }

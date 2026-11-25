@@ -57,9 +57,12 @@
   var SHAKE = here === "/protein-calculator-1/";          // the protein page: me with a protein shake
   var DONUT = here === "/how-long-should-i-diet-calculator/";   // diet length page: me lying on the text eating a donut
   var DEADLIFT = here === "/1-rep-max-calculator/";       // 1RM page: me pulling a 1 rep max deadlift
+  var RANKUP = here === "/strength-standards-calculator/"; // strength standards: me ranking up on a strength meter
   var VO2 = here === "/vo2-max-calculator/";              // VO2 max page: me doing a VO2 max test on a treadmill
   footer.innerHTML = VO2
     ? '<div class="by-wrap vo-wrap"><div class="vo" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
+    : RANKUP
+    ? '<div class="by-wrap rk-wrap"><div class="rk" aria-hidden="true"></div><div class="rk-meter" aria-hidden="true"><b>PRO</b><span><i></i><i></i><i></i><i></i><i></i><i></i></span></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
     : DEADLIFT
     ? '<div class="by-wrap dl-wrap"><div class="dl" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
     : DONUT
@@ -197,6 +200,53 @@
     } else step();
   })();
 
+  // Strength standards page: pixel me beside a little strength meter. He deadlifts a light bar (the meter
+  // barely moves), looks up at it confused, loads big plates on, grinds out a heavy pull that maxes the
+  // meter out, then jumps to celebrate. Then it all resets and plays again.
+  if (RANKUP) (function () {
+    var rk = footer.querySelector(".rk"), meter = footer.querySelector(".rk-meter"), segs = meter.querySelectorAll("i");
+    var wrap = footer.querySelector(".by-wrap"), ig = footer.querySelector(".by-ig-text");
+    var dpr = window.devicePixelRatio || 1, sc = 1.3;           // CSS px per sprite pixel
+    var W = 46 * sc, H = 40 * sc, snap = function (v) { return Math.round(v * dpr) / dpr; };
+    rk.style.width = W + "px"; rk.style.height = H + "px";
+    meter.style.right = "0px"; rk.style.right = "18px";
+    wrap.style.paddingRight = Math.ceil(W + 18 + 10) + "px";
+    function frame(n) { rk.style.backgroundPosition = ((n - 1) * 100 / 33) + "% 0"; }
+    function fill(n) {
+      for (var i = 0; i < segs.length; i++) segs[i].className = i < n ? "on" : "";
+      meter.classList.toggle("max", n >= segs.length);
+    }
+    function place() {                                   // plates (and the meter) on the baseline of "@trainbloom"
+      var mark = document.createElement("span");
+      mark.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
+      ig.insertBefore(mark, ig.firstChild);
+      var base = mark.getBoundingClientRect().top - wrap.getBoundingClientRect().top;
+      ig.removeChild(mark);
+      rk.style.top = snap(base - H) + "px";
+      meter.style.top = snap(base - meter.offsetHeight) + "px";
+    }
+    place();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    window.addEventListener("resize", place);
+    frame(1); fill(0);
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { frame(34); fill(6); return; }
+    // [sprite frame, ms, meter level]
+    var SEQ = [[1, 600, 0], [2, 250, 0], [3, 400, 0], [4, 250, 0], [5, 250, 1], [6, 250, 1], [7, 250, 1], [8, 350, 2],
+      [9, 700, 2], [10, 200, 2], [11, 200, 2], [12, 200, 2], [13, 400, 2],             // light pull: barely moves it
+      [14, 500, 2], [15, 1100, 2],                                                      // looks up at it... ?
+      [16, 500, 2], [17, 500, 2], [18, 250, 2],                                         // loads the big plates
+      [19, 400, 2], [20, 320, 3], [21, 300, 3], [22, 300, 4], [23, 300, 4], [24, 350, 5],
+      [25, 300, 6], [26, 300, 6], [25, 300, 6], [26, 300, 6],                           // heavy pull: maxed out
+      [27, 200, 6], [28, 200, 6], [29, 250, 6], [30, 350, 6],
+      [31, 180, 6], [32, 260, 6], [33, 220, 6], [34, 400, 6], [31, 180, 6], [32, 260, 6], [33, 220, 6], [34, 1400, 6]];
+    var k = 0;
+    function step() { var s = SEQ[k]; frame(s[0]); fill(s[2]); k = (k + 1) % SEQ.length; setTimeout(step, s[1]); }
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(step, 300); } }, { threshold: 0.6 });
+      io.observe(rk);
+    } else step();
+  })();
+
   // 1RM page: pixel me beside the text pulling a 1 rep max deadlift. Once he's on screen he shakes out
   // and psyches up, grips the bar, grinds it up squinting, holds the lockout shaking, sets it down, jumps
   // to celebrate, then wobbles, falls back and passes out with X eyes, breathing hard with stars circling
@@ -281,7 +331,7 @@
     } else step();
   })();
 
-  if (!TREADMILL && !SHAKE && !DONUT && !DEADLIFT && !VO2) (function () {
+  if (!TREADMILL && !SHAKE && !DONUT && !DEADLIFT && !VO2 && !RANKUP) (function () {
     var clip = footer.querySelector(".peek-clip"), peek = footer.querySelector(".peek");
     var wrap = footer.querySelector(".by-wrap"), shadow = footer.querySelector(".peek-shadow");
     var hole = footer.querySelector(".peek-hole");
