@@ -53,14 +53,49 @@
 
   var footer = document.createElement("footer");
   footer.className = "site-footer";
-  footer.innerHTML = '<div class="by-wrap"><i class="peek-hole" aria-hidden="true"></i><div class="peek-clip" aria-hidden="true"><div class="peek"></div></div><i class="peek-shadow" aria-hidden="true"></i><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>';
+  var TREADMILL = here === "/calorie-calculator-tdee/";   // the TDEE page gets me on a treadmill instead
+  footer.innerHTML = TREADMILL
+    ? '<div class="by-wrap tm-wrap"><div class="tm" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
+    : '<div class="by-wrap"><i class="peek-hole" aria-hidden="true"></i><div class="peek-clip" aria-hidden="true"><div class="peek"></div></div><i class="peek-shadow" aria-hidden="true"></i><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>';
   document.body.appendChild(footer);
+
+  // TDEE page: pixel me on a treadmill beside the text. He runs, slows down, stops and bends over
+  // to catch his breath, wipes his brow, then starts running again, on a loop. Every pose is a frame
+  // of one sprite sheet (35x35 per frame, drawn at 2x), so he stays crisp.
+  if (TREADMILL) (function () {
+    var tm = footer.querySelector(".tm"), wrap = footer.querySelector(".by-wrap");
+    var ig = footer.querySelector(".by-ig-text");
+    function frame(n) { tm.style.backgroundPosition = ((n - 1) * 100 / 23) + "% 0"; }
+    function place() {                                   // wheels on the baseline of "@trainbloom"
+      var mark = document.createElement("span");
+      mark.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
+      ig.insertBefore(mark, ig.firstChild);
+      var base = mark.getBoundingClientRect().top - wrap.getBoundingClientRect().top;
+      ig.removeChild(mark);
+      tm.style.top = Math.round(base - 70) + "px";
+    }
+    place();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    window.addEventListener("resize", place);
+    frame(14);
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var RUN = [], i;
+    for (i = 1; i <= 12; i++) RUN.push([i, 90]);
+    var SEQ = RUN.concat(RUN, RUN, [[13, 120], [14, 260], [15, 160], [16, 260], [17, 260], [18, 260], [17, 260], [18, 260],
+      [19, 220], [20, 420], [21, 450], [22, 320], [23, 110], [24, 110]]);
+    var k = 0;
+    function step() { var s = SEQ[k]; frame(s[0]); k = (k + 1) % SEQ.length; setTimeout(step, s[1]); }
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(step, 400); } });
+      io.observe(footer);
+    } else step();
+  })();
 
   // Pixel me in the footer: he pops up out of the ground beside "Built by Tony / @trainbloom" (like
   // popping out of a hole), lands, turns to face the text, and idles there breathing and blinking.
   // Animated the 8-bit way: positions move on his own 2px pixel grid and update at 15fps, and the
   // landing / breathing are separate pose frames rather than any smooth scaling, so he always stays crisp.
-  (function () {
+  if (!TREADMILL) (function () {
     var clip = footer.querySelector(".peek-clip"), peek = footer.querySelector(".peek");
     var wrap = footer.querySelector(".by-wrap"), shadow = footer.querySelector(".peek-shadow");
     var hole = footer.querySelector(".peek-hole");
