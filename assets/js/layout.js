@@ -57,7 +57,10 @@
   var SHAKE = here === "/protein-calculator-1/";          // the protein page: me with a protein shake
   var DONUT = here === "/how-long-should-i-diet-calculator/";   // diet length page: me lying on the text eating a donut
   var MONSTER = here === "/1-rep-max-calculator/";        // 1RM page: me sitting on the text sipping a white Monster
-  footer.innerHTML = MONSTER
+  var VO2 = here === "/vo2-max-calculator/";              // VO2 max page: me doing a VO2 max test on a treadmill
+  footer.innerHTML = VO2
+    ? '<div class="by-wrap vo-wrap"><div class="vo" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
+    : MONSTER
     ? '<div class="by-wrap mo-wrap"><div class="mo" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
     : DONUT
     ? '<div class="by-wrap dn-wrap"><div class="dn" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
@@ -233,7 +236,43 @@
     } else step();
   })();
 
-  if (!TREADMILL && !SHAKE && !DONUT && !MONSTER) (function () {
+  // VO2 max page: pixel me on a treadmill beside the text doing a VO2 max test. Once he's on screen he
+  // picks up the mask, straps it on, runs, stops, takes the mask off and hangs it on the console, bends
+  // over to catch his breath, then grabs the mask again and repeats. One shared treadmill under every
+  // frame (so it never shifts); he's drawn on top.
+  if (VO2) (function () {
+    var vo = footer.querySelector(".vo"), wrap = footer.querySelector(".by-wrap"), ig = footer.querySelector(".by-ig-text");
+    var dpr = window.devicePixelRatio || 1, sc = Math.max(1, Math.round(dpr * 1.6)) / dpr;   // whole screen pixels per sprite pixel
+    var W = 41 * sc, snap = function (v) { return Math.round(v * dpr) / dpr; };
+    vo.style.width = vo.style.height = W + "px";
+    wrap.style.paddingRight = Math.ceil(W + 12) + "px";
+    function frame(n) { vo.style.backgroundPosition = ((n - 1) * 100 / 19) + "% 0"; }
+    function place() {                                   // wheels on the baseline of "@trainbloom"
+      var mark = document.createElement("span");
+      mark.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
+      ig.insertBefore(mark, ig.firstChild);
+      var base = mark.getBoundingClientRect().top - wrap.getBoundingClientRect().top;
+      ig.removeChild(mark);
+      vo.style.top = snap(base - W) + "px";
+    }
+    place();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    window.addEventListener("resize", place);
+    frame(1);
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var RUN = [[6, 100], [7, 100], [8, 100], [9, 100], [10, 100], [11, 100], [12, 100], [13, 100]];
+    var SEQ = [[2, 260], [3, 260], [4, 300], [5, 500]].concat(RUN, RUN, RUN, RUN,
+      [[14, 450], [15, 320], [16, 320], [17, 420], [18, 320], [19, 320], [18, 320], [19, 320], [18, 320], [19, 320],
+       [20, 900], [17, 380], [16, 380], [1, 900]]);
+    var k = 0;
+    function step() { var s = SEQ[k]; frame(s[0]); k = (k + 1) % SEQ.length; setTimeout(step, s[1]); }
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(step, 300); } }, { threshold: 0.6 });
+      io.observe(vo);
+    } else step();
+  })();
+
+  if (!TREADMILL && !SHAKE && !DONUT && !MONSTER && !VO2) (function () {
     var clip = footer.querySelector(".peek-clip"), peek = footer.querySelector(".peek");
     var wrap = footer.querySelector(".by-wrap"), shadow = footer.querySelector(".peek-shadow");
     var hole = footer.querySelector(".peek-hole");
