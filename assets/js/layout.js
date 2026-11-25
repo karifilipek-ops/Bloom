@@ -54,7 +54,10 @@
   var footer = document.createElement("footer");
   footer.className = "site-footer";
   var TREADMILL = here === "/calorie-calculator-tdee/";   // the TDEE page gets me on a treadmill instead
-  footer.innerHTML = TREADMILL
+  var SHAKE = here === "/protein-calculator-1/";          // the protein page: me with a protein shake
+  footer.innerHTML = SHAKE
+    ? '<div class="by-wrap sp-wrap"><div class="sp" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
+    : TREADMILL
     ? '<div class="by-wrap tm-wrap"><div class="tm" aria-hidden="true"></div><div class="tm-guy" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
     : '<div class="by-wrap"><i class="peek-hole" aria-hidden="true"></i><div class="peek-clip" aria-hidden="true"><div class="peek"></div></div><i class="peek-shadow" aria-hidden="true"></i><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>';
   document.body.appendChild(footer);
@@ -113,7 +116,36 @@
   // popping out of a hole), lands, turns to face the text, and idles there breathing and blinking.
   // Animated the 8-bit way: positions move on his own 2px pixel grid and update at 15fps, and the
   // landing / breathing are separate pose frames rather than any smooth scaling, so he always stays crisp.
-  if (!TREADMILL) (function () {
+  // Protein page: pixel me beside the text with a protein shake. Once the footer comes into view he
+  // shakes it hard, looks at you, takes a long drink, lowers it, and waits a moment before going again.
+  if (SHAKE) (function () {
+    var sp = footer.querySelector(".sp"), wrap = footer.querySelector(".by-wrap"), ig = footer.querySelector(".by-ig-text");
+    function frame(n) { sp.style.backgroundPosition = ((n - 1) * 100 / 15) + "% 0"; }
+    function place() {                                   // feet on the baseline of "@trainbloom"
+      var mark = document.createElement("span");
+      mark.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
+      ig.insertBefore(mark, ig.firstChild);
+      var base = mark.getBoundingClientRect().top - wrap.getBoundingClientRect().top;
+      ig.removeChild(mark);
+      sp.style.top = Math.round(base - 66) + "px";
+    }
+    place();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    window.addEventListener("resize", place);
+    frame(1);
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var SHAKES = [[2, 90], [3, 90], [4, 90], [5, 90], [6, 90], [7, 90]];
+    var SEQ = [[1, 900]].concat(SHAKES, SHAKES, [[8, 320], [10, 300], [11, 150], [12, 200], [13, 900], [12, 160],
+      [13, 700], [14, 200], [15, 200], [1, 1600]]);
+    var k = 0;
+    function step() { var s = SEQ[k]; frame(s[0]); k = (k + 1) % SEQ.length; setTimeout(step, s[1]); }
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(step, 300); } });
+      io.observe(footer);
+    } else step();
+  })();
+
+  if (!TREADMILL && !SHAKE) (function () {
     var clip = footer.querySelector(".peek-clip"), peek = footer.querySelector(".peek");
     var wrap = footer.querySelector(".by-wrap"), shadow = footer.querySelector(".peek-shadow");
     var hole = footer.querySelector(".peek-hole");
