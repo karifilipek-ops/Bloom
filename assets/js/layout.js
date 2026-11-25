@@ -56,12 +56,12 @@
   var TREADMILL = here === "/calorie-calculator-tdee/";   // the TDEE page gets me on a treadmill instead
   var SHAKE = here === "/protein-calculator-1/";          // the protein page: me with a protein shake
   var DONUT = here === "/how-long-should-i-diet-calculator/";   // diet length page: me lying on the text eating a donut
-  var MONSTER = here === "/1-rep-max-calculator/";        // 1RM page: me sitting on the text sipping a white Monster
+  var DEADLIFT = here === "/1-rep-max-calculator/";       // 1RM page: me pulling a 1 rep max deadlift
   var VO2 = here === "/vo2-max-calculator/";              // VO2 max page: me doing a VO2 max test on a treadmill
   footer.innerHTML = VO2
     ? '<div class="by-wrap vo-wrap"><div class="vo" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
-    : MONSTER
-    ? '<div class="by-wrap mo-wrap"><div class="mo" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
+    : DEADLIFT
+    ? '<div class="by-wrap dl-wrap"><div class="dl" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
     : DONUT
     ? '<div class="by-wrap dn-wrap"><div class="dn" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
     : SHAKE
@@ -197,42 +197,45 @@
     } else step();
   })();
 
-  // 1RM page: pixel me sitting on the right end of "Built by Tony", legs hanging off past the end of
-  // the word, sipping a white Monster. His body stays still; only the can and his arm move (resting on
-  // his leg, half way up, at his mouth), with a blink now and then and a content eyes-closed "ahh".
-  if (MONSTER) (function () {
-    var mo = footer.querySelector(".mo"), wrap = footer.querySelector(".by-wrap"), name = footer.querySelector(".by-name");
-    var REST = 0, BLINK = 1, MID = 2, UP = 3, SIP = 4, AHH = 5;
-    function frame(n) { mo.style.backgroundPosition = (n * 100 / 5) + "% 0"; }
-    function place() {
+  // 1RM page: pixel me beside the text pulling a 1 rep max deadlift. Once he's on screen he shakes out
+  // and psyches up, grips the bar, grinds it up squinting, holds the lockout shaking, sets it down, jumps
+  // to celebrate, then wobbles, falls back and passes out with X eyes, breathing hard with stars circling
+  // his head (that last part loops). One clean barbell is drawn into every frame so it never changes shape.
+  if (DEADLIFT) (function () {
+    var dl = footer.querySelector(".dl"), wrap = footer.querySelector(".by-wrap"), ig = footer.querySelector(".by-ig-text");
+    var dpr = window.devicePixelRatio || 1, sc = 1.3;           // CSS px per sprite pixel
+    var W = 42 * sc, H = 38 * sc, snap = function (v) { return Math.round(v * dpr) / dpr; };
+    dl.style.width = W + "px"; dl.style.height = H + "px";
+    wrap.style.paddingRight = Math.ceil(W + 12) + "px";
+    function frame(n) { dl.style.backgroundPosition = ((n - 1) * 100 / 30) + "% 0"; }
+    function place() {                                   // the plates rest on the baseline of "@trainbloom"
       var mark = document.createElement("span");
       mark.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
-      name.insertBefore(mark, name.firstChild);
-      var w = wrap.getBoundingClientRect(), base = mark.getBoundingClientRect().top - w.top;
-      name.removeChild(mark);
-      var cs = getComputedStyle(name), c = document.createElement("canvas").getContext("2d");
-      c.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
-      var top = base - c.measureText("B").actualBoundingBoxAscent;
-      // 1.35 CSS px per sprite pixel, snapped to whole screen pixels where it can be
-      var dpr = window.devicePixelRatio || 1, sc = 1.35;
-      var snap = function (v) { return Math.round(v * dpr) / dpr; };
-      mo.style.width = 23 * sc + "px"; mo.style.height = 38 * sc + "px";
-      var nr = name.getBoundingClientRect();
-      mo.style.top = snap(top - 30 * sc) + "px";                       // his seat (sprite row 30) on the letter tops
-      mo.style.left = snap(nr.right - w.left - 8 * sc + sc) + "px";      // legs (from sprite column 8) just past the word
+      ig.insertBefore(mark, ig.firstChild);
+      var base = mark.getBoundingClientRect().top - wrap.getBoundingClientRect().top;
+      ig.removeChild(mark);
+      dl.style.top = snap(base - H) + "px";
     }
     place();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
     window.addEventListener("resize", place);
-    frame(REST);
+    frame(1);
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    var SEQ = [[MID, 180], [UP, 450], [SIP, 1000], [UP, 250], [MID, 180], [AHH, 800], [REST, 1300], [BLINK, 140],
-      [REST, 1500], [MID, 180], [UP, 450], [SIP, 800], [UP, 250], [MID, 180], [REST, 1800], [BLINK, 140], [REST, 900]];
-    var k = 0;
-    function step() { var s = SEQ[k]; frame(s[0]); k = (k + 1) % SEQ.length; setTimeout(step, s[1]); }
+    var SEQ = [[1, 500], [2, 220], [3, 220], [2, 220], [3, 300],              // shake out, psych up
+      [4, 260], [5, 450],                                                       // bend down, grip
+      [6, 320], [7, 280], [8, 280], [9, 280], [10, 300],                        // grind it up, squinting
+      [11, 280], [12, 280], [11, 280], [12, 280],                               // lockout, shaking
+      [13, 200], [14, 200], [15, 250], [16, 300],                               // set it down
+      [17, 180], [18, 260], [19, 220], [20, 400],                               // jump to celebrate
+      [21, 450], [22, 180], [23, 180], [24, 220], [25, 600]];                   // wobble, fall back, out
+    var k = 0, LOOP = 26;                                                       // 26-31: breathing, stars circling
+    function step() {
+      if (k < SEQ.length) { var s = SEQ[k++]; frame(s[0]); setTimeout(step, s[1]); return; }
+      frame(LOOP + (k++ - SEQ.length) % 6); setTimeout(step, 260);
+    }
     if ("IntersectionObserver" in window) {
       var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(step, 300); } }, { threshold: 0.6 });
-      io.observe(mo);
+      io.observe(dl);
     } else step();
   })();
 
@@ -278,7 +281,7 @@
     } else step();
   })();
 
-  if (!TREADMILL && !SHAKE && !DONUT && !MONSTER && !VO2) (function () {
+  if (!TREADMILL && !SHAKE && !DONUT && !DEADLIFT && !VO2) (function () {
     var clip = footer.querySelector(".peek-clip"), peek = footer.querySelector(".peek");
     var wrap = footer.querySelector(".by-wrap"), shadow = footer.querySelector(".peek-shadow");
     var hole = footer.querySelector(".peek-hole");
