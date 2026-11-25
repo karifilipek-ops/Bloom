@@ -210,10 +210,10 @@
       var cs = getComputedStyle(name), c = document.createElement("canvas").getContext("2d");
       c.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
       var top = base - c.measureText("B").actualBoundingBoxAscent;
-      // each sprite pixel = a whole number of screen pixels (5 on most phones, 3 on most laptops)
-      var dpr = window.devicePixelRatio || 1, sc = Math.max(1, Math.round(dpr * 1.6)) / dpr;
+      // each sprite pixel = a whole number of screen pixels (4 on most phones, 3 on most laptops)
+      var dpr = window.devicePixelRatio || 1, sc = Math.max(1, Math.round(dpr * 1.3)) / dpr;
       var snap = function (v) { return Math.round(v * dpr) / dpr; };
-      mo.style.width = 21 * sc + "px"; mo.style.height = 38 * sc + "px";
+      mo.style.width = 23 * sc + "px"; mo.style.height = 38 * sc + "px";
       var nr = name.getBoundingClientRect();
       mo.style.top = snap(top - 30 * sc) + "px";                       // his seat (sprite row 30) on the letter tops
       mo.style.left = snap(nr.right - w.left - 8 * sc + sc) + "px";      // legs (from sprite column 8) just past the word
