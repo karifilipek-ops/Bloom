@@ -656,6 +656,8 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .site-footer .tm { position: absolute; right: 0; top: 0; width: 70px; height: 70px; background: url(/assets/img/treadmill.png) 0 0 / 200% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }
 .site-footer .by-wrap.sp-wrap { padding-right: 60px; }
 .site-footer .sp { position: absolute; right: 0; top: 0; width: 44px; height: 66px; background: url(/assets/img/shake-me.png) 0 0 / 1600% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }
+.site-footer .by-wrap.dn-wrap { padding-top: 60px; padding-right: 0; }
+.site-footer .dn { position: absolute; left: 0; top: 0; width: 82px; height: 56px; background: url(/assets/img/donut-me.png) 0 0 / 400% 100% no-repeat; image-rendering: pixelated; pointer-events: none; z-index: 2; }
 .site-footer .tm-guy { position: absolute; right: 0; top: 0; width: 70px; height: 70px; background: url(/assets/img/treadmill-me.png) 0 0 / 2400% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }

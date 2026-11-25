@@ -55,7 +55,10 @@
   footer.className = "site-footer";
   var TREADMILL = here === "/calorie-calculator-tdee/";   // the TDEE page gets me on a treadmill instead
   var SHAKE = here === "/protein-calculator-1/";          // the protein page: me with a protein shake
-  footer.innerHTML = SHAKE
+  var DONUT = here === "/how-long-should-i-diet-calculator/";   // diet length page: me lying on the text eating a donut
+  footer.innerHTML = DONUT
+    ? '<div class="by-wrap dn-wrap"><div class="dn" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
+    : SHAKE
     ? '<div class="by-wrap sp-wrap"><div class="sp" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
     : TREADMILL
     ? '<div class="by-wrap tm-wrap"><div class="tm" aria-hidden="true"></div><div class="tm-guy" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
@@ -148,7 +151,42 @@
     } else step();
   })();
 
-  if (!TREADMILL && !SHAKE) (function () {
+  // Diet length page: pixel me lying on top of "Built by Tony", taking his time with a donut. His body
+  // stays still; only his arm and the donut move (resting, half way up, at his mouth), with a blink now
+  // and then while he rests.
+  if (DONUT) (function () {
+    var dn = footer.querySelector(".dn"), wrap = footer.querySelector(".by-wrap"), name = footer.querySelector(".by-name");
+    var REST = 0, BLINK = 1, MID = 2, UP = 3;
+    function frame(n) { dn.style.backgroundPosition = (n * 100 / 3) + "% 0"; }
+    function place() {                                   // lying right on top of the letters of "Built by Tony"
+      var mark = document.createElement("span");
+      mark.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
+      name.insertBefore(mark, name.firstChild);
+      var w = wrap.getBoundingClientRect(), base = mark.getBoundingClientRect().top - w.top;
+      name.removeChild(mark);
+      var cs = getComputedStyle(name), c = document.createElement("canvas").getContext("2d");
+      c.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+      var top = base - c.measureText("B").actualBoundingBoxAscent;
+      var nr = name.getBoundingClientRect();
+      dn.style.top = Math.round(top - 56) + "px";
+      dn.style.left = Math.round(nr.left - w.left + (nr.width - 82) / 2) + "px";
+    }
+    place();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    window.addEventListener("resize", place);
+    frame(REST);
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var SEQ = [[MID, 180], [UP, 650], [MID, 180], [REST, 900], [BLINK, 140], [REST, 1400], [MID, 180], [UP, 650], [MID, 180],
+      [REST, 2200], [BLINK, 140], [REST, 1200]];
+    var k = 0;
+    function step() { var s = SEQ[k]; frame(s[0]); k = (k + 1) % SEQ.length; setTimeout(step, s[1]); }
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(step, 400); } }, { threshold: 0.6 });
+      io.observe(dn);
+    } else step();
+  })();
+
+  if (!TREADMILL && !SHAKE && !DONUT) (function () {
     var clip = footer.querySelector(".peek-clip"), peek = footer.querySelector(".peek");
     var wrap = footer.querySelector(".by-wrap"), shadow = footer.querySelector(".peek-shadow");
     var hole = footer.querySelector(".peek-hole");
