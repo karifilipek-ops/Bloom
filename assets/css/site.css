@@ -639,7 +639,7 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .site-footer .peek-clip.free { overflow: visible; }
 .site-footer .peek-hole { position: absolute; display: none; width: 44px; height: 14px; background: url(/assets/img/peek-hole.png) 0 0 / 300% 100% no-repeat; image-rendering: pixelated; }
 .site-footer .peek { position: absolute; left: 0; bottom: -1px; width: 44px; height: 54px; opacity: 0; }
-.site-footer .peek-guy { width: 44px; height: 54px; background: url(/assets/img/peek-me.png) 0 0 / 400% 100% no-repeat; image-rendering: pixelated; }
+.site-footer .peek-guy { width: 44px; height: 54px; background: url(/assets/img/peek-me.png) 0 0 / 600% 100% no-repeat; image-rendering: pixelated; }
 .site-footer .peek-guy.flip { transform: scaleX(-1); }
 .site-footer .peek-shadow {
   position: absolute; right: 12px; bottom: calc(100% - 25px); width: 24px; height: 3px; border-radius: 50%;

@@ -70,7 +70,7 @@
     }
     peek.innerHTML = '<div class="peek-guy"></div>';
     var guy = peek.firstChild;
-    var STAND = 0, BLINK = 1, BREATHE = 2, CROUCH = 3;
+    var STAND = 0, BLINK = 1, BREATHE = 2, CROUCH = 3, WAVE_A = 4, WAVE_B = 5;
     var PAD = 50, H = 54, TICK = 1000 / 15;
     // Where the text's ink actually sits (from the font metrics), relative to the top of .by-wrap:
     // he pops out from behind the top line ("Built by Tony") and lands on the bottom line's baseline.
@@ -94,7 +94,7 @@
       DROP = 0;
       shadow.style.bottom = "auto"; shadow.style.top = Math.round(b.base - 1) + "px";
     }
-    function frame(n) { guy.style.backgroundPosition = (n * 100 / 3) + "% 0"; }
+    function frame(n) { guy.style.backgroundPosition = (n * 20) + "% 0"; }
     var bx = 0, by = 0;
     function snap(v, base) { return Math.round((base + v) / 2) * 2 - base; }
     function pose(x, y) { peek.style.transform = "translate(" + snap(x, bx) + "px," + snap(y, by) + "px)"; }
@@ -110,6 +110,13 @@
         setTimeout(step, 520);
       })();
     }
+    function wave() {                                    // arm up, wiggle the hand twice, arm down
+      var seq = [WAVE_A, WAVE_B, WAVE_A, WAVE_B, WAVE_A, STAND], i = 0;
+      (function next() {
+        frame(seq[i]);
+        if (++i < seq.length) setTimeout(next, 170); else setTimeout(idle, 500);
+      })();
+    }
     function land(x2, quick) {
       clip.classList.add("free"); peek.style.opacity = 1; pose(x2, DROP); shadow.classList.add("on");
       if (quick) { guy.classList.add("flip"); idle(); return; }
@@ -117,7 +124,7 @@
       setTimeout(function () { frame(BREATHE); }, TICK);                      // soak up the landing...
       setTimeout(function () { frame(STAND); }, TICK * 2);                    // ...and stand
       setTimeout(function () { guy.classList.add("flip"); }, TICK * 2 + 300); // turn to face the text
-      setTimeout(idle, TICK * 2 + 900);
+      setTimeout(wave, TICK * 2 + 1300);                                      // a second later, a little wave
     }
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) {
       frame(STAND); geometry(); measure(); land(textW() + 4, true); return;
