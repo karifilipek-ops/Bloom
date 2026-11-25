@@ -204,7 +204,7 @@
   if (DEADLIFT) (function () {
     var dl = footer.querySelector(".dl"), wrap = footer.querySelector(".by-wrap"), ig = footer.querySelector(".by-ig-text");
     var dpr = window.devicePixelRatio || 1, sc = 1.3;           // CSS px per sprite pixel
-    var W = 42 * sc, H = 38 * sc, snap = function (v) { return Math.round(v * dpr) / dpr; };
+    var W = 42 * sc, H = 40 * sc, snap = function (v) { return Math.round(v * dpr) / dpr; };
     dl.style.width = W + "px"; dl.style.height = H + "px";
     wrap.style.paddingRight = Math.ceil(W + 12) + "px";
     function frame(n) { dl.style.backgroundPosition = ((n - 1) * 100 / 30) + "% 0"; }
