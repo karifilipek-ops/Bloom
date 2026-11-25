@@ -138,13 +138,13 @@
     // 0, 2 and 1 sprite pixels higher); his body stays still.
     var SHAKES = [], i;
     for (i = 0; i < 6; i++) SHAKES.push([3, 55], [2, 55], [3, 55], [1, 55]);
-    var SEQ = [[1, 900]].concat(SHAKES, [[1, 350], [8, 320], [10, 300], [11, 150], [12, 200], [13, 900], [12, 160],
+    var SEQ = SHAKES.concat([[1, 350], [8, 320], [10, 300], [11, 150], [12, 200], [13, 900], [12, 160],
       [13, 700], [14, 200], [15, 200], [1, 1600]]);
     var k = 0;
     function step() { var s = SEQ[k]; frame(s[0]); k = (k + 1) % SEQ.length; setTimeout(step, s[1]); }
     if ("IntersectionObserver" in window) {
-      var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(step, 300); } });
-      io.observe(footer);
+      var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); step(); } }, { threshold: 0.6 });
+      io.observe(sp);                                    // start the moment he's actually on screen
     } else step();
   })();
 
