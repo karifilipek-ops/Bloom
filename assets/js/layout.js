@@ -264,8 +264,8 @@
     // 20-27: after the test he straightens up, sways, stumbles back and collapses onto the belt;
     // 28 is him flat out with X eyes, 29 the same with his chest heaving up. He stays there breathing hard.
     var SEQ = [[2, 260], [3, 260], [4, 300], [5, 500]].concat(RUN, RUN, RUN, RUN,
-      [[14, 450], [15, 320], [16, 320], [17, 420], [18, 320], [19, 320], [18, 320], [19, 320], [18, 320], [19, 320],
-       [20, 600], [21, 500], [22, 220], [23, 180], [24, 160], [25, 160], [26, 220], [27, 500], [28, 700]]);
+      [[14, 400], [15, 300], [16, 300], [17, 380], [18, 300], [19, 300],
+       [20, 280], [21, 300], [22, 180], [23, 160], [24, 150], [25, 150], [26, 200], [27, 450], [28, 700]]);
     var BREATHE = [[29, 330], [28, 330]];
     var k = 0;
     function step() {
