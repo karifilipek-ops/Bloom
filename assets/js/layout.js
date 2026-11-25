@@ -134,8 +134,11 @@
     window.addEventListener("resize", place);
     frame(1);
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    var SHAKES = [[2, 90], [3, 90], [4, 90], [5, 90], [6, 90], [7, 90]];
-    var SEQ = [[1, 900]].concat(SHAKES, SHAKES, [[8, 320], [10, 300], [11, 150], [12, 200], [13, 900], [12, 160],
+    // Shake: only the shaker in his hand pumps up and down (frames 1-3 are the same pose with the shaker
+    // 0, 2 and 1 sprite pixels higher); his body stays still.
+    var SHAKES = [], i;
+    for (i = 0; i < 6; i++) SHAKES.push([3, 55], [2, 55], [3, 55], [1, 55]);
+    var SEQ = [[1, 900]].concat(SHAKES, [[1, 350], [8, 320], [10, 300], [11, 150], [12, 200], [13, 900], [12, 160],
       [13, 700], [14, 200], [15, 200], [1, 1600]]);
     var k = 0;
     function step() { var s = SEQ[k]; frame(s[0]); k = (k + 1) % SEQ.length; setTimeout(step, s[1]); }
