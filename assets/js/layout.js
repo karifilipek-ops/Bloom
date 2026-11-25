@@ -210,8 +210,8 @@
       var cs = getComputedStyle(name), c = document.createElement("canvas").getContext("2d");
       c.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
       var top = base - c.measureText("B").actualBoundingBoxAscent;
-      // 1.5 CSS px per sprite pixel (3 screen pixels on most laptops; 4.5 on most phones, which still reads crisp)
-      var dpr = window.devicePixelRatio || 1, sc = dpr >= 1.5 ? 1.5 : 2;
+      // 1.35 CSS px per sprite pixel, snapped to whole screen pixels where it can be
+      var dpr = window.devicePixelRatio || 1, sc = 1.35;
       var snap = function (v) { return Math.round(v * dpr) / dpr; };
       mo.style.width = 23 * sc + "px"; mo.style.height = 38 * sc + "px";
       var nr = name.getBoundingClientRect();
