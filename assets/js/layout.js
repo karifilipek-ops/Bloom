@@ -214,8 +214,8 @@
     cr.style.width = props.style.width = W + "px"; cr.style.height = props.style.height = H + "px";
     wrap.style.paddingRight = Math.ceil(W + 6) + "px";
     footer.style.overflowX = "clip";                     // so running off the side never makes the page scroll
-    function frame(n) { cr.style.backgroundPosition = ((n - 1) * 100 / 27) + "% 0"; }
-    function scene(n) { props.style.backgroundPosition = (n * 100 / 3) + "% 0"; }   // 0 shut jar, 1 lid off, 2 cup back, 3 + shirt scraps
+    function frame(n) { cr.style.backgroundPosition = ((n - 1) * 100 / 29) + "% 0"; }
+    function scene(n) { props.style.backgroundPosition = (n * 100 / 4) + "% 0"; }   // 0 shut tub, 1-2 lid off, 3 + shirt scraps, 4 cup in his hand
     function place() {                                   // the floor of the scene on the baseline of "@trainbloom"
       var mark = document.createElement("span");
       mark.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
@@ -230,7 +230,9 @@
     frame(1); scene(0);
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { frame(16); scene(3); return; }
     // [frame, ms, scene]
-    var SEQ = [[1, 700, 0], [2, 300, 1], [3, 350, 1], [4, 450, 1], [5, 300, 1], [6, 650, 1], [7, 400, 1], [8, 500, 1],
+    var SEQ = [[1, 700, 0], [2, 650, 1],                                                   // scoops some out of the tub
+      [29, 170, 1], [30, 170, 1], [29, 170, 1], [30, 170, 1], [29, 170, 1], [30, 220, 1],          // pours it in his water
+      [6, 750, 4], [7, 400, 4], [8, 500, 1],                                                      // drinks it
       [9, 220, 1], [10, 220, 1], [9, 220, 1], [10, 260, 1], [11, 300, 1], [12, 320, 2], [13, 260, 2], [14, 340, 2],
       [15, 600, 3], [16, 450, 3], [17, 550, 3], [18, 550, 3], [19, 450, 3], [20, 550, 3], [21, 200, 3]];
     var k = 0, run = 0, x = 0;
