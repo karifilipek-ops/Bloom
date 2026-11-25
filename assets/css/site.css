@@ -177,7 +177,7 @@ a { color: inherit; }
   .hero-stage .hs-v { font-size: 42px; }
   .hero-stage .hs-u { font-size: 24px; }
   .hero-copy { padding-top: 4.2cqw; }
-  .hero-art h1 { font-size: 8.4cqw; letter-spacing: .22em; margin-right: -.22em; text-shadow: .5cqw .5cqw 0 var(--lav-dark); }
+  .hero-art h1 { font-size: 10.4cqw; letter-spacing: .18em; margin-right: -.18em; text-shadow: .6cqw .6cqw 0 var(--lav-dark); }
   .hero-art p { font-size: 3.4cqw; margin-top: 1.4cqw; }
 }
 .hero.sm { padding: 57px 16px 57px; } /* even top/bottom so the icon + title sit in the vertical middle */
