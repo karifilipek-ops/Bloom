@@ -652,8 +652,9 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 40px auto; max-w
 .site-footer .by-ig:hover { color: var(--ink); }
 .site-footer .by-arrow { font-size: 15px; }
 /* TDEE page: me on a treadmill to the right of the text (35x35 sprite frames at 2x) */
-.site-footer .by-wrap.tm-wrap { padding-right: 82px; }
-.site-footer .tm { position: absolute; right: 0; top: 0; width: 70px; height: 70px; background: url(/assets/img/treadmill-me.png) 0 0 / 2400% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }
+.site-footer .by-wrap.tm-wrap { padding-right: 112px; }
+.site-footer .tm { position: absolute; right: 0; top: 0; width: 70px; height: 70px; background: url(/assets/img/treadmill.png) 0 0 / 200% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }
+.site-footer .tm-guy { position: absolute; right: 0; top: 0; width: 70px; height: 70px; background: url(/assets/img/treadmill-me.png) 0 0 / 2400% 100% no-repeat; image-rendering: pixelated; pointer-events: none; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 

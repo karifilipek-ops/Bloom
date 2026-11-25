@@ -55,40 +55,58 @@
   footer.className = "site-footer";
   var TREADMILL = here === "/calorie-calculator-tdee/";   // the TDEE page gets me on a treadmill instead
   footer.innerHTML = TREADMILL
-    ? '<div class="by-wrap tm-wrap"><div class="tm" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
+    ? '<div class="by-wrap tm-wrap"><div class="tm" aria-hidden="true"></div><div class="tm-guy" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
     : '<div class="by-wrap"><i class="peek-hole" aria-hidden="true"></i><div class="peek-clip" aria-hidden="true"><div class="peek"></div></div><i class="peek-shadow" aria-hidden="true"></i><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>';
   document.body.appendChild(footer);
 
-  // TDEE page: pixel me on a treadmill beside the text. He runs, slows down, stops and bends over
-  // to catch his breath, wipes his brow, then starts running again, on a loop. Every pose is a frame
-  // of one sprite sheet (35x35 per frame, drawn at 2x), so he stays crisp.
+  // TDEE page: pixel me and a treadmill beside the text. The first time the footer comes into view he's
+  // standing on the ground next to it: he hops on, presses start (the screen lights up), and runs for a
+  // few seconds, then slows down, stops and bends over to catch his breath, wipes his brow, and starts
+  // running again, on a loop. He and the treadmill are separate sprites (35x35 frames drawn at 2x) and he
+  // only ever moves in whole 2px steps at 15fps, so everything stays crisp.
   if (TREADMILL) (function () {
-    var tm = footer.querySelector(".tm"), wrap = footer.querySelector(".by-wrap");
+    var tm = footer.querySelector(".tm"), guy = footer.querySelector(".tm-guy"), wrap = footer.querySelector(".by-wrap");
     var ig = footer.querySelector(".by-ig-text");
-    function frame(n) { tm.style.backgroundPosition = ((n - 1) * 100 / 23) + "% 0"; }
+    function frame(n) { guy.style.backgroundPosition = ((n - 1) * 100 / 23) + "% 0"; }
+    function pos(dx, dy) { guy.style.transform = "translate(" + dx * 2 + "px," + dy * 2 + "px)"; }
+    function screen(on) { tm.style.backgroundPosition = on ? "100% 0" : "0 0"; }
     function place() {                                   // wheels on the baseline of "@trainbloom"
       var mark = document.createElement("span");
       mark.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
       ig.insertBefore(mark, ig.firstChild);
       var base = mark.getBoundingClientRect().top - wrap.getBoundingClientRect().top;
       ig.removeChild(mark);
-      tm.style.top = Math.round(base - 70) + "px";
+      tm.style.top = guy.style.top = Math.round(base - 70) + "px";
     }
     place();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
     window.addEventListener("resize", place);
-    frame(14);
-    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    var RUN = [], i;
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { frame(14); screen(true); return; }
+    var GROUND = [-22, 6];                               // standing on the ground just left of the treadmill
+    frame(14); pos(GROUND[0], GROUND[1]); screen(false);
+    var TICK = 1000 / 15, RUN = [], i;
     for (i = 1; i <= 12; i++) RUN.push([i, 90]);
-    var SEQ = RUN.concat(RUN, RUN, [[13, 120], [14, 260], [15, 160], [16, 260], [17, 260], [18, 260], [17, 260], [18, 260],
-      [19, 220], [20, 420], [21, 450], [22, 320], [23, 110], [24, 110]]);
-    var k = 0;
-    function step() { var s = SEQ[k]; frame(s[0]); k = (k + 1) % SEQ.length; setTimeout(step, s[1]); }
+    var LOOP = [[23, 110], [24, 110]].concat(RUN, RUN, RUN, [[13, 120], [14, 260], [15, 160], [16, 260], [17, 260],
+      [18, 260], [17, 260], [18, 260], [19, 220], [20, 420], [21, 450], [22, 320]]);
+    function play(seq, k, done) {
+      if (k >= seq.length) return done();
+      var s = seq[k]; frame(s[0]); if (s[2]) s[2]();
+      setTimeout(function () { play(seq, k + 1, done); }, s[1]);
+    }
+    function loop() { play(LOOP, 0, loop); }
+    function hop() {                                     // [dx, dy] in sprite pixels, one per 15fps tick
+      var path = [[-19, 3], [-16, 0], [-13, -2], [-10, -3], [-7, -3], [-4, -2], [-2, -1]], k = 0;
+      frame(5);
+      (function step() {
+        if (k < path.length) { pos(path[k][0], path[k][1]); k++; setTimeout(step, TICK); return; }
+        pos(0, 0);
+        play([[13, TICK], [14, 450], [20, 380, function () { setTimeout(function () { screen(true); }, 120); }], [14, 300]], 0, loop);
+      })();
+    }
     if ("IntersectionObserver" in window) {
-      var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(step, 400); } });
+      var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(hop, 900); } });
       io.observe(footer);
-    } else step();
+    } else setTimeout(hop, 900);
   })();
 
   // Pixel me in the footer: he pops up out of the ground beside "Built by Tony / @trainbloom" (like
