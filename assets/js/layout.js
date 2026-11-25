@@ -273,12 +273,12 @@
       [29, 170, 1], [30, 170, 1], [29, 170, 1], [30, 170, 1], [29, 170, 1], [30, 220, 1],          // pours it in his water
       [6, 750, 4], [7, 400, 4], [8, 500, 1],                                                      // drinks it
       [9, 220, 1], [10, 220, 1], [9, 220, 1], [10, 260, 1], [11, 300, 1], [12, 320, 2], [13, 260, 2], [14, 340, 2],
-      [15, 600, 3], [16, 450, 3], [17, 550, 3], [18, 550, 3], [19, 450, 3], [20, 550, 3], [21, 200, 3]];
+      [15, 600, 3], [16, 450, 3], [17, 550, 3], [18, 550, 3], [19, 450, 3], [20, 550, 3], [21, 140, 3]];
     var k = 0, run = 0, x = 0;
     function sprint() {                                  // he keeps running, right off the side of the screen
       frame(22 + run % 3); run++;
-      x += 8 * sc; cr.style.transform = "translateX(" + snap(x) + "px)";
-      if (cr.getBoundingClientRect().left < window.innerWidth + 10) return setTimeout(sprint, 110);
+      x += 14 * sc; cr.style.transform = "translateX(" + snap(x) + "px)";
+      if (cr.getBoundingClientRect().left < window.innerWidth + 10) return setTimeout(sprint, 75);
       setTimeout(function () {                           // gone; a beat later he's back, tiny again
         cr.style.transform = ""; x = 0; run = 0; k = 0; step();
       }, 1500);
