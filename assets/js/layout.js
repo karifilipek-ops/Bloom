@@ -207,11 +207,11 @@
     var rk = footer.querySelector(".rk"), meter = footer.querySelector(".rk-meter"), segs = meter.querySelectorAll("i");
     var wrap = footer.querySelector(".by-wrap"), ig = footer.querySelector(".by-ig-text");
     var dpr = window.devicePixelRatio || 1, sc = 1.3;           // CSS px per sprite pixel
-    var W = 46 * sc, H = 40 * sc, snap = function (v) { return Math.round(v * dpr) / dpr; };
+    var W = 80 * sc, H = 40 * sc, snap = function (v) { return Math.round(v * dpr) / dpr; };
     rk.style.width = W + "px"; rk.style.height = H + "px";
     meter.style.right = "0px"; rk.style.right = "18px";
     wrap.style.paddingRight = Math.ceil(W + 18 + 10) + "px";
-    function frame(n) { rk.style.backgroundPosition = ((n - 1) * 100 / 33) + "% 0"; }
+    function frame(n) { rk.style.backgroundPosition = ((n - 1) * 100 / 58) + "% 0"; }
     function fill(n) {
       for (var i = 0; i < segs.length; i++) segs[i].className = i < n ? "on" : "";
       meter.classList.toggle("max", n >= segs.length);
@@ -229,16 +229,22 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
     window.addEventListener("resize", place);
     frame(1); fill(0);
-    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { frame(34); fill(6); return; }
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { frame(59); fill(6); return; }
     // [sprite frame, ms, meter level]
     var SEQ = [[1, 600, 0], [2, 250, 0], [3, 400, 0], [4, 250, 0], [5, 250, 1], [6, 250, 1], [7, 250, 1], [8, 350, 2],
       [9, 700, 2], [10, 200, 2], [11, 200, 2], [12, 200, 2], [13, 400, 2],             // light pull: barely moves it
       [14, 500, 2], [15, 1100, 2],                                                      // looks up at it... ?
-      [16, 500, 2], [17, 500, 2], [18, 250, 2],                                         // loads the big plates
-      [19, 400, 2], [20, 320, 3], [21, 300, 3], [22, 300, 4], [23, 300, 4], [24, 350, 5],
-      [25, 300, 6], [26, 300, 6], [25, 300, 6], [26, 300, 6],                           // heavy pull: maxed out
-      [27, 200, 6], [28, 200, 6], [29, 250, 6], [30, 350, 6],
-      [31, 180, 6], [32, 260, 6], [33, 220, 6], [34, 400, 6], [31, 180, 6], [32, 260, 6], [33, 220, 6], [34, 1400, 6]];
+      [16, 160, 2], [17, 160, 2], [18, 160, 2], [19, 160, 2],                           // walks to the left plate
+      [20, 400, 2], [21, 300, 2], [22, 200, 2], [23, 220, 2],                           // picks it up, carries it over
+      [24, 300, 2], [25, 250, 2], [26, 450, 2],                                         // slides it on
+      [27, 160, 2], [28, 160, 2], [29, 160, 2], [30, 160, 2], [31, 160, 2],             // walks across
+      [32, 160, 2], [33, 160, 2], [34, 400, 2], [35, 300, 2], [36, 200, 2], [37, 220, 2],
+      [38, 300, 2], [39, 250, 2], [40, 450, 2],                                         // right side loaded
+      [41, 160, 2], [42, 160, 2], [43, 350, 2],                                         // back to the middle
+      [44, 400, 2], [45, 320, 3], [46, 300, 3], [47, 300, 4], [48, 300, 4], [49, 350, 5],
+      [50, 300, 6], [51, 300, 6], [50, 300, 6], [51, 300, 6],                           // heavy pull: maxed out
+      [52, 200, 6], [53, 200, 6], [54, 250, 6], [55, 350, 6],
+      [56, 180, 6], [57, 260, 6], [58, 220, 6], [59, 400, 6], [56, 180, 6], [57, 260, 6], [58, 220, 6], [59, 1400, 6]];
     var k = 0;
     function step() { var s = SEQ[k]; frame(s[0]); fill(s[2]); k = (k + 1) % SEQ.length; setTimeout(step, s[1]); }
     if ("IntersectionObserver" in window) {
