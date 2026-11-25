@@ -242,7 +242,7 @@
   // frame (so it never shifts); he's drawn on top.
   if (VO2) (function () {
     var vo = footer.querySelector(".vo"), wrap = footer.querySelector(".by-wrap"), ig = footer.querySelector(".by-ig-text");
-    var dpr = window.devicePixelRatio || 1, sc = Math.max(1, Math.round(dpr * 1.6)) / dpr;   // whole screen pixels per sprite pixel
+    var dpr = window.devicePixelRatio || 1, sc = 1.3;          // CSS px per sprite pixel
     var W = 44 * sc, H = 41 * sc, snap = function (v) { return Math.round(v * dpr) / dpr; };
     vo.style.width = W + "px"; vo.style.height = H + "px";
     wrap.style.paddingRight = Math.ceil(W + 12) + "px";
