@@ -58,9 +58,12 @@
   var DONUT = here === "/how-long-should-i-diet-calculator/";   // diet length page: me lying on the text eating a donut
   var DEADLIFT = here === "/1-rep-max-calculator/";       // 1RM page: me pulling a 1 rep max deadlift
   var RANKUP = here === "/strength-standards-calculator/"; // strength standards: me ranking up on a strength meter
+  var CREATINE = here === "/creatine-calculator/";        // creatine page: me taking creatine and hulking out
   var VO2 = here === "/vo2-max-calculator/";              // VO2 max page: me doing a VO2 max test on a treadmill
   footer.innerHTML = VO2
     ? '<div class="by-wrap vo-wrap"><div class="vo" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
+    : CREATINE
+    ? '<div class="by-wrap cr-wrap"><div class="cr-props" aria-hidden="true"></div><div class="cr" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
     : RANKUP
     ? '<div class="by-wrap rk-wrap"><div class="rk" aria-hidden="true"></div><div class="rk-meter" aria-hidden="true"><b>PRO</b><span><i></i><i></i><i></i><i></i><i></i><i></i></span></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
     : DEADLIFT
@@ -197,6 +200,55 @@
     if ("IntersectionObserver" in window) {
       var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(step, 400); } }, { threshold: 0.6 });
       io.observe(dn);
+    } else step();
+  })();
+
+  // Creatine page: pixel me beside the text with a tub of creatine. Once he's on screen he scoops some into
+  // his water, drinks it, starts shaking, his eyes go red, he bulks up and rips through his shirt, looks
+  // around as a jacked monster, then sprints off the side of the screen. A beat later it starts over.
+  if (CREATINE) (function () {
+    var cr = footer.querySelector(".cr"), props = footer.querySelector(".cr-props");
+    var wrap = footer.querySelector(".by-wrap"), ig = footer.querySelector(".by-ig-text");
+    var dpr = window.devicePixelRatio || 1, sc = 1.3;           // CSS px per sprite pixel
+    var W = 64 * sc, H = 63 * sc, FLOOR = 62 * sc, snap = function (v) { return Math.round(v * dpr) / dpr; };
+    cr.style.width = props.style.width = W + "px"; cr.style.height = props.style.height = H + "px";
+    wrap.style.paddingRight = Math.ceil(W + 6) + "px";
+    footer.style.overflowX = "clip";                     // so running off the side never makes the page scroll
+    function frame(n) { cr.style.backgroundPosition = ((n - 1) * 100 / 27) + "% 0"; }
+    function scene(n) { props.style.backgroundPosition = (n * 100 / 3) + "% 0"; }   // 0 shut jar, 1 lid off, 2 cup back, 3 + shirt scraps
+    function place() {                                   // the floor of the scene on the baseline of "@trainbloom"
+      var mark = document.createElement("span");
+      mark.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
+      ig.insertBefore(mark, ig.firstChild);
+      var base = mark.getBoundingClientRect().top - wrap.getBoundingClientRect().top;
+      ig.removeChild(mark);
+      cr.style.top = props.style.top = snap(base - FLOOR) + "px";
+    }
+    place();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    window.addEventListener("resize", place);
+    frame(1); scene(0);
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { frame(16); scene(3); return; }
+    // [frame, ms, scene]
+    var SEQ = [[1, 700, 0], [2, 300, 1], [3, 350, 1], [4, 450, 1], [5, 300, 1], [6, 650, 1], [7, 400, 1], [8, 500, 1],
+      [9, 220, 1], [10, 220, 1], [9, 220, 1], [10, 260, 1], [11, 300, 1], [12, 320, 2], [13, 260, 2], [14, 340, 2],
+      [15, 600, 3], [16, 450, 3], [17, 550, 3], [18, 550, 3], [19, 450, 3], [20, 550, 3], [21, 200, 3]];
+    var k = 0, run = 0, x = 0;
+    function sprint() {                                  // he keeps running, right off the side of the screen
+      frame(22 + run % 3); run++;
+      x += 8 * sc; cr.style.transform = "translateX(" + snap(x) + "px)";
+      if (cr.getBoundingClientRect().left < window.innerWidth + 10) return setTimeout(sprint, 110);
+      setTimeout(function () {                           // gone; a beat later he's back, tiny again
+        cr.style.transform = ""; x = 0; run = 0; k = 0; step();
+      }, 1500);
+    }
+    function step() {
+      if (k >= SEQ.length) return sprint();
+      var s = SEQ[k++]; frame(s[0]); scene(s[2]); setTimeout(step, s[1]);
+    }
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(step, 300); } }, { threshold: 0.6 });
+      io.observe(cr);
     } else step();
   })();
 
@@ -337,7 +389,7 @@
     } else step();
   })();
 
-  if (!TREADMILL && !SHAKE && !DONUT && !DEADLIFT && !VO2 && !RANKUP) (function () {
+  if (!TREADMILL && !SHAKE && !DONUT && !DEADLIFT && !VO2 && !RANKUP && !CREATINE) (function () {
     var clip = footer.querySelector(".peek-clip"), peek = footer.querySelector(".peek");
     var wrap = footer.querySelector(".by-wrap"), shadow = footer.querySelector(".peek-shadow");
     var hole = footer.querySelector(".peek-hole");
