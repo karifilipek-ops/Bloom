@@ -56,7 +56,10 @@
   var TREADMILL = here === "/calorie-calculator-tdee/";   // the TDEE page gets me on a treadmill instead
   var SHAKE = here === "/protein-calculator-1/";          // the protein page: me with a protein shake
   var DONUT = here === "/how-long-should-i-diet-calculator/";   // diet length page: me lying on the text eating a donut
-  footer.innerHTML = DONUT
+  var MONSTER = here === "/1-rep-max-calculator/";        // 1RM page: me sitting on the text sipping a white Monster
+  footer.innerHTML = MONSTER
+    ? '<div class="by-wrap mo-wrap"><div class="mo" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
+    : DONUT
     ? '<div class="by-wrap dn-wrap"><div class="dn" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
     : SHAKE
     ? '<div class="by-wrap sp-wrap"><div class="sp" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
@@ -191,7 +194,46 @@
     } else step();
   })();
 
-  if (!TREADMILL && !SHAKE && !DONUT) (function () {
+  // 1RM page: pixel me sitting on the right end of "Built by Tony", legs hanging off past the end of
+  // the word, sipping a white Monster. His body stays still; only the can and his arm move (resting on
+  // his leg, half way up, at his mouth), with a blink now and then and a content eyes-closed "ahh".
+  if (MONSTER) (function () {
+    var mo = footer.querySelector(".mo"), wrap = footer.querySelector(".by-wrap"), name = footer.querySelector(".by-name");
+    var REST = 0, BLINK = 1, MID = 2, UP = 3, SIP = 4, AHH = 5;
+    function frame(n) { mo.style.backgroundPosition = (n * 100 / 5) + "% 0"; }
+    function place() {
+      var mark = document.createElement("span");
+      mark.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
+      name.insertBefore(mark, name.firstChild);
+      var w = wrap.getBoundingClientRect(), base = mark.getBoundingClientRect().top - w.top;
+      name.removeChild(mark);
+      var cs = getComputedStyle(name), c = document.createElement("canvas").getContext("2d");
+      c.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+      var top = base - c.measureText("B").actualBoundingBoxAscent;
+      // each sprite pixel = a whole number of screen pixels (5 on most phones, 3 on most laptops)
+      var dpr = window.devicePixelRatio || 1, sc = Math.max(1, Math.round(dpr * 1.6)) / dpr;
+      var snap = function (v) { return Math.round(v * dpr) / dpr; };
+      mo.style.width = 21 * sc + "px"; mo.style.height = 38 * sc + "px";
+      var nr = name.getBoundingClientRect();
+      mo.style.top = snap(top - 30 * sc) + "px";                       // his seat (sprite row 30) on the letter tops
+      mo.style.left = snap(nr.right - w.left - 8 * sc + sc) + "px";      // legs (from sprite column 8) just past the word
+    }
+    place();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+    window.addEventListener("resize", place);
+    frame(REST);
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var SEQ = [[MID, 180], [UP, 450], [SIP, 1000], [UP, 250], [MID, 180], [AHH, 800], [REST, 1300], [BLINK, 140],
+      [REST, 1500], [MID, 180], [UP, 450], [SIP, 800], [UP, 250], [MID, 180], [REST, 1800], [BLINK, 140], [REST, 900]];
+    var k = 0;
+    function step() { var s = SEQ[k]; frame(s[0]); k = (k + 1) % SEQ.length; setTimeout(step, s[1]); }
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(step, 300); } }, { threshold: 0.6 });
+      io.observe(mo);
+    } else step();
+  })();
+
+  if (!TREADMILL && !SHAKE && !DONUT && !MONSTER) (function () {
     var clip = footer.querySelector(".peek-clip"), peek = footer.querySelector(".peek");
     var wrap = footer.querySelector(".by-wrap"), shadow = footer.querySelector(".peek-shadow");
     var hole = footer.querySelector(".peek-hole");
