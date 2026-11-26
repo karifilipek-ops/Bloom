@@ -59,12 +59,12 @@
   var DEADLIFT = here === "/1-rep-max-calculator/";       // 1RM page: me pulling a 1 rep max deadlift
   var RANKUP = here === "/strength-standards-calculator/"; // strength standards: me ranking up on a strength meter
   var CREATINE = here === "/creatine-calculator/";        // creatine page: me taking creatine and hulking out
-  var STATUE = here === "/muscle-gain-potential-calculator/"; // muscle gain page: me carving a statue of my future self
+  var MONSTER = here === "/muscle-gain-potential-calculator/"; // muscle gain page: me sitting on the text sipping a white Monster
   var VO2 = here === "/vo2-max-calculator/";              // VO2 max page: me doing a VO2 max test on a treadmill
   footer.innerHTML = VO2
     ? '<div class="by-wrap vo-wrap"><div class="vo" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
-    : STATUE
-    ? '<div class="by-wrap st-wrap"><div class="st" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
+    : MONSTER
+    ? '<div class="by-wrap mo-wrap"><div class="mo" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
     : CREATINE
     ? '<div class="by-wrap cr-wrap"><div class="cr-props" aria-hidden="true"></div><div class="cr" aria-hidden="true"></div><p class="by"><span class="by-name">Built by Tony</span><a class="by-ig" href="https://www.instagram.com/trainbloom" target="_blank" rel="noopener"><span class="by-ig-text">@trainbloom</span><span class="by-arrow" aria-hidden="true">↗</span></a></p></div>'
     : RANKUP
@@ -206,39 +206,43 @@
     } else step();
   })();
 
-  // Muscle gain page: pixel me beside the text with a block of stone. Once he's on screen he walks up
-  // and chisels away at it: the corner, the head, the arms, the legs, the face, the abs, until it's a
-  // statue of a jacked version of him. He puts his tools down, steps back, looks up at it and grins.
-  // Then it starts again from a fresh block.
-  if (STATUE) (function () {
-    var st = footer.querySelector(".st"), wrap = footer.querySelector(".by-wrap"), ig = footer.querySelector(".by-ig-text");
-    var dpr = window.devicePixelRatio || 1, sc = 1.3;           // CSS px per sprite pixel
-    var W = 69 * sc, H = 40 * sc, snap = function (v) { return Math.round(v * dpr) / dpr; };
-    st.style.width = W + "px"; st.style.height = H + "px";
-    wrap.style.paddingRight = Math.ceil(W + 10) + "px";
-    function frame(n) { st.style.backgroundPosition = ((n - 1) * 100 / 23) + "% 0"; }
-    function place() {                                   // the floor of the scene on the baseline of "@trainbloom"
+
+  // Muscle gain page: pixel me sitting on the right end of "Built by Tony", legs hanging off past the end of
+  // the word, sipping a white Monster. His body stays still; only the can and his arm move (resting on
+  // his leg, half way up, at his mouth), with a blink now and then and a content eyes-closed "ahh".
+  if (MONSTER) (function () {
+    var mo = footer.querySelector(".mo"), wrap = footer.querySelector(".by-wrap"), name = footer.querySelector(".by-name");
+    var REST = 0, BLINK = 1, MID = 2, UP = 3, SIP = 4, AHH = 5;
+    function frame(n) { mo.style.backgroundPosition = (n * 100 / 5) + "% 0"; }
+    function place() {
       var mark = document.createElement("span");
       mark.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
-      ig.insertBefore(mark, ig.firstChild);
-      var base = mark.getBoundingClientRect().top - wrap.getBoundingClientRect().top;
-      ig.removeChild(mark);
-      st.style.top = snap(base - H) + "px";
+      name.insertBefore(mark, name.firstChild);
+      var w = wrap.getBoundingClientRect(), base = mark.getBoundingClientRect().top - w.top;
+      name.removeChild(mark);
+      var cs = getComputedStyle(name), c = document.createElement("canvas").getContext("2d");
+      c.font = cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+      var top = base - c.measureText("B").actualBoundingBoxAscent;
+      // 1.35 CSS px per sprite pixel, snapped to whole screen pixels where it can be
+      var dpr = window.devicePixelRatio || 1, sc = 1.35;
+      var snap = function (v) { return Math.round(v * dpr) / dpr; };
+      mo.style.width = 23 * sc + "px"; mo.style.height = 38 * sc + "px";
+      var nr = name.getBoundingClientRect();
+      mo.style.top = snap(top - 30 * sc) + "px";                       // his seat (sprite row 30) on the letter tops
+      mo.style.left = snap(nr.right - w.left - 8 * sc + sc) + "px";      // legs (from sprite column 8) just past the word
     }
     place();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
     window.addEventListener("resize", place);
-    frame(1);
-    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { frame(24); return; }
-    var SEQ = [[1, 500], [2, 500], [3, 320], [4, 300], [5, 300], [6, 320],             // walks up, first chips
-      [7, 300], [8, 320], [9, 280], [10, 300], [11, 320], [12, 280], [13, 300],          // head, shoulders, arms
-      [14, 320], [15, 280], [16, 320], [17, 450], [18, 320], [19, 450],                 // legs, face, abs
-      [20, 550], [21, 400], [22, 400], [23, 900], [24, 1800]];                          // tools down, steps back, admires it
+    frame(REST);
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var SEQ = [[MID, 180], [UP, 450], [SIP, 1000], [UP, 250], [MID, 180], [AHH, 800], [REST, 1300], [BLINK, 140],
+      [REST, 1500], [MID, 180], [UP, 450], [SIP, 800], [UP, 250], [MID, 180], [REST, 1800], [BLINK, 140], [REST, 900]];
     var k = 0;
     function step() { var s = SEQ[k]; frame(s[0]); k = (k + 1) % SEQ.length; setTimeout(step, s[1]); }
     if ("IntersectionObserver" in window) {
       var io = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { io.disconnect(); setTimeout(step, 300); } }, { threshold: 0.6 });
-      io.observe(st);
+      io.observe(mo);
     } else step();
   })();
 
@@ -430,7 +434,7 @@
     } else step();
   })();
 
-  if (!TREADMILL && !SHAKE && !DONUT && !DEADLIFT && !VO2 && !RANKUP && !CREATINE && !STATUE) (function () {
+  if (!TREADMILL && !SHAKE && !DONUT && !DEADLIFT && !VO2 && !RANKUP && !CREATINE && !MONSTER) (function () {
     var clip = footer.querySelector(".peek-clip"), peek = footer.querySelector(".peek");
     var wrap = footer.querySelector(".by-wrap"), shadow = footer.querySelector(".peek-shadow");
     var hole = footer.querySelector(".peek-hole");
