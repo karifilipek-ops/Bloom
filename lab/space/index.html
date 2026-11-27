@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>bodymath.io | lab: space</title>
+  <!-- Test page only: not linked from the site, kept out of search. -->
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#100814">
+  <link rel="icon" href="/assets/img/favicon-32.png?v=2" sizes="32x32">
+  <link rel="preload" href="/assets/fonts/departure-mono-400.woff2" as="font" type="font/woff2" crossorigin>
+  <style>
+    /* Departure Mono by Helena Zhang, SIL OFL 1.1 (see /assets/fonts/departure-mono-OFL.txt) */
+    @font-face {
+      font-family: "Departure Mono";
+      src: url(/assets/fonts/departure-mono-400.woff2) format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    :root {
+      --bg: #100814;
+      --text: #eee8f6;
+      --muted: #8f84a8;
+      --dim: #6c6185;
+      --panel: #1a1027;
+      --panel-edge: #2e2043;
+      --panel-lip: #0a050e;
+      --track: #110a1a;
+      --tab: #2c1f41;
+      --tab-lip: #0b0611;
+      --tile: #241838;
+      --tile-edge: #33254b;
+      --tile-lip: #0e0816;
+      --accent: #b9abf1;
+      --accent-edge: #cfc4ff;
+      --accent-lip: #6e5eae;
+      --accent-ink: #170d26;
+      /* Departure Mono is drawn on an 11px grid; these sizes land on whole device pixels on 3x phones */
+      --fs-s: 11px;
+      --fs-m: 14.667px;
+      --fs-l: 18.333px;
+      --fs-xl: 29.333px;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--bg); -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Departure Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+      font-size: var(--fs-m);
+      line-height: 1.4;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html.loading body { opacity: 0; }
+    body { transition: opacity .35s ease; }
+
+    #sky {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100lvh;
+      display: block;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: max(52px, env(safe-area-inset-top)) 16px 64px;
+    }
+
+    .brand { text-align: center; }
+    .brand h1 {
+      margin: 0;
+      font-size: var(--fs-xl);
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand h1 svg { flex: none; display: block; }
+    .brand .io { color: var(--muted); }
+    .brand p {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: var(--fs-m);
+    }
+
+    .panel {
+      margin-top: 52px;
+      background: var(--panel);
+      border: 1px solid var(--panel-edge);
+      border-radius: 18px;
+      padding: 20px 16px 16px;
+      box-shadow: 0 5px 0 var(--panel-lip);
+    }
+    .ph {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+    }
+    .ph h2 {
+      margin: 0;
+      font-size: var(--fs-l);
+      font-weight: 400;
+      line-height: 1.2;
+    }
+    .sq {
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
+      box-shadow: 3px 3px 0 var(--accent-lip);
+      margin: -6px 3px 0 0;
+      flex: none;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin: 16px 0 14px;
+      padding: 4px;
+      background: var(--track);
+      border-radius: 12px;
+    }
+    .tab {
+      flex: 1 1 0;
+      appearance: none;
+      border: 0;
+      margin: 0;
+      padding: 10px 4px 9px;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: var(--fs-m);
+      line-height: 1.2;
+      cursor: pointer;
+      transition: color .15s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab[aria-selected="true"] {
+      background: var(--tab);
+      color: var(--text);
+      box-shadow: 0 3px 0 var(--tab-lip);
+    }
+    .tab:focus-visible, .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .tiles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding-bottom: 4px;
+    }
+    .tile {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      min-height: 78px;
+      padding: 34px 14px 13px;
+      border-radius: 12px;
+      background: var(--tile);
+      border: 1px solid var(--tile-edge);
+      box-shadow: 0 4px 0 var(--tile-lip);
+      color: var(--text);
+      text-decoration: none;
+      font-size: var(--fs-m);
+      line-height: 1.35;
+      transition: transform .08s ease, box-shadow .08s ease, border-color .15s;
+    }
+    .tile .ar { position: absolute; top: 13px; left: 13px; color: var(--dim); display: block; }
+    .tile .ic { position: absolute; top: 11px; right: 12px; color: var(--muted); display: block; }
+    .tile:hover { border-color: #4a3a66; }
+    .tile:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--tile-lip); }
+    .tile.hot {
+      background: var(--accent);
+      border-color: var(--accent-edge);
+      box-shadow: 0 4px 0 var(--accent-lip);
+      color: var(--accent-ink);
+    }
+    .tile.hot .ar, .tile.hot .ic { color: var(--accent-ink); }
+    .tile.hot:active { box-shadow: 0 1px 0 var(--accent-lip); }
+    .tile[hidden] { display: none; }
+
+    .foot {
+      margin: 18px 0 2px;
+      text-align: center;
+      color: var(--dim);
+      font-size: var(--fs-s);
+      line-height: 1;
+    }
+    .foot i {
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      margin: 0 8px;
+      vertical-align: 2px;
+      background: var(--dim);
+    }
+  </style>
+  <script>/* fade in once the pixel font is ready (max 1.5s) */
+  (function(h){h.classList.add("loading");var done=function(){h.classList.remove("loading")};setTimeout(done,1500);if(document.fonts&&document.fonts.load){document.fonts.load('14.667px "Departure Mono"').then(done,done)}})(document.documentElement);</script>
+</head>
+<body>
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <main>
+    <header class="brand">
+      <h1><svg width="21" height="21" viewBox="0 0 7 7" shape-rendering="crispEdges" aria-hidden="true"><path fill="#6e5eae" d="M3 0h1v1h-1zM0 3h1v1h-1zM6 3h1v1h-1zM3 6h1v1h-1z"/><path fill="#b9abf1" d="M3 1h1v1h-1zM2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM1 3h1v1h-1zM2 3h1v1h-1zM4 3h1v1h-1zM5 3h1v1h-1zM2 4h1v1h-1zM3 4h1v1h-1zM4 4h1v1h-1zM3 5h1v1h-1z"/><path fill="#ffffff" d="M3 3h1v1h-1z"/></svg><span data-clear>bodymath<span class="io">.io</span></span></h1>
+      <p><span data-clear>the math your body runs on.</span></p>
+    </header>
+
+    <section class="panel" aria-labelledby="pick">
+      <div class="ph">
+        <h2 id="pick">choose a calculator</h2>
+        <span class="sq" aria-hidden="true"></span>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Filter calculators">
+        <button class="tab" role="tab" aria-selected="true" data-f="all">all tools</button>
+        <button class="tab" role="tab" aria-selected="false" data-f="nutrition">nutrition</button>
+        <button class="tab" role="tab" aria-selected="false" data-f="training">training</button>
+      </div>
+
+      <nav class="tiles" aria-label="Calculators">
+        <a class="tile hot" data-c="nutrition" href="/calorie-calculator-tdee/"><svg class="ar" width="10" height="10" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h-3zM3 1h2v1h-2zM2 2h1v1h-1zM4 2h1v1h-1zM1 3h1v1h-1zM0 4h1v1h-1z"/></svg><svg class="ic" width="24" height="24" viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M4 0h1v1h-1zM4 1h2v1h-2zM3 2h3v1h-3zM8 2h1v1h-1zM3 3h4v1h-4zM8 3h2v1h-2zM2 4h8v1h-8zM2 5h9v1h-9zM1 6h4v1h-4zM6 6h5v1h-5zM1 7h3v1h-3zM7 7h4v1h-4zM1 8h3v1h-3zM7 8h4v1h-4zM1 9h4v1h-4zM6 9h4v1h-4zM2 10h8v1h-8zM3 11h6v1h-6z"/></svg>TDEE /<br>Calories</a>
+        <a class="tile" data-c="nutrition" href="/protein-calculator-1/"><svg class="ar" width="10" height="10" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h-3zM3 1h2v1h-2zM2 2h1v1h-1zM4 2h1v1h-1zM1 3h1v1h-1zM0 4h1v1h-1z"/></svg><svg class="ic" width="24" height="24" viewBox="0 0 12 12" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M4 0h4v1h-4zM3 1h2v1h-2zM7 1h2v1h-2zM2 2h8v1h-8zM2 3h8v1h-8zM2 5h8v1h-8zM2 6h8v1h-8zM2 7h1v1h-1zM9 7h1v1h-1zM2 8h8v1h-8zM3 9h6v1h-6zM3 10h6v1h-6zM3 11h6v1h-6z"/></svg>Protein</a>
+        <a class="tile" data-c="training" href="/1-rep-max-calculator/"><svg class="ar" width="10" height="10" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h-3zM3 1h2v1h-2zM2 2h1v1h-1zM4 2h1v1h-1zM1 3h1v1h-1zM0 4h1v1h-1z"/></svg><svg class="ic" width="26" height="14" viewBox="0 0 13 7" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 0h2v1h-2zM10 0h2v1h-2zM0 1h3v1h-3zM10 1h3v1h-3zM0 2h3v1h-3zM10 2h3v1h-3zM0 3h13v1h-13zM0 4h3v1h-3zM10 4h3v1h-3zM0 5h3v1h-3zM10 5h3v1h-3zM1 6h2v1h-2zM10 6h2v1h-2z"/></svg>1-Rep Max</a>
+        <a class="tile" data-c="training" href="/vo2-max-calculator/"><svg class="ar" width="10" height="10" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h-3zM3 1h2v1h-2zM2 2h1v1h-1zM4 2h1v1h-1zM1 3h1v1h-1zM0 4h1v1h-1z"/></svg><svg class="ic" width="24" height="16" viewBox="0 0 12 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M4 0h4v1h-4zM2 1h2v1h-2zM8 1h2v1h-2zM1 2h1v1h-1zM9 2h2v1h-2zM1 3h1v1h-1zM8 3h1v1h-1zM10 3h1v1h-1zM0 4h1v1h-1zM7 4h1v1h-1zM11 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM11 5h1v1h-1zM0 6h1v1h-1zM5 6h2v1h-2zM11 6h1v1h-1zM0 7h1v1h-1zM5 7h2v1h-2zM11 7h1v1h-1z"/></svg>VO2 Max</a>
+        <a class="tile" data-c="training" href="/strength-standards-calculator/"><svg class="ar" width="10" height="10" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h-3zM3 1h2v1h-2zM2 2h1v1h-1zM4 2h1v1h-1zM1 3h1v1h-1zM0 4h1v1h-1z"/></svg><svg class="ic" width="22" height="20" viewBox="0 0 11 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M9 0h2v1h-2zM9 1h2v1h-2zM9 2h2v1h-2zM5 3h2v1h-2zM9 3h2v1h-2zM5 4h2v1h-2zM9 4h2v1h-2zM5 5h2v1h-2zM9 5h2v1h-2zM1 6h2v1h-2zM5 6h2v1h-2zM9 6h2v1h-2zM1 7h2v1h-2zM5 7h2v1h-2zM9 7h2v1h-2zM1 8h2v1h-2zM5 8h2v1h-2zM9 8h2v1h-2zM0 9h11v1h-11z"/></svg>Strength<br>Standards</a>
+        <a class="tile" data-c="training" href="/muscle-gain-potential-calculator/"><svg class="ar" width="10" height="10" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h-3zM3 1h2v1h-2zM2 2h1v1h-1zM4 2h1v1h-1zM1 3h1v1h-1zM0 4h1v1h-1z"/></svg><svg class="ic" width="28" height="22" viewBox="0 0 14 11" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h-3zM1 1h5v1h-5zM1 2h5v1h-5zM2 3h4v1h-4zM2 4h4v1h-4zM9 4h3v1h-3zM2 5h4v1h-4zM7 5h6v1h-6zM2 6h4v1h-4zM7 6h7v1h-7zM2 7h12v1h-12zM3 8h11v1h-11zM4 9h10v1h-10zM6 10h7v1h-7z"/></svg>Muscle<br>Potential</a>
+        <a class="tile" data-c="nutrition" href="/creatine-calculator/"><svg class="ar" width="10" height="10" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h-3zM3 1h2v1h-2zM2 2h1v1h-1zM4 2h1v1h-1zM1 3h1v1h-1zM0 4h1v1h-1z"/></svg><svg class="ic" width="24" height="20" viewBox="0 0 12 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h8v1h-8zM2 1h1v1h-1zM4 1h1v1h-1zM6 1h1v1h-1zM8 1h2v1h-2zM2 2h8v1h-8zM1 4h10v1h-10zM1 5h10v1h-10zM1 6h1v1h-1zM10 6h1v1h-1zM1 7h1v1h-1zM10 7h1v1h-1zM1 8h10v1h-10zM1 9h10v1h-10z"/></svg>Creatine</a>
+        <a class="tile" data-c="nutrition" href="/how-long-should-i-diet-calculator/"><svg class="ar" width="10" height="10" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h3v1h-3zM3 1h2v1h-2zM2 2h1v1h-1zM4 2h1v1h-1zM1 3h1v1h-1zM0 4h1v1h-1z"/></svg><svg class="ic" width="22" height="18" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 0h1v1h-1zM8 0h1v1h-1zM0 1h11v1h-11zM0 2h11v1h-11zM0 3h1v1h-1zM10 3h1v1h-1zM0 4h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM10 4h1v1h-1zM0 5h1v1h-1zM10 5h1v1h-1zM0 6h1v1h-1zM2 6h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM0 7h1v1h-1zM10 7h1v1h-1zM0 8h11v1h-11z"/></svg>Diet Duration</a>
+      </nav>
+
+      <p class="foot">always free<i></i>no sign-up</p>
+    </section>
+  </main>
+
+  <script>
+  // Tabs: filter the tiles.
+  (function () {
+    var tabs = document.querySelectorAll(".tab");
+    var tiles = document.querySelectorAll(".tile");
+    tabs.forEach(function (t) {
+      t.addEventListener("click", function () {
+        var f = t.getAttribute("data-f");
+        tabs.forEach(function (o) { o.setAttribute("aria-selected", o === t ? "true" : "false"); });
+        tiles.forEach(function (el) { el.hidden = f !== "all" && el.getAttribute("data-c") !== f; });
+      });
+    });
+  })();
+
+  // Pixel starfield. Every star sits on a 2px art grid; stars twinkle by stepping
+  // between a few fixed brightness levels (no smooth glow), a few "+" sparkles
+  // grow and shrink their arms, and three depth layers drift at different speeds
+  // when you scroll, so the sky reads as one continuous place behind the page.
+  (function () {
+    var cv = document.getElementById("sky");
+    var cx = cv.getContext("2d", { alpha: false });
+    var P = 2;                     // CSS px per art pixel
+    var TW = 1100, TH = 900;       // the star field repeats every TW x TH art pixels (2200 x 1800 CSS px)
+    var BG = [16, 8, 20];
+    var GRID = [12, 6, 15];
+    var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    var seed = 1127;
+    function rnd() {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    }
+    function mix(c, k) { // blend colour c toward the background, k = 1 full colour
+      return "rgb(" + Math.round(BG[0] + (c[0] - BG[0]) * k) + "," + Math.round(BG[1] + (c[1] - BG[1]) * k) + "," + Math.round(BG[2] + (c[2] - BG[2]) * k) + ")";
+    }
+    function shades(c) { return [mix(c, 1), mix(c, .62), mix(c, .34), mix(c, .16)]; }
+
+    // star colours sampled from the reference: white, pale pink, pale yellow, ice blue, blue grey, dusty mauve, grey
+    var BRIGHT = [[244, 241, 248], [236, 172, 198], [247, 228, 170], [150, 186, 236]];
+    var DIM = [[110, 130, 168], [124, 88, 116], [100, 94, 118], [80, 70, 98]];
+    var B = BRIGHT.map(shades), D = DIM.map(shades);
+    function pick(arr, w) { var r = rnd() * w.reduce(function (a, b) { return a + b; }), i = 0; while ((r -= w[i]) > 0) i++; return arr[i]; }
+
+    // three layers: far (many dim stars, barely move), mid, near (brighter, sparkles)
+    var LAYERS = [
+      { speed: .08, n: 1500, bright: .14 },
+      { speed: .2,  n: 850,  bright: .45 },
+      { speed: .38, n: 420,  bright: .8  }
+    ];
+    LAYERS.forEach(function (L) {
+      L.stars = [];
+      for (var i = 0; i < L.n; i++) {
+        var br = rnd() < L.bright;
+        var s = {
+          x: Math.floor(rnd() * TW),
+          y: Math.floor(rnd() * TH),
+          c: br ? pick(B, [5, 2, 2, 3]) : pick(D, [3, 2, 3, 3]),
+          tw: rnd() < (br ? .55 : .3) ? 2400 + rnd() * 5200 : 0,
+          ph: rnd() * 8000,
+          base: br ? 0 : (rnd() < .5 ? 1 : 0)
+        };
+        if (br && rnd() < .1) s.d = pick(B, [2, 3, 1, 2]); // a few side-by-side double stars
+        L.stars.push(s);
+      }
+      L.sparks = [];
+    });
+    // plus-shaped sparkles live on the mid and near layers
+    var SPARK = [[255, 247, 226], [214, 228, 255], [255, 222, 236]];
+    [1, 2].forEach(function (li) {
+      for (var i = 0; i < (li === 1 ? 22 : 16); i++) {
+        var col = SPARK[Math.floor(rnd() * SPARK.length)];
+        LAYERS[li].sparks.push({
+          x: 3 + Math.floor(rnd() * (TW - 6)),
+          y: 3 + Math.floor(rnd() * (TH - 6)),
+          s: shades(col),
+          per: 3200 + rnd() * 4200,
+          ph: rnd() * 7000,
+          big: li === 2 && rnd() < .6
+        });
+      }
+    });
+
+    // brightness level for a twinkling star: mostly full, with a short stepped dip
+    function level(s, t) {
+      if (!s.tw || still) return s.base;
+      var u = ((t + s.ph) % s.tw) / s.tw;
+      if (u < .05) return Math.min(3, s.base + 1);
+      if (u < .11) return Math.min(3, s.base + 2);
+      if (u < .16) return Math.min(3, s.base + 1);
+      return s.base;
+    }
+    // arm length + centre shade for a sparkle over its cycle
+    var ARM = [1, 2, 2, 2, 1];
+    function sparkState(k, t) {
+      if (still) return [1, 0];
+      var u = ((t + k.ph) % k.per) / k.per;
+      if (u < .25) { var a = ARM[Math.floor(u / .05)]; return [k.big ? a : Math.min(a, 1), 0]; }
+      return [k.big ? 1 : 0, u > .6 ? 1 : 0];
+    }
+
+    var W = 0, H = 0, dpr = 1, cols = 0, rows = 0, cell = 2, gridPat = null;
+    function size() {
+      dpr = Math.min(window.devicePixelRatio || 1, 3);
+      var w = cv.clientWidth, h = cv.clientHeight;
+      var nw = Math.round(w * dpr), nh = Math.round(h * dpr);
+      if (nw === W && nh === H) return false;
+      W = cv.width = nw; H = cv.height = nh;
+      cell = P * dpr;
+      cols = Math.ceil(w / P) + 1; rows = Math.ceil(h / P) + 1;
+      // faint pixel grid like the reference (only where a cell is at least 4 device px)
+      gridPat = null;
+      var c = Math.round(cell);
+      if (c >= 4 && Math.abs(c - cell) < .01) {
+        var g = document.createElement("canvas"); g.width = g.height = c;
+        var gx = g.getContext("2d");
+        gx.fillStyle = "rgb(" + BG + ")"; gx.fillRect(0, 0, c, c);
+        gx.fillStyle = "rgb(" + GRID + ")"; gx.fillRect(c - 1, 0, 1, c); gx.fillRect(0, c - 1, c, 1);
+        gridPat = cx.createPattern(g, "repeat");
+      }
+      return true;
+    }
+    function px(x, y) { // art pixel -> device rect, snapped so neighbours never gap or overlap
+      var x0 = Math.round(x * cell), y0 = Math.round(y * cell);
+      cx.fillRect(x0, y0, Math.round((x + 1) * cell) - x0, Math.round((y + 1) * cell) - y0);
+    }
+    function mod(a, n) { return ((a % n) + n) % n; }
+
+    // keep stars out from behind the title + tagline so none lands on a letter or reads as punctuation
+    var clears = [], holes = [], dirty = true;
+    function measure() {
+      var sy = window.scrollY || 0;
+      clears = [].map.call(document.querySelectorAll("[data-clear]"), function (el) {
+        var r = el.getBoundingClientRect();
+        return [r.left, r.top + sy, r.right, r.bottom + sy];
+      });
+      dirty = true;
+    }
+    function blocked(x, y) {
+      for (var i = 0; i < holes.length; i++) {
+        var h = holes[i];
+        if (x >= h[0] && x <= h[2] && y >= h[1] && y <= h[3]) return true;
+      }
+      return false;
+    }
+
+    function draw(t) {
+      cx.fillStyle = gridPat || "rgb(" + BG + ")";
+      cx.fillRect(0, 0, W, H);
+      var sy = window.scrollY || 0;
+      holes = clears.map(function (c) {
+        return [Math.floor(c[0] / P) - 2, Math.floor((c[1] - sy) / P) - 1, Math.ceil(c[2] / P) + 1, Math.ceil((c[3] - sy) / P)];
+      });
+      for (var li = 0; li < LAYERS.length; li++) {
+        var L = LAYERS[li];
+        var oy = Math.round(sy * L.speed / P);
+        var i, s, x, y, k;
+        for (i = 0; i < L.stars.length; i++) {
+          s = L.stars[i];
+          var lv = -1;
+          for (x = s.x, k = 0; x < cols; x += TW, k++) {
+            y = mod(s.y - oy + k * 377, TH);   // copies past 2200px wide shift down so they never line up
+            if (y >= rows || blocked(x, y)) continue;
+            if (lv < 0) lv = level(s, t);
+            cx.fillStyle = s.c[lv]; px(x, y);
+            if (s.d) { cx.fillStyle = s.d[Math.min(3, lv + 1)]; px(x + 1, y); }
+          }
+        }
+        for (i = 0; i < L.sparks.length; i++) {
+          k = L.sparks[i];
+          y = mod(k.y - oy, TH);
+          if (y >= rows + 3) continue;
+          var st = sparkState(k, t), arm = st[0];
+          for (x = k.x; x < cols + 3; x += TW) {
+            if (blocked(x - 2, y) || blocked(x + 2, y) || blocked(x, y - 2) || blocked(x, y + 2)) continue;
+            if (arm >= 1) {
+              cx.fillStyle = k.s[arm >= 2 ? 1 : 2];
+              px(x - 1, y); px(x + 1, y); px(x, y - 1); px(x, y + 1);
+            }
+            if (arm >= 2) {
+              cx.fillStyle = k.s[3];
+              px(x - 2, y); px(x + 2, y); px(x, y - 2); px(x, y + 2);
+            }
+            cx.fillStyle = k.s[st[1]]; px(x, y);
+          }
+        }
+      }
+    }
+
+    var lastStep = -1, lastY = -1;
+    function frame(now) {
+      var step = still ? 0 : Math.floor(now / 110);   // twinkles move in ~9 steps a second, like sprite frames
+      var y = window.scrollY || 0;
+      if (dirty || step !== lastStep || y !== lastY) {
+        lastStep = step; lastY = y; dirty = false;
+        draw(step * 110);
+      }
+      requestAnimationFrame(frame);
+    }
+    size();
+    measure();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+    window.addEventListener("load", measure);
+    window.addEventListener("resize", function () { size(); measure(); });
+    requestAnimationFrame(frame);
+  })();
+  </script>
+</body>
+</html>
