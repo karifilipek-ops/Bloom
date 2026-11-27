@@ -8,39 +8,41 @@
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" content="#100814">
   <link rel="icon" href="/assets/img/favicon-32.png?v=2" sizes="32x32">
-  <link rel="preload" href="/assets/fonts/departure-mono-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/vt323-400.woff2" as="font" type="font/woff2" crossorigin>
   <style>
-    /* Departure Mono by Helena Zhang, SIL OFL 1.1 (see /assets/fonts/departure-mono-OFL.txt) */
     @font-face {
-      font-family: "Departure Mono";
-      src: url(/assets/fonts/departure-mono-400.woff2) format("woff2");
+      font-family: "VT323";
+      src: url(/assets/fonts/vt323-400.woff2) format("woff2");
       font-weight: 400;
       font-style: normal;
       font-display: block;
     }
     :root {
-      --bg: #100814;
-      --text: #eee8f6;
-      --muted: #8f84a8;
-      --dim: #6c6185;
-      --panel: #1a1027;
-      --panel-edge: #2e2043;
-      --panel-lip: #0a050e;
-      --track: #110a1a;
-      --tab: #2c1f41;
-      --tab-lip: #0b0611;
-      --tile: #241838;
-      --tile-edge: #33254b;
-      --tile-lip: #0e0816;
-      --accent: #b9abf1;
-      --accent-edge: #cfc4ff;
-      --accent-lip: #6e5eae;
-      --accent-ink: #170d26;
-      /* Departure Mono is drawn on an 11px grid; these sizes land on whole device pixels on 3x phones */
-      --fs-s: 11px;
-      --fs-m: 14.667px;
-      --fs-l: 18.333px;
-      --fs-xl: 29.333px;
+      --bg: #100814;            /* the sky */
+      --text: #f4f4f5;
+      --muted: #9a9b9f;
+      --dim: #77787c;
+      --panel: #17191a;         /* neutral greys for the menu, so it isn't purple on purple */
+      --panel-edge: #434547;
+      --panel-lip: #050709;
+      --track: #0e1011;
+      --tab: #34363a;
+      --tab-lip: #0a0b0c;
+      --tile: #27292d;
+      --tile-edge: #37393d;
+      --tile-hover: #4b4d52;
+      --tile-lip: #0c0c0c;
+      --arrow: #818183;
+      --icon: #c2c2c4;
+      --accent: #b9a9ee;
+      --accent-edge: #cdbffa;
+      --accent-lip: #8d76bd;
+      --accent-ink: #0d0614;
+      /* VT323 is drawn on a 25-per-em pixel grid: 25px and 50px land on whole device pixels on 2x and 3x screens */
+      --fs-s: 20px;
+      --fs-m: 25px;
+      --fs-l: 33.333px;
+      --fs-xl: 50px;
     }
     * { box-sizing: border-box; }
     html { background: var(--bg); -webkit-text-size-adjust: 100%; }
@@ -49,9 +51,9 @@
       min-height: 100vh;
       background: var(--bg);
       color: var(--text);
-      font-family: "Departure Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+      font-family: "VT323", "Courier New", monospace;
       font-size: var(--fs-m);
-      line-height: 1.4;
+      line-height: 1.1;
       -webkit-tap-highlight-color: transparent;
     }
     html.loading body { opacity: 0; }
@@ -74,7 +76,7 @@
       z-index: 1;
       max-width: 480px;
       margin: 0 auto;
-      padding: max(52px, env(safe-area-inset-top)) 16px 64px;
+      padding: max(48px, env(safe-area-inset-top)) 14px 64px;
     }
 
     .brand { text-align: center; }
@@ -88,20 +90,21 @@
       align-items: center;
       gap: 12px;
     }
-    .brand h1 svg { flex: none; display: block; }
+    .brand h1 svg { flex: none; display: block; margin-top: -2px; }
     .brand .io { color: var(--muted); }
     .brand p {
-      margin: 14px 0 0;
+      margin: 10px 0 0;
       color: var(--muted);
       font-size: var(--fs-m);
+      line-height: 1;
     }
 
     .panel {
-      margin-top: 52px;
+      margin-top: 46px;
       background: var(--panel);
       border: 1px solid var(--panel-edge);
       border-radius: 18px;
-      padding: 20px 16px 16px;
+      padding: 18px 14px 14px;
       box-shadow: 0 5px 0 var(--panel-lip);
     }
     .ph {
@@ -114,14 +117,14 @@
       margin: 0;
       font-size: var(--fs-l);
       font-weight: 400;
-      line-height: 1.2;
+      line-height: 1;
     }
     .sq {
       width: 10px;
       height: 10px;
       background: var(--accent);
       box-shadow: 3px 3px 0 var(--accent-lip);
-      margin: -6px 3px 0 0;
+      margin: -4px 3px 0 0;
       flex: none;
     }
 
@@ -138,13 +141,14 @@
       appearance: none;
       border: 0;
       margin: 0;
-      padding: 10px 4px 9px;
+      padding: 8px 2px 7px;
       border-radius: 9px;
       background: transparent;
       color: var(--muted);
       font: inherit;
       font-size: var(--fs-m);
-      line-height: 1.2;
+      line-height: 1;
+      white-space: nowrap;
       cursor: pointer;
       transition: color .15s;
     }
@@ -159,7 +163,7 @@
     .tiles {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 10px;
       padding-bottom: 4px;
     }
     .tile {
@@ -167,8 +171,8 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      min-height: 78px;
-      padding: 34px 14px 13px;
+      min-height: 84px;
+      padding: 36px 12px 11px;
       border-radius: 12px;
       background: var(--tile);
       border: 1px solid var(--tile-edge);
@@ -176,12 +180,12 @@
       color: var(--text);
       text-decoration: none;
       font-size: var(--fs-m);
-      line-height: 1.35;
+      line-height: 1;
       transition: transform .08s ease, box-shadow .08s ease, border-color .15s;
     }
-    .tile .ar { position: absolute; top: 13px; left: 13px; color: var(--dim); display: block; }
-    .tile .ic { position: absolute; top: 11px; right: 12px; color: var(--muted); display: block; }
-    .tile:hover { border-color: #4a3a66; }
+    .tile .ar { position: absolute; top: 13px; left: 12px; color: var(--arrow); display: block; }
+    .tile .ic { position: absolute; top: 11px; right: 11px; color: var(--icon); display: block; }
+    .tile:hover { border-color: var(--tile-hover); }
     .tile:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--tile-lip); }
     .tile.hot {
       background: var(--accent);
@@ -194,7 +198,7 @@
     .tile[hidden] { display: none; }
 
     .foot {
-      margin: 18px 0 2px;
+      margin: 16px 0 0;
       text-align: center;
       color: var(--dim);
       font-size: var(--fs-s);
@@ -205,12 +209,12 @@
       width: 4px;
       height: 4px;
       margin: 0 8px;
-      vertical-align: 2px;
+      vertical-align: 3px;
       background: var(--dim);
     }
   </style>
   <script>/* fade in once the pixel font is ready (max 1.5s) */
-  (function(h){h.classList.add("loading");var done=function(){h.classList.remove("loading")};setTimeout(done,1500);if(document.fonts&&document.fonts.load){document.fonts.load('14.667px "Departure Mono"').then(done,done)}})(document.documentElement);</script>
+  (function(h){h.classList.add("loading");var done=function(){h.classList.remove("loading")};setTimeout(done,1500);if(document.fonts&&document.fonts.load){document.fonts.load('25px "VT323"').then(done,done)}})(document.documentElement);</script>
 </head>
 <body>
   <canvas id="sky" aria-hidden="true"></canvas>
