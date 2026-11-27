@@ -9,7 +9,15 @@
   <meta name="theme-color" content="#100814">
   <link rel="icon" href="/assets/img/favicon-32.png?v=2" sizes="32x32">
   <link rel="preload" href="/assets/fonts/vt323-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/jersey10-400.woff2" as="font" type="font/woff2" crossorigin>
   <style>
+    @font-face {
+      font-family: "Jersey 10";
+      src: url(/assets/fonts/jersey10-400.woff2) format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
     @font-face {
       font-family: "VT323";
       src: url(/assets/fonts/vt323-400.woff2) format("woff2");
@@ -38,11 +46,11 @@
       --accent-edge: #cdbffa;
       --accent-lip: #8d76bd;
       --accent-ink: #0d0614;
-      /* VT323 is drawn on a 25-per-em pixel grid: 25px and 50px land on whole device pixels on 2x and 3x screens */
+      --fs-xs: 16.667px;
       --fs-s: 20px;
-      --fs-m: 25px;
-      --fs-l: 33.333px;
-      --fs-xl: 50px;
+      --fs-m: 22px;
+      --fs-l: 25px;
+      --fs-xl: 41.667px;
     }
     * { box-sizing: border-box; }
     html { background: var(--bg); -webkit-text-size-adjust: 100%; }
@@ -76,7 +84,7 @@
       z-index: 1;
       max-width: 480px;
       margin: 0 auto;
-      padding: max(48px, env(safe-area-inset-top)) 14px 64px;
+      padding: max(34px, env(safe-area-inset-top)) 24px 0;
     }
 
     .brand { text-align: center; }
@@ -93,18 +101,18 @@
     .brand h1 svg { flex: none; display: block; margin-top: -2px; }
     .brand .io { color: var(--muted); }
     .brand p {
-      margin: 10px 0 0;
+      margin: 14px 0 0;
       color: var(--muted);
-      font-size: var(--fs-m);
+      font-size: var(--fs-s);
       line-height: 1;
     }
 
     .panel {
-      margin-top: 46px;
+      margin-top: 44px;
       background: var(--panel);
       border: 1px solid var(--panel-edge);
       border-radius: 18px;
-      padding: 18px 14px 14px;
+      padding: 22px 18px 20px;
       box-shadow: 0 5px 0 var(--panel-lip);
     }
     .ph {
@@ -131,22 +139,22 @@
     .tabs {
       display: flex;
       gap: 4px;
-      margin: 16px 0 14px;
+      margin: 16px 0 16px;
       padding: 4px;
       background: var(--track);
-      border-radius: 12px;
+      border-radius: 11px;
     }
     .tab {
       flex: 1 1 0;
       appearance: none;
       border: 0;
       margin: 0;
-      padding: 8px 2px 7px;
-      border-radius: 9px;
+      padding: 7px 2px 6px;
+      border-radius: 8px;
       background: transparent;
       color: var(--muted);
       font: inherit;
-      font-size: var(--fs-m);
+      font-size: var(--fs-s);
       line-height: 1;
       white-space: nowrap;
       cursor: pointer;
@@ -171,8 +179,8 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      min-height: 84px;
-      padding: 36px 12px 11px;
+      min-height: 70px;
+      padding: 34px 11px 12px;
       border-radius: 12px;
       background: var(--tile);
       border: 1px solid var(--tile-edge);
@@ -183,7 +191,7 @@
       line-height: 1;
       transition: transform .08s ease, box-shadow .08s ease, border-color .15s;
     }
-    .tile .ar { position: absolute; top: 13px; left: 12px; color: var(--arrow); display: block; }
+    .tile .ar { position: absolute; top: 12px; left: 12px; color: var(--arrow); display: block; }
     .tile .ic { position: absolute; top: 11px; right: 11px; color: var(--icon); display: block; }
     .tile:hover { border-color: var(--tile-hover); }
     .tile:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--tile-lip); }
@@ -198,10 +206,10 @@
     .tile[hidden] { display: none; }
 
     .foot {
-      margin: 16px 0 0;
+      margin: 18px 0 0;
       text-align: center;
       color: var(--dim);
-      font-size: var(--fs-s);
+      font-size: var(--fs-xs);
       line-height: 1;
     }
     .foot i {
@@ -209,12 +217,33 @@
       width: 4px;
       height: 4px;
       margin: 0 8px;
-      vertical-align: 3px;
+      vertical-align: 2px;
       background: var(--dim);
     }
+
+    /* Shared footer with pixel me (built by /assets/js/layout.js). Same geometry as site.css, night colours. */
+    .site-footer { position: relative; z-index: 1; text-align: center; padding: 34px 16px 40px; }
+    .site-footer p { margin: 2px 0; }
+    .site-footer .by-wrap { position: relative; display: inline-block; padding-right: 50px; }
+    .site-footer .peek-clip { position: absolute; left: 0; right: -60px; bottom: calc(100% - 11px); height: 140px; overflow: hidden; pointer-events: none; }
+    .site-footer .peek-clip.free { overflow: visible; }
+    .site-footer .peek-hole { position: absolute; display: none; width: 44px; height: 14px; background: url(/assets/img/peek-hole.png) 0 0 / 300% 100% no-repeat; image-rendering: pixelated; }
+    .site-footer .peek { position: absolute; left: 0; bottom: -1px; width: 44px; height: 54px; opacity: 0; }
+    .site-footer .peek-guy { width: 44px; height: 54px; background: url(/assets/img/peek-me.png) 0 0 / 600% 100% no-repeat; image-rendering: pixelated; }
+    .site-footer .peek-guy.flip { transform: scaleX(-1); }
+    .site-footer .peek-shadow {
+      position: absolute; right: 12px; bottom: calc(100% - 25px); width: 24px; height: 3px; border-radius: 50%;
+      background: rgba(0, 0, 0, .55); transform: scaleX(0); transition: transform .2s ease-out;
+    }
+    .site-footer .peek-shadow.on { transform: scaleX(1); }
+    .site-footer .by { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; margin: 0; font-family: "Jersey 10", "VT323", monospace; line-height: 1.15; text-align: left; }
+    .site-footer .by-name { font-size: 22px; letter-spacing: .08em; color: var(--text); }
+    .site-footer .by-ig { font-size: 19px; letter-spacing: .08em; color: var(--accent); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+    .site-footer .by-ig:hover { color: var(--text); }
+    .site-footer .by-arrow { font-size: 15px; }
   </style>
   <script>/* fade in once the pixel font is ready (max 1.5s) */
-  (function(h){h.classList.add("loading");var done=function(){h.classList.remove("loading")};setTimeout(done,1500);if(document.fonts&&document.fonts.load){document.fonts.load('25px "VT323"').then(done,done)}})(document.documentElement);</script>
+  (function(h){h.classList.add("loading");var done=function(){h.classList.remove("loading")};setTimeout(done,1500);if(document.fonts&&document.fonts.load){Promise.all([document.fonts.load('22px "VT323"'),document.fonts.load('22px "Jersey 10"')]).then(done,done)}})(document.documentElement);</script>
 </head>
 <body>
   <canvas id="sky" aria-hidden="true"></canvas>
@@ -384,7 +413,7 @@
     var clears = [], holes = [], dirty = true;
     function measure() {
       var sy = window.scrollY || 0;
-      clears = [].map.call(document.querySelectorAll("[data-clear]"), function (el) {
+      clears = [].map.call(document.querySelectorAll("[data-clear], .site-footer .by-wrap"), function (el) {
         var r = el.getBoundingClientRect();
         return [r.left, r.top + sy, r.right, r.bottom + sy];
       });
@@ -459,5 +488,6 @@
     requestAnimationFrame(frame);
   })();
   </script>
+  <script src="/assets/js/layout.js"></script>
 </body>
 </html>

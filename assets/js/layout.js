@@ -16,7 +16,7 @@
 
   // Home page: no header bar (every calculator is linked right there on the page).
   // Calculator pages: just the "Calculators" menu, with a link back to the full list first.
-  var isHome = here === "/";
+  var isHome = here === "/" || here.indexOf("/lab/") === 0;   // /lab/ pages are test versions of the home page
   if (!isHome) {
     var items = '<li class="nav-home"><a href="/">All calculators</a></li>' + CALCULATORS.map(function (c) {
       var cur = c[0] === here ? ' aria-current="page"' : "";
